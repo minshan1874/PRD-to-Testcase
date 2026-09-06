@@ -1,0 +1,92 @@
+/* ============================================================
+   TestCase Generator — Dark Tech Theme
+   Indigo Neon · Glassmorphism · Tech Grid
+   ============================================================ */
+
+:root {
+  /* --- Brand Primary (Indigo Neon) --- */
+  --tc-primary: #6366F1;
+  --tc-primary-foreground: #FFFFFF;
+  --tc-primary-hover: #818CF8;
+  --tc-primary-active: #4F46E5;
+  --tc-primary-glow: rgba(99, 102, 241, 0.6);
+  --tc-primary-50: rgba(99, 102, 241, 0.1);
+  --tc-primary-100: rgba(99, 102, 241, 0.2);
+  --tc-primary-200: rgba(99, 102, 241, 0.35);
+
+  /* --- Background & Surfaces --- */
+  --tc-background: #0A0E1A;
+  --tc-background-2: #0F172A;
+  --tc-foreground: #E2E8F0;
+  --tc-card: rgba(15, 23, 42, 0.6);
+  --tc-card-2: rgba(30, 41, 59, 0.4);
+  --tc-card-foreground: #E2E8F0;
+  --tc-popover: rgba(15, 23, 42, 0.95);
+  --tc-popover-foreground: #E2E8F0;
+
+  /* --- Muted / Secondary Text --- */
+  --tc-muted: rgba(148, 163, 184, 0.1);
+  --tc-muted-foreground: #94A3B8;
+  --tc-foreground-secondary: #CBD5E1;
+  --tc-foreground-tertiary: #64748B;
+
+  /* --- Border & Input --- */
+  --tc-border: rgba(148, 163, 184, 0.15);
+  --tc-border-glow: rgba(99, 102, 241, 0.4);
+  --tc-input: rgba(15, 23, 42, 0.8);
+  --tc-ring: #6366F1;
+
+  /* --- Accent / Surface-2 --- */
+  --tc-accent: rgba(148, 163, 184, 0.08);
+  --tc-accent-foreground: #E2E8F0;
+  --tc-surface-2: rgba(30, 41, 59, 0.5);
+
+  /* --- State Colors --- */
+  --tc-success: #10B981;
+  --tc-success-foreground: #FFFFFF;
+  --tc-success-bg: rgba(16, 185, 129, 0.15);
+  --tc-warning: #F59E0B;
+  --tc-warning-foreground: #FFFFFF;
+  --tc-warning-bg: rgba(245, 158, 11, 0.15);
+  --tc-error: #EF4444;
+  --tc-error-foreground: #FFFFFF;
+  --tc-error-bg: rgba(239, 68, 68, 0.15);
+  --tc-info: #3B82F6;
+  --tc-info-bg: rgba(59, 130, 246, 0.15);
+
+  /* --- Radius Scale --- */
+  --tc-radius-sm: 6px;
+  --tc-radius-md: 10px;
+  --tc-radius-lg: 14px;
+  --tc-radius-xl: 18px;
+  --tc-radius-pill: 999px;
+
+  /* --- Shadow Scale (soft, dark-adapted) --- */
+  --tc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --tc-shadow-md: 0 4px 12px -4px rgba(0, 0, 0, 0.4);
+  --tc-shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+
+  /* --- Spacing (8pt grid) --- */
+  --tc-s-1: 4px;
+  --tc-s-2: 8px;
+  --tc-s-3: 12px;
+  --tc-s-4: 16px;
+  --tc-s-5: 24px;
+  --tc-s-6: 32px;
+  --tc-s-7: 48px;
+  --tc-s-8: 64px;
+
+  /* --- Typography --- */
+  --tc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --tc-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --tc-text-xs: 12px;
+  --tc-text-sm: 13px;
+  --tc-text-base: 14px;
+  --tc-text-lg: 16px;
+  --tc-text-xl: 18px;
+  --tc-text-2xl: 20px;
+  --tc-text-3xl: 24px;
+  --tc-text-4xl: 30px;
+  --tc-text-display: clamp(28px, 3.5vw, 44px);
+}

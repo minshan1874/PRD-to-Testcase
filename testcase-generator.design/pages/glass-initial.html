@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestGen · 测试用例生成器</title>
+    <style id="theme-vars">
+/* ============================================================
+   TestCase Generator — Glassmorphism Luxury Theme
+   Lavender Purple · Rose Gold Accent · Soft Glass
+   ============================================================ */
+
+:root {
+  /* --- Brand Primary (Lavender Purple) --- */
+  --tc-primary: #8B5CF6;
+  --tc-primary-foreground: #FFFFFF;
+  --tc-primary-hover: #7C3AED;
+  --tc-primary-active: #6D28D9;
+  --tc-primary-50: #F5F3FF;
+  --tc-primary-100: #EDE9FE;
+  --tc-primary-200: #DDD6FE;
+  --tc-primary-300: #C4B5FD;
+
+  /* --- Background & Surfaces --- */
+  --tc-background: #FAF7FF;
+  --tc-foreground: #1E1B4B;
+  --tc-card: rgba(255, 255, 255, 0.55);
+  --tc-card-foreground: #1E1B4B;
+  --tc-popover: rgba(255, 255, 255, 0.85);
+  --tc-popover-foreground: #1E1B4B;
+
+  /* --- Glass Effect Tokens --- */
+  --tc-glass-bg: rgba(255, 255, 255, 0.55);
+  --tc-glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --tc-glass-border: rgba(255, 255, 255, 0.85);
+  --tc-glass-border-soft: rgba(255, 255, 255, 0.5);
+  --tc-glass-blur: 20px;
+  --tc-glass-saturate: 180%;
+
+  /* --- Muted / Secondary Text --- */
+  --tc-muted: #F5F3FF;
+  --tc-muted-foreground: #7C7A9B;
+  --tc-foreground-secondary: #4C4A6B;
+  --tc-foreground-tertiary: #A8A6C0;
+
+  /* --- Border & Input --- */
+  --tc-border: #E8E4F5;
+  --tc-input: rgba(255, 255, 255, 0.72);
+  --tc-ring: #8B5CF6;
+
+  /* --- Accent / Surface-2 --- */
+  --tc-accent: #F5F3FF;
+  --tc-accent-foreground: #1E1B4B;
+  --tc-surface-2: rgba(245, 243, 255, 0.6);
+
+  /* --- State Colors --- */
+  --tc-success: #10B981;
+  --tc-success-foreground: #FFFFFF;
+  --tc-success-bg: #ECFDF5;
+  --tc-warning: #F59E0B;
+  --tc-warning-foreground: #FFFFFF;
+  --tc-warning-bg: #FFFBEB;
+  --tc-error: #F43F5E;
+  --tc-error-foreground: #FFFFFF;
+  --tc-error-bg: #FFF1F2;
+  --tc-info: #6366F1;
+  --tc-info-bg: #EEF2FF;
+
+  /* --- Radius Scale (larger, softer) --- */
+  --tc-radius-sm: 8px;
+  --tc-radius-md: 12px;
+  --tc-radius-lg: 18px;
+  --tc-radius-xl: 24px;
+  --tc-radius-pill: 999px;
+
+  /* --- Shadow Scale (purple-tinted, soft) --- */
+  --tc-shadow-sm: 0 1px 2px rgba(30, 27, 75, 0.04), 0 1px 1px rgba(139, 92, 246, 0.03);
+  --tc-shadow-md: 0 4px 12px -4px rgba(139, 92, 246, 0.10);
+  --tc-shadow-lg: 0 12px 32px -8px rgba(139, 92, 246, 0.18);
+
+  /* --- Spacing (8pt grid) --- */
+  --tc-s-1: 4px;
+  --tc-s-2: 8px;
+  --tc-s-3: 12px;
+  --tc-s-4: 16px;
+  --tc-s-5: 24px;
+  --tc-s-6: 32px;
+  --tc-s-7: 48px;
+  --tc-s-8: 64px;
+
+  /* --- Typography --- */
+  --tc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --tc-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --tc-text-xs: 12px;
+  --tc-text-sm: 13px;
+  --tc-text-base: 14px;
+  --tc-text-lg: 16px;
+  --tc-text-xl: 18px;
+  --tc-text-2xl: 20px;
+  --tc-text-3xl: 24px;
+  --tc-text-4xl: 30px;
+  --tc-text-display: clamp(28px, 3.5vw, 44px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tc-background);
+    --color-foreground: var(--tc-foreground);
+    --color-card: var(--tc-card);
+    --color-card-foreground: var(--tc-card-foreground);
+    --color-popover: var(--tc-popover);
+    --color-popover-foreground: var(--tc-popover-foreground);
+    --color-primary: var(--tc-primary);
+    --color-primary-foreground: var(--tc-primary-foreground);
+    --color-muted: var(--tc-muted);
+    --color-muted-foreground: var(--tc-muted-foreground);
+    --color-accent: var(--tc-accent);
+    --color-accent-foreground: var(--tc-accent-foreground);
+    --color-border: var(--tc-border);
+    --color-input: var(--tc-input);
+    --color-ring: var(--tc-ring);
+    --radius-sm: var(--tc-radius-sm);
+    --radius-md: var(--tc-radius-md);
+    --radius-lg: var(--tc-radius-lg);
+    --radius-xl: var(--tc-radius-xl);
+  }
+  @layer base {
+    body { background: var(--tc-background); color: var(--tc-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tc-background); }
+      .text-background { color: var(--tc-background); }
+      .border-background { border-color: var(--tc-background); }
+      .ring-background { --tw-ring-color: var(--tc-background); }
+      .bg-foreground { background-color: var(--tc-foreground); }
+      .text-foreground { color: var(--tc-foreground); }
+      .border-foreground { border-color: var(--tc-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tc-foreground); }
+      .bg-card { background-color: var(--tc-card); }
+      .text-card { color: var(--tc-card); }
+      .border-card { border-color: var(--tc-card); }
+      .ring-card { --tw-ring-color: var(--tc-card); }
+      .bg-card-foreground { background-color: var(--tc-card-foreground); }
+      .text-card-foreground { color: var(--tc-card-foreground); }
+      .border-card-foreground { border-color: var(--tc-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tc-card-foreground); }
+      .bg-popover { background-color: var(--tc-popover); }
+      .text-popover { color: var(--tc-popover); }
+      .border-popover { border-color: var(--tc-popover); }
+      .ring-popover { --tw-ring-color: var(--tc-popover); }
+      .bg-popover-foreground { background-color: var(--tc-popover-foreground); }
+      .text-popover-foreground { color: var(--tc-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tc-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tc-popover-foreground); }
+      .bg-primary { background-color: var(--tc-primary); }
+      .text-primary { color: var(--tc-primary); }
+      .border-primary { border-color: var(--tc-primary); }
+      .ring-primary { --tw-ring-color: var(--tc-primary); }
+      .bg-primary-foreground { background-color: var(--tc-primary-foreground); }
+      .text-primary-foreground { color: var(--tc-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tc-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tc-primary-foreground); }
+      .bg-muted { background-color: var(--tc-muted); }
+      .text-muted { color: var(--tc-muted); }
+      .border-muted { border-color: var(--tc-muted); }
+      .ring-muted { --tw-ring-color: var(--tc-muted); }
+      .bg-muted-foreground { background-color: var(--tc-muted-foreground); }
+      .text-muted-foreground { color: var(--tc-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tc-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tc-muted-foreground); }
+      .bg-accent { background-color: var(--tc-accent); }
+      .text-accent { color: var(--tc-accent); }
+      .border-accent { border-color: var(--tc-accent); }
+      .ring-accent { --tw-ring-color: var(--tc-accent); }
+      .bg-accent-foreground { background-color: var(--tc-accent-foreground); }
+      .text-accent-foreground { color: var(--tc-accent-foreground); }
+      .border-accent-foreground { border-color: var(--tc-accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--tc-accent-foreground); }
+      .bg-border { background-color: var(--tc-border); }
+      .text-border { color: var(--tc-border); }
+      .border-border { border-color: var(--tc-border); }
+      .ring-border { --tw-ring-color: var(--tc-border); }
+      .bg-input { background-color: var(--tc-input); }
+      .text-input { color: var(--tc-input); }
+      .border-input { border-color: var(--tc-input); }
+      .ring-input { --tw-ring-color: var(--tc-input); }
+      .bg-ring { background-color: var(--tc-ring); }
+      .text-ring { color: var(--tc-ring); }
+      .border-ring { border-color: var(--tc-ring); }
+      .ring-ring { --tw-ring-color: var(--tc-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ============================================
+         Glassmorphism Luxury — Page-Specific Styles
+         ============================================ */
+
+      body {
+        font-family: var(--tc-font-sans);
+        background-color: var(--tc-background);
+        color: var(--tc-foreground);
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Multi-layer radial gradient glow background */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(ellipse 600px 500px at 10% 0%, rgba(139, 92, 246, 0.18), transparent 70%),
+          radial-gradient(ellipse 500px 400px at 90% 5%, rgba(244, 114, 182, 0.12), transparent 70%),
+          radial-gradient(ellipse 550px 450px at 85% 90%, rgba(99, 102, 241, 0.14), transparent 70%),
+          radial-gradient(ellipse 450px 380px at 15% 95%, rgba(167, 139, 250, 0.12), transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Glass Card */
+      .tc-glass-card {
+        background: var(--tc-glass-bg);
+        backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        -webkit-backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        border: 1px solid var(--tc-glass-border);
+        border-radius: var(--tc-radius-xl);
+        box-shadow: var(--tc-shadow-lg);
+      }
+
+      /* Glass Input */
+      .tc-glass-input {
+        background: var(--tc-glass-bg-strong);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: var(--tc-radius-md);
+        color: var(--tc-foreground);
+        transition: all 0.25s ease;
+      }
+      .tc-glass-input:focus {
+        outline: none;
+        border-color: var(--tc-primary);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12), 0 4px 16px -4px rgba(139, 92, 246, 0.2);
+      }
+      .tc-glass-input::placeholder {
+        color: var(--tc-foreground-tertiary);
+      }
+
+      /* Primary Button — Gradient */
+      .tc-btn-primary {
+        background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+        color: #FFFFFF;
+        border: none;
+        border-radius: var(--tc-radius-md);
+        font-weight: 600;
+        font-size: var(--tc-text-lg);
+        padding: 16px 32px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 8px 24px -6px rgba(139, 92, 246, 0.45);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .tc-btn-primary:hover {
+        background: linear-gradient(135deg, #7C3AED, #8B5CF6);
+        box-shadow: 0 12px 32px -6px rgba(139, 92, 246, 0.55);
+        transform: translateY(-1px);
+      }
+      .tc-btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px -4px rgba(139, 92, 246, 0.4);
+      }
+
+      /* Secondary Button — Glass */
+      .tc-btn-secondary {
+        background: rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: var(--tc-radius-md);
+        color: var(--tc-foreground);
+        font-weight: 500;
+        padding: 10px 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--tc-text-sm);
+      }
+      .tc-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.7);
+        border-color: rgba(139, 92, 246, 0.3);
+        color: var(--tc-primary);
+      }
+
+      /* Type Tag (Glass) */
+      .tc-type-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(8px) saturate(160%);
+        -webkit-backdrop-filter: blur(8px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: var(--tc-radius-md);
+        font-size: var(--tc-text-sm);
+        color: var(--tc-foreground-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+      .tc-type-tag:hover {
+        border-color: rgba(139, 92, 246, 0.35);
+        color: var(--tc-primary);
+      }
+      .tc-type-tag.active {
+        background: rgba(139, 92, 246, 0.12);
+        border-color: rgba(139, 92, 246, 0.4);
+        color: var(--tc-primary);
+        font-weight: 500;
+      }
+
+      /* Status Tag */
+      .tc-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: var(--tc-radius-pill);
+        font-size: var(--tc-text-xs);
+        font-weight: 500;
+      }
+      .tc-tag-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--tc-success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      /* Section Title */
+      .tc-section-title {
+        font-size: var(--tc-text-xl);
+        font-weight: 600;
+        color: var(--tc-foreground);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .tc-section-title .icon-wrap {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.1));
+        border-radius: 8px;
+        color: var(--tc-primary);
+      }
+
+      /* Glass Switch */
+      .tc-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: var(--tc-radius-pill);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+      }
+      .tc-switch::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        background: #FFFFFF;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.25s ease;
+      }
+      .tc-switch.active {
+        background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      .tc-switch.active::after {
+        left: 22px;
+      }
+
+      /* Nav */
+      .tc-nav-glass {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+      }
+
+      /* Smart hint bar */
+      .tc-smart-hint {
+        background: rgba(139, 92, 246, 0.08);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(139, 92, 246, 0.15);
+        border-radius: var(--tc-radius-md);
+        font-size: var(--tc-text-sm);
+        color: var(--tc-primary);
+      }
+
+      /* Config group divider */
+      .tc-config-group {
+        position: relative;
+        padding-left: 16px;
+      }
+      .tc-config-group::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background: linear-gradient(to bottom, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.1));
+        border-radius: 2px;
+      }
+
+      /* Select glass */
+      .tc-select-glass {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px) saturate(160%);
+        -webkit-backdrop-filter: blur(10px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: var(--tc-radius-md);
+        color: var(--tc-foreground);
+        font-size: var(--tc-text-base);
+        padding: 10px 36px 10px 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237C7A9B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+      .tc-select-glass:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      .tc-select-glass:focus {
+        outline: none;
+        border-color: var(--tc-primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+      }
+
+      /* Radio label group */
+      .tc-radio-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: var(--tc-radius-md);
+        font-size: var(--tc-text-sm);
+        color: var(--tc-foreground-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+      .tc-radio-label:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      .tc-radio-label.active {
+        background: rgba(139, 92, 246, 0.12);
+        border-color: rgba(139, 92, 246, 0.4);
+        color: var(--tc-primary);
+        font-weight: 500;
+      }
+
+      /* Mono text */
+      .tc-mono {
+        font-family: var(--tc-font-mono);
+      }
+
+      /* Avatar glass ring */
+      .tc-avatar-glass {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8B5CF6, #EC4899);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .tc-avatar-glass::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        pointer-events: none;
+      }
+
+      /* Collapsible */
+      .tc-collapse-header {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .tc-collapse-icon {
+        transition: transform 0.25s ease;
+      }
+      .tc-collapse-header.collapsed .tc-collapse-icon {
+        transform: rotate(-90deg);
+      }
+
+      /* Word count badge */
+      .tc-word-count {
+        position: absolute;
+        bottom: 12px;
+        right: 14px;
+        font-size: 11px;
+        font-family: var(--tc-font-mono);
+        color: var(--tc-foreground-tertiary);
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        padding: 2px 8px;
+        border-radius: 6px;
+        pointer-events: none;
+      }
+
+      /* Page container */
+      .tc-page-container {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+
+    <!-- ========== TOP NAV ========== -->
+    <nav id="top-nav" class="tc-nav-glass fixed top-0 left-0 right-0 z-50 h-[68px] flex items-center">
+      <div class="w-full max-w-[720px] mx-auto px-6 flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);">
+            <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+          </div>
+          <div class="flex flex-col leading-tight">
+            <span class="text-[17px] font-semibold" style="color: var(--tc-foreground);">TestGen</span>
+            <span class="text-[11px]" style="color: var(--tc-muted-foreground);">智能测试用例生成平台</span>
+          </div>
+        </div>
+        <!-- User Avatar -->
+        <div class="tc-avatar-glass">
+          Z
+        </div>
+      </div>
+    </nav>
+
+    <main class="relative z-10 pt-[92px] pb-12">
+      <div class="tc-page-container px-6">
+
+        <!-- ========== PAGE TITLE ========== -->
+        <div id="page-title" class="text-center mb-8 mt-4">
+          <h1 class="text-[32px] font-semibold mb-3" style="color: var(--tc-foreground); letter-spacing: -0.3px;">
+            生成测试用例
+          </h1>
+          <p class="text-[15px]" style="color: var(--tc-muted-foreground);">
+            粘贴产品需求文档，AI 将自动分析并生成完整的测试用例
+          </p>
+        </div>
+
+        <!-- ========== A. INPUT SECTION ========== -->
+        <section id="input-section" class="tc-glass-card p-6 mb-5">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <div class="tc-section-title mb-1">
+                需求输入
+              </div>
+              <p class="text-[13px]" style="color: var(--tc-muted-foreground);">
+                粘贴 PRD 文档或功能描述
+              </p>
+            </div>
+            <span class="tc-tag tc-tag-success">
+              <i data-lucide="zap" class="w-3 h-3"></i>
+              智能解析
+            </span>
+          </div>
+
+          <!-- Smart hint bar (shown after input) -->
+          <div class="tc-smart-hint px-4 py-2.5 mb-3 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4" style="color: var(--tc-primary);"></i>
+            <span>已识别 <strong>3</strong> 个功能点 · 预估生成约 <strong>45</strong> 条用例</span>
+          </div>
+
+          <!-- Textarea -->
+          <div class="relative">
+            <textarea
+              id="input-prd"
+              class="tc-glass-input w-full p-4 resize-none text-[14px] leading-relaxed"
+              style="height: 200px;"
+              placeholder="请在此粘贴产品需求文档或功能描述...
+
+例如：
+用户登录模块
+1. 支持手机号 + 验证码登录
+2. 支持账号密码登录
+3. 支持第三方微信登录
+4. 连续5次密码错误锁定账号15分钟
+5. 登录状态保持7天"
+            ></textarea>
+            <div class="tc-word-count">0 / 5000</div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-[12px] tc-mono" style="color: var(--tc-foreground-tertiary);">
+              0 字
+            </span>
+            <div class="flex items-center gap-2">
+              <button class="tc-btn-secondary" style="padding: 8px 14px; font-size: 12px;">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                清空
+              </button>
+              <button class="tc-btn-secondary" style="padding: 8px 14px; font-size: 12px;">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                从文件导入
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== B. CONFIG SECTION ========== -->
+        <section id="config-section" class="tc-glass-card p-6 mb-5">
+          <div class="flex flex-col gap-6">
+
+            <!-- 1. Template -->
+            <div class="tc-config-group">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-5 h-5 rounded-md flex items-center justify-center" style="background: rgba(139, 92, 246, 0.12); color: var(--tc-primary);">
+                  <i data-lucide="layout-template" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[14px] font-medium" style="color: var(--tc-foreground);">用例模板</span>
+              </div>
+              <select id="select-template" class="tc-select-glass w-full">
+                <option>标准功能测试模板（推荐）</option>
+                <option>敏捷测试用例模板</option>
+                <option>探索性测试模板</option>
+                <option>回归测试模板</option>
+                <option>接口测试模板</option>
+              </select>
+            </div>
+
+            <!-- 2. Test Case Types -->
+            <div class="tc-config-group">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-5 h-5 rounded-md flex items-center justify-center" style="background: rgba(139, 92, 246, 0.12); color: var(--tc-primary);">
+                  <i data-lucide="tags" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[14px] font-medium" style="color: var(--tc-foreground);">用例类型</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <div class="tc-type-tag active">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  功能测试
+                </div>
+                <div class="tc-type-tag">
+                  UI 测试
+                </div>
+                <div class="tc-type-tag">
+                  性能测试
+                </div>
+                <div class="tc-type-tag">
+                  安全测试
+                </div>
+                <div class="tc-type-tag">
+                  兼容性测试
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Output Format -->
+            <div class="tc-config-group">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-5 h-5 rounded-md flex items-center justify-center" style="background: rgba(139, 92, 246, 0.12); color: var(--tc-primary);">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                </div>
+                <span class="text-[14px] font-medium" style="color: var(--tc-foreground);">输出格式</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <div class="tc-radio-label active">
+                  <span class="w-2 h-2 rounded-full" style="background: var(--tc-primary);"></span>
+                  Excel / CSV
+                </div>
+                <div class="tc-radio-label">
+                  <span class="w-2 h-2 rounded-full" style="background: var(--tc-border);"></span>
+                  Markdown
+                </div>
+                <div class="tc-radio-label">
+                  <span class="w-2 h-2 rounded-full" style="background: var(--tc-border);"></span>
+                  XMind
+                </div>
+                <div class="tc-radio-label">
+                  <span class="w-2 h-2 rounded-full" style="background: var(--tc-border);"></span>
+                  TestLink XML
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Advanced Options (Collapsible) -->
+            <div class="tc-config-group">
+              <div class="tc-collapse-header mb-3" id="advanced-collapse-trigger">
+                <div class="flex items-center gap-2">
+                  <div class="w-5 h-5 rounded-md flex items-center justify-center" style="background: rgba(139, 92, 246, 0.12); color: var(--tc-primary);">
+                    <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span class="text-[14px] font-medium" style="color: var(--tc-foreground);">高级选项</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[12px]" style="color: var(--tc-muted-foreground);">已选 2 项</span>
+                  <i data-lucide="chevron-down" class="w-4 h-4 tc-collapse-icon" style="color: var(--tc-muted-foreground);"></i>
+                </div>
+              </div>
+
+              <div id="advanced-options" class="flex flex-col gap-3 pl-1">
+                <div class="flex items-center justify-between py-1.5">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-[14px]" style="color: var(--tc-foreground-secondary);">包含负面用例</span>
+                  </div>
+                  <div class="tc-switch active"></div>
+                </div>
+                <div class="flex items-center justify-between py-1.5">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-[14px]" style="color: var(--tc-foreground-secondary);">生成边界值</span>
+                  </div>
+                  <div class="tc-switch active"></div>
+                </div>
+                <div class="flex items-center justify-between py-1.5">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-[14px]" style="color: var(--tc-foreground-secondary);">覆盖异常流程</span>
+                  </div>
+                  <div class="tc-switch"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========== C. GENERATE ACTIONS ========== -->
+        <section id="generate-actions" class="mb-10">
+          <button id="btn-generate" class="tc-btn-primary w-full" style="height: 52px; font-size: 16px;">
+            <i data-lucide="wand-2" class="w-5 h-5"></i>
+            开始生成测试用例
+          </button>
+          <div class="text-center mt-3">
+            <span class="text-[12px] tc-mono" style="color: var(--tc-primary-300);">
+              Ctrl + Enter 生成
+            </span>
+          </div>
+          <div class="text-center mt-1.5">
+            <span class="text-[12px]" style="color: var(--tc-foreground-tertiary);">
+              预计生成 50-80 条用例 · 约需 30 秒
+            </span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="footer" class="relative z-10 pb-6 pt-2">
+      <div class="tc-page-container px-6">
+        <div class="pt-5 border-t" style="border-color: rgba(139, 92, 246, 0.08);">
+          <div class="flex items-center justify-between text-[11px]" style="color: var(--tc-foreground-tertiary);">
+            <span>© 2025 TestGen. All rights reserved.</span>
+            <span class="tc-mono">v2.1.0</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+
+      // Word count interaction
+      const textarea = document.getElementById('input-prd');
+      const wordCountBadge = document.querySelector('.tc-word-count');
+      const wordCountText = document.querySelector('#input-section .tc-mono');
+
+      textarea.addEventListener('input', function() {
+        const len = this.value.length;
+        wordCountBadge.textContent = len + ' / 5000';
+        if (wordCountText) wordCountText.textContent = len + ' 字';
+      });
+
+      // Type tag toggle
+      document.querySelectorAll('.tc-type-tag').forEach(tag => {
+        tag.addEventListener('click', function() {
+          this.classList.toggle('active');
+          const checkIcon = this.querySelector('[data-lucide="check"]');
+          if (this.classList.contains('active') && !checkIcon) {
+            const icon = document.createElement('i');
+            icon.setAttribute('data-lucide', 'check');
+            icon.className = 'w-3.5 h-3.5';
+            this.insertBefore(icon, this.firstChild);
+            lucide.createIcons();
+          } else if (!this.classList.contains('active') && checkIcon) {
+            checkIcon.remove();
+          }
+        });
+      });
+
+      // Radio label toggle
+      document.querySelectorAll('.tc-radio-label').forEach(label => {
+        label.addEventListener('click', function() {
+          const group = this.parentElement;
+          group.querySelectorAll('.tc-radio-label').forEach(l => {
+            l.classList.remove('active');
+            const dot = l.querySelector('span');
+            if (dot) dot.style.background = 'var(--tc-border)';
+          });
+          this.classList.add('active');
+          const dot = this.querySelector('span');
+          if (dot) dot.style.background = 'var(--tc-primary)';
+        });
+      });
+
+      // Switch toggle
+      document.querySelectorAll('.tc-switch').forEach(sw => {
+        sw.addEventListener('click', function() {
+          this.classList.toggle('active');
+        });
+      });
+
+      // Advanced options collapse
+      const collapseTrigger = document.getElementById('advanced-collapse-trigger');
+      const advancedOptions = document.getElementById('advanced-options');
+      let collapsed = false;
+
+      collapseTrigger.addEventListener('click', function() {
+        collapsed = !collapsed;
+        this.classList.toggle('collapsed', collapsed);
+        advancedOptions.style.display = collapsed ? 'none' : 'flex';
+      });
+    </script>
+</body>
+</html>

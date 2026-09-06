@@ -1,0 +1,522 @@
+{
+  "schemaVersion": "2026.07.11.0",
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": null,
+    "version_source": "unknown",
+    "read_status": "missing"
+  },
+  "project": {
+    "operation": "create",
+    "resolvedLane": "complex_html_page",
+    "selectedIntentWorkflowRead": true,
+    "deviceType": "desktop",
+    "projectName": "AI 生成测试用例 · 设计基线",
+    "designRead": "AI 测试用例生成工具 / 研发与测试人员 / 专业工具型 / 数据高密度 / 避免视觉花哨牺牲表格可读性",
+    "designDials": {
+      "layoutVariance": 2,
+      "motionIntensity": 1,
+      "visualDensity": 4
+    },
+    "styleDefinitionBrief": "专业工具型 SaaS，靛蓝主色 + 中性灰阶，高对比度表格，紧凑但不拥挤的信息密度",
+    "contextRequirementsLoaded": [
+      {
+        "path": "intent-workflows/intent-project-complex-build/INTENT_WORKFLOW.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/page-rendering-quality-gate.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/design-artifact-validation.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "visual-experience/visual-experience-guidelines.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/agent-dispatch-runtime/shared-page-rendering-kernel.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/delivery-evidence-contract.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "visual-experience/visual-checkpoint-protocol.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      }
+    ],
+    "contextReadScope": "complex-build-minimal",
+    "readScopeLedger": [
+      {
+        "actor": "page-sub-agent",
+        "lane": "complex_html_page",
+        "path": "intent-workflows/intent-project-complex-build/complex-page-runtime.md",
+        "reason": "page runtime guide",
+        "scopeClass": "page-runtime",
+        "declaredBeforeRead": true,
+        "recordedAt": "2026-09-06T12:45:08.431Z",
+        "nodeId": "page-step1-upload-empty",
+        "htmlSrc": "pages/step1-upload-empty.html"
+      },
+      {
+        "actor": "page-sub-agent",
+        "lane": "complex_html_page",
+        "path": "intent-workflows/intent-project-complex-build/complex-page-dispatch-contract.md",
+        "reason": "dispatch contract",
+        "scopeClass": "dispatch-contract",
+        "declaredBeforeRead": true,
+        "recordedAt": "2026-09-06T12:45:08.431Z",
+        "nodeId": "page-step1-upload-empty",
+        "htmlSrc": "pages/step1-upload-empty.html"
+      }
+    ],
+    "cssPreflightEvidence": {
+      "preflightFile": ".preflight/preflight.html",
+      "status": "passed",
+      "semanticTokens": "present",
+      "themeInline": "present",
+      "tailwindCdn": "present",
+      "brandPrefix": "tcg",
+      "prefixMode": "standard"
+    },
+    "sharedProjectShellContract": {
+      "deviceType": "desktop",
+      "maxWidth": "1152px",
+      "headerHeight": "64px",
+      "backgroundTreatment": "subtle-gray-surface",
+      "surfaceDepthModel": "border-led-with-subtle-shadow",
+      "radiusScale": {
+        "sm": "4px",
+        "md": "6px",
+        "lg": "8px",
+        "xl": "12px",
+        "full": "9999px"
+      },
+      "shapeSystem": "subtle-rounded-corners",
+      "staticShadowAlphaMax": 0.05,
+      "mobileNavigation": {
+        "applies": false
+      }
+    },
+    "visualQualityCheckpoints": [
+      {
+        "id": "visual-anchor",
+        "description": "靛蓝主色 + 深灰文字 + 浅灰背景的工具型基调；卡片白色带细边框",
+        "target": "所有页面保持一致的视觉锚点：主色用于强调/激活，中性色承担信息层级"
+      },
+      {
+        "id": "information-hierarchy",
+        "description": "步骤导航 → 卡片标题 → 表单/表格内容 → 辅助说明，四级清晰的信息层级",
+        "target": "用户能在 3 秒内识别当前步骤、主要操作和次要信息"
+      },
+      {
+        "id": "composition-structure",
+        "description": "单列卡片式布局，最大宽度 1152px，卡片间距 24px，表格占满可用宽度",
+        "target": "内容左对齐，操作按钮右对齐，表格横向滚动而非挤压列宽"
+      },
+      {
+        "id": "implementation-strategy",
+        "description": "语义化 HTML + CSS 变量 + 轻量 JS 交互，确保表格长文本可读和换行",
+        "target": "所有交互状态（悬停/聚焦/禁用/错误）在 HTML 中可直接观察"
+      }
+    ],
+    "validationRunDiscipline": "one-pass-final",
+    "validationHistory": [],
+    "validationRepairLedger": [],
+    "lowValueCallWatchdog": {
+      "noProgressNextAction": "readiness-summary",
+      "maxConsecutiveNoProgressTurns": 3
+    }
+  },
+  "pages": [
+    {
+      "nodeId": "page-step1-upload-empty",
+      "title": "01 上传文档 / 空状态",
+      "htmlSrc": "pages/step1-upload-empty.html",
+      "brandPrefix": "tcg",
+      "pageIndex": 1,
+      "stateGroupId": "step1-upload",
+      "stateRole": "base",
+      "visualNorthStar": "清晰的上传引导 + 拖拽区域 + 限制说明，空状态下不显得空旷",
+      "continuityAnchors": [
+        "相同的顶部 Header 和步骤导航结构",
+        "卡片式内容容器，统一圆角和边框",
+        "底部右对齐的主操作按钮"
+      ],
+      "componentPlan": [
+        "上传拖拽区域（虚线边框 + 图标 + 说明文字）",
+        "限制说明 Badge 组",
+        "主按钮（禁用态 + 可用态）"
+      ],
+      "iconPlan": "使用 Lucide 图标：UploadCloud, FileText, Image, Trash2",
+      "imagePlan": [],
+      "chartsRequired": false
+    },
+    {
+      "nodeId": "page-step1-upload-parsing",
+      "title": "01 上传文档 / 解析中与异常",
+      "htmlSrc": "pages/step1-upload-parsing.html",
+      "brandPrefix": "tcg",
+      "pageIndex": 2,
+      "stateGroupId": "step1-upload",
+      "stateRole": "derived",
+      "baseStatePageId": "page-step1-upload-empty",
+      "visualNorthStar": "展示多种来源行状态：解析中、成功、PDF转图、图片、失败、警告",
+      "continuityAnchors": [
+        "与空状态共享上传区和整体布局",
+        "来源行使用统一的图标+文件名+元信息+操作结构"
+      ],
+      "componentPlan": [
+        "来源行（解析中/成功/失败 多种状态）",
+        "统计 Badge（文本字符数/图片数 正常/警告/超限）",
+        "清空按钮 + 下一步按钮"
+      ],
+      "iconPlan": "使用 Lucide 图标：Loader2, FileText, Image, XCircle, Trash2, AlertTriangle",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "sharedShellContract": {
+        "immutableRegions": [
+          "app-header",
+          "step-nav",
+          "upload-card-header",
+          "upload-dropzone"
+        ],
+        "mutableRegions": [
+          "source-pool-list",
+          "stats-row",
+          "footer-actions"
+        ]
+      }
+    },
+    {
+      "nodeId": "page-step2-config-default",
+      "title": "02 生成配置 / 默认状态",
+      "htmlSrc": "pages/step2-config-default.html",
+      "pageIndex": 3,
+      "stateGroupId": "step2-config",
+      "stateRole": "base",
+      "visualNorthStar": "三张配置卡片垂直排列，信息密度适中，操作明确",
+      "continuityAnchors": [
+        "相同的顶部 Header 和步骤导航结构",
+        "卡片标题带 HelpTip 模式",
+        "底部左右分布的上一步/下一步按钮"
+      ],
+      "componentPlan": [
+        "追溯功能卡片（Switch + Badge + Tooltip）",
+        "字段配置卡片（网格字段行 + 排序切换 + 自定义字段输入）",
+        "模型配置卡片（可搜索下拉 + 模型能力标签）"
+      ],
+      "iconPlan": "使用 Lucide 图标：Eye, EyeOff, ArrowUp, ArrowDown, Plus, Trash2, HelpCircle, RefreshCw, PencilLine",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step2-config-image-warning",
+      "title": "02 生成配置 / 图片输入与模型提醒",
+      "htmlSrc": "pages/step2-config-image-warning.html",
+      "pageIndex": 4,
+      "stateGroupId": "step2-config",
+      "stateRole": "derived",
+      "baseStatePageId": "page-step2-config-default",
+      "visualNorthStar": "展示图片输入警告、自定义模型 ID 输入框、模型能力不匹配提醒",
+      "continuityAnchors": [
+        "与默认态共享追溯卡片和字段配置卡片",
+        "模型卡片结构一致，仅状态内容不同"
+      ],
+      "componentPlan": [
+        "图片输入自动选择模型提示（成功色）",
+        "图片能力不匹配警告（警告色 Badge）",
+        "结构化输出不支持警告",
+        "自定义模型 ID 输入框"
+      ],
+      "iconPlan": "使用 Lucide 图标：AlertTriangle, CheckCircle, PencilLine, HelpCircle",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "sharedShellContract": {
+        "immutableRegions": [
+          "app-header",
+          "step-nav",
+          "trace-card",
+          "fields-card"
+        ],
+        "mutableRegions": [
+          "model-card-content",
+          "warnings-row"
+        ]
+      },
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step3-generate-running",
+      "title": "03 生成结果 / 生成中",
+      "htmlSrc": "pages/step3-generate-running.html",
+      "pageIndex": 5,
+      "stateGroupId": "step3-generate",
+      "stateRole": "base",
+      "visualNorthStar": "阶段型进度指示器 + 当前阶段文案 + 耐心等待说明 + 停止按钮",
+      "continuityAnchors": [
+        "相同的顶部 Header 和步骤导航结构",
+        "卡片式布局，内容居中对齐的进度展示区"
+      ],
+      "componentPlan": [
+        "顶部摘要 Badge（模型 ID + 输入统计）",
+        "四阶段进度指示器（准备输入/请求模型/整理结果/完成）",
+        "当前阶段说明文案",
+        "停止生成按钮"
+      ],
+      "iconPlan": "使用 Lucide 图标：Loader2, Check, Circle, StopCircle, Sparkles",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step3-generate-complete",
+      "title": "03 生成结果 / 生成完成",
+      "htmlSrc": "pages/step3-generate-complete.html",
+      "pageIndex": 6,
+      "stateGroupId": "step3-generate",
+      "stateRole": "derived",
+      "baseStatePageId": "page-step3-generate-running",
+      "visualNorthStar": "成功图标 + 生成数量统计 + 下一步按钮",
+      "continuityAnchors": [
+        "与生成中共享顶部摘要和阶段指示器框架",
+        "阶段指示器全部标记为完成"
+      ],
+      "componentPlan": [
+        "成功图标和主标题",
+        "生成统计网格（用例数/待确认项/风险假设数）",
+        "下一步：预览与导出按钮"
+      ],
+      "iconPlan": "使用 Lucide 图标：CheckCircle, FileText, AlertTriangle, Zap",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "sharedShellContract": {
+        "immutableRegions": [
+          "app-header",
+          "step-nav",
+          "summary-bar"
+        ],
+        "mutableRegions": [
+          "phase-indicator",
+          "status-content",
+          "action-button"
+        ]
+      },
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step3-generate-failed",
+      "title": "03 生成结果 / 生成失败",
+      "htmlSrc": "pages/step3-generate-failed.html",
+      "pageIndex": 7,
+      "stateGroupId": "step3-generate",
+      "stateRole": "derived",
+      "baseStatePageId": "page-step3-generate-running",
+      "visualNorthStar": "错误图标 + 具体错误文案 + 展开详情 + 重试按钮",
+      "continuityAnchors": [
+        "与生成中共享顶部摘要和阶段指示器框架",
+        "失败阶段高亮为错误色"
+      ],
+      "componentPlan": [
+        "错误图标和标题",
+        "错误说明（支持展开查看详细原因）",
+        "重试按钮"
+      ],
+      "iconPlan": "使用 Lucide 图标：XCircle, AlertCircle, ChevronDown, RefreshCw",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "sharedShellContract": {
+        "immutableRegions": [
+          "app-header",
+          "step-nav",
+          "summary-bar"
+        ],
+        "mutableRegions": [
+          "phase-indicator",
+          "status-content",
+          "action-button"
+        ]
+      },
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step4-preview-data",
+      "title": "04 预览导出 / 有数据",
+      "htmlSrc": "pages/step4-preview-data.html",
+      "pageIndex": 8,
+      "stateGroupId": "step4-preview",
+      "stateRole": "base",
+      "visualNorthStar": "宽表格 + 吸顶表头 + 横向滚动 + 长文本换行，数据密集但可读",
+      "continuityAnchors": [
+        "相同的顶部 Header 和步骤导航结构",
+        "标题 + Badge + 操作按钮的顶部工具栏模式"
+      ],
+      "componentPlan": [
+        "预览标题 + 用例数 Badge",
+        "导出操作区（导出勾选/导出全部按钮）",
+        "只读数据表格（吸顶表头 + 横向滚动 + 斑马纹）",
+        "表格列覆盖用例 ID/模块/标题/测试类型/优先级/操作步骤/预期结果等"
+      ],
+      "iconPlan": "使用 Lucide 图标：Download, Table, ChevronLeft, ChevronRight",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "brandPrefix": "tcg"
+    },
+    {
+      "nodeId": "page-step4-preview-empty",
+      "title": "04 预览导出 / 无结果",
+      "htmlSrc": "pages/step4-preview-empty.html",
+      "pageIndex": 9,
+      "stateGroupId": "step4-preview",
+      "stateRole": "derived",
+      "baseStatePageId": "page-step4-preview-data",
+      "visualNorthStar": "明确的空状态提示 + 返回第 3 步的操作路径",
+      "continuityAnchors": [
+        "与有数据状态共享顶部标题和操作区框架",
+        "表格区域替换为空状态插图 + 文案 + 按钮"
+      ],
+      "componentPlan": [
+        "空状态图标/插图",
+        "空状态说明文案",
+        "返回生成结果步骤的按钮"
+      ],
+      "iconPlan": "使用 Lucide 图标：FileQuestion, ArrowLeft",
+      "imagePlan": [],
+      "chartsRequired": false,
+      "sharedShellContract": {
+        "immutableRegions": [
+          "app-header",
+          "step-nav",
+          "preview-header-bar"
+        ],
+        "mutableRegions": [
+          "table-area"
+        ]
+      },
+      "brandPrefix": "tcg"
+    }
+  ],
+  "assets": [],
+  "wiringPlan": [
+    {
+      "from": "page-step1-upload-empty",
+      "to": "page-step2-config-default",
+      "domId": "btn-next-step1",
+      "label": "下一步：生成配置"
+    },
+    {
+      "from": "page-step1-upload-parsing",
+      "to": "page-step2-config-default",
+      "domId": "btn-next-step1",
+      "label": "下一步：生成配置"
+    },
+    {
+      "from": "page-step2-config-default",
+      "to": "page-step1-upload-empty",
+      "domId": "btn-prev-step2",
+      "label": "上一步：上传文档",
+      "hideEdge": true
+    },
+    {
+      "from": "page-step2-config-default",
+      "to": "page-step3-generate-running",
+      "domId": "btn-next-step2",
+      "label": "下一步：生成"
+    },
+    {
+      "from": "page-step2-config-image-warning",
+      "to": "page-step3-generate-running",
+      "domId": "btn-next-step2",
+      "label": "下一步：生成"
+    },
+    {
+      "from": "page-step3-generate-complete",
+      "to": "page-step4-preview-data",
+      "domId": "btn-next-step3",
+      "label": "下一步：预览与导出"
+    },
+    {
+      "from": "page-step3-generate-failed",
+      "to": "page-step3-generate-running",
+      "domId": "btn-retry-step3",
+      "label": "重试"
+    },
+    {
+      "from": "page-step4-preview-empty",
+      "to": "page-step3-generate-running",
+      "domId": "btn-back-step4",
+      "label": "返回生成结果",
+      "hideEdge": true
+    }
+  ],
+  "hiddenInteractionPlan": [
+    {
+      "from": "page-step1-upload-parsing",
+      "to": "page-step1-upload-empty",
+      "domId": "step-nav-1",
+      "label": "步骤1导航",
+      "hideEdge": true
+    },
+    {
+      "from": "page-step2-config-image-warning",
+      "to": "page-step2-config-default",
+      "domId": "step-nav-2",
+      "label": "步骤2导航",
+      "hideEdge": true
+    },
+    {
+      "from": "page-step3-generate-complete",
+      "to": "page-step3-generate-running",
+      "domId": "step-nav-3",
+      "label": "步骤3导航",
+      "hideEdge": true
+    },
+    {
+      "from": "page-step3-generate-failed",
+      "to": "page-step3-generate-running",
+      "domId": "step-nav-3",
+      "label": "步骤3导航",
+      "hideEdge": true
+    },
+    {
+      "from": "page-step4-preview-empty",
+      "to": "page-step4-preview-data",
+      "domId": "step-nav-4",
+      "label": "步骤4导航",
+      "hideEdge": true
+    }
+  ],
+  "designSource": {
+    "operatingMode": "free-explore",
+    "cssFilePath": "colors_and_type.css",
+    "brandPrefix": "tcg",
+    "primaryHue": "indigo",
+    "styleConstraints": {
+      "radiusMax": 16,
+      "staticShadowAlphaMax": 0.05,
+      "singlePrimaryHue": true
+    }
+  }
+}

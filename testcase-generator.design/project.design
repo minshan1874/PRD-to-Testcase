@@ -1,0 +1,86 @@
+{
+  "data": [
+    {
+      "id": "page-generator-initial",
+      "title": "初始态 · 输入需求",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1158,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a84d7bb6",
+          "measuredAt": 1788693970756
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/generator-initial.html",
+        "interactions": [],
+        "stateGroupId": "generator-states",
+        "stateRole": "base"
+      }
+    },
+    {
+      "id": "page-generator-loading",
+      "title": "生成中 · Loading",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 480,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1513,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-ef05bebb",
+          "measuredAt": 1788693970756
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/generator-loading.html",
+        "interactions": [],
+        "stateGroupId": "generator-states",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/generator-initial.html"
+      }
+    },
+    {
+      "id": "page-generator",
+      "title": "结果态 · 用例列表",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 960,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1420,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8b25c79e",
+          "measuredAt": 1788693232075
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/generator.html",
+        "interactions": [],
+        "stateGroupId": "generator-states",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/generator-loading.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "TestGen 测试用例生成器"
+  }
+}

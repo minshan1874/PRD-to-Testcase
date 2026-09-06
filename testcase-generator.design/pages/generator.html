@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestGen · 测试用例生成工作台</title>
+    <style id="theme-vars">
+/* ============================================================
+   TestCase Generator — Design Tokens
+   Modern Minimal · Indigo Primary · Tool-first
+   ============================================================ */
+
+:root {
+  /* --- Brand Primary (Indigo) --- */
+  --tc-primary: #4F46E5;
+  --tc-primary-foreground: #FFFFFF;
+  --tc-primary-hover: #4338CA;
+  --tc-primary-active: #3730A3;
+  --tc-primary-50: #EEF2FF;
+  --tc-primary-100: #E0E7FF;
+  --tc-primary-200: #C7D2FE;
+
+  /* --- Background & Surfaces --- */
+  --tc-background: #FAFAFB;
+  --tc-foreground: #0F172A;
+  --tc-card: #FFFFFF;
+  --tc-card-foreground: #0F172A;
+  --tc-popover: #FFFFFF;
+  --tc-popover-foreground: #0F172A;
+
+  /* --- Muted / Secondary Text --- */
+  --tc-muted: #F1F5F9;
+  --tc-muted-foreground: #64748B;
+  --tc-foreground-secondary: #475569;
+  --tc-foreground-tertiary: #94A3B8;
+
+  /* --- Border & Input --- */
+  --tc-border: #E2E8F0;
+  --tc-input: #E2E8F0;
+  --tc-ring: #4F46E5;
+
+  /* --- Accent / Surface-2 --- */
+  --tc-accent: #F1F5F9;
+  --tc-accent-foreground: #0F172A;
+  --tc-surface-2: #F8FAFC;
+
+  /* --- State Colors --- */
+  --tc-success: #10B981;
+  --tc-success-foreground: #FFFFFF;
+  --tc-success-bg: #ECFDF5;
+  --tc-warning: #F59E0B;
+  --tc-warning-foreground: #FFFFFF;
+  --tc-warning-bg: #FFFBEB;
+  --tc-error: #EF4444;
+  --tc-error-foreground: #FFFFFF;
+  --tc-error-bg: #FEF2F2;
+  --tc-info: #3B82F6;
+  --tc-info-bg: #EFF6FF;
+
+  /* --- Radius Scale --- */
+  --tc-radius-sm: 6px;
+  --tc-radius-md: 8px;
+  --tc-radius-lg: 12px;
+  --tc-radius-xl: 16px;
+  --tc-radius-pill: 999px;
+
+  /* --- Shadow Scale --- */
+  --tc-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
+  --tc-shadow-md: 0 4px 12px -4px rgba(15, 23, 42, 0.10);
+  --tc-shadow-lg: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+
+  /* --- Spacing (8pt grid) --- */
+  --tc-s-1: 4px;
+  --tc-s-2: 8px;
+  --tc-s-3: 12px;
+  --tc-s-4: 16px;
+  --tc-s-5: 24px;
+  --tc-s-6: 32px;
+  --tc-s-7: 48px;
+  --tc-s-8: 64px;
+
+  /* --- Typography --- */
+  --tc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --tc-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --tc-text-xs: 12px;
+  --tc-text-sm: 13px;
+  --tc-text-base: 14px;
+  --tc-text-lg: 16px;
+  --tc-text-xl: 18px;
+  --tc-text-2xl: 20px;
+  --tc-text-3xl: 24px;
+  --tc-text-4xl: 30px;
+  --tc-text-display: clamp(28px, 3.5vw, 44px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tc-background);
+    --color-foreground: var(--tc-foreground);
+    --color-card: var(--tc-card);
+    --color-card-foreground: var(--tc-card-foreground);
+    --color-popover: var(--tc-popover);
+    --color-popover-foreground: var(--tc-popover-foreground);
+    --color-primary: var(--tc-primary);
+    --color-primary-foreground: var(--tc-primary-foreground);
+    --color-muted: var(--tc-muted);
+    --color-muted-foreground: var(--tc-muted-foreground);
+    --color-accent: var(--tc-accent);
+    --color-accent-foreground: var(--tc-accent-foreground);
+    --color-border: var(--tc-border);
+    --color-input: var(--tc-input);
+    --color-ring: var(--tc-ring);
+    --radius-sm: var(--tc-radius-sm);
+    --radius-md: var(--tc-radius-md);
+    --radius-lg: var(--tc-radius-lg);
+    --radius-xl: var(--tc-radius-xl);
+  }
+  @layer base {
+    body { background: var(--tc-background); color: var(--tc-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tc-background); }
+      .text-background { color: var(--tc-background); }
+      .border-background { border-color: var(--tc-background); }
+      .ring-background { --tw-ring-color: var(--tc-background); }
+      .bg-foreground { background-color: var(--tc-foreground); }
+      .text-foreground { color: var(--tc-foreground); }
+      .border-foreground { border-color: var(--tc-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tc-foreground); }
+      .bg-card { background-color: var(--tc-card); }
+      .text-card { color: var(--tc-card); }
+      .border-card { border-color: var(--tc-card); }
+      .ring-card { --tw-ring-color: var(--tc-card); }
+      .bg-card-foreground { background-color: var(--tc-card-foreground); }
+      .text-card-foreground { color: var(--tc-card-foreground); }
+      .border-card-foreground { border-color: var(--tc-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tc-card-foreground); }
+      .bg-popover { background-color: var(--tc-popover); }
+      .text-popover { color: var(--tc-popover); }
+      .border-popover { border-color: var(--tc-popover); }
+      .ring-popover { --tw-ring-color: var(--tc-popover); }
+      .bg-popover-foreground { background-color: var(--tc-popover-foreground); }
+      .text-popover-foreground { color: var(--tc-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tc-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tc-popover-foreground); }
+      .bg-primary { background-color: var(--tc-primary); }
+      .text-primary { color: var(--tc-primary); }
+      .border-primary { border-color: var(--tc-primary); }
+      .ring-primary { --tw-ring-color: var(--tc-primary); }
+      .bg-primary-foreground { background-color: var(--tc-primary-foreground); }
+      .text-primary-foreground { color: var(--tc-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tc-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tc-primary-foreground); }
+      .bg-muted { background-color: var(--tc-muted); }
+      .text-muted { color: var(--tc-muted); }
+      .border-muted { border-color: var(--tc-muted); }
+      .ring-muted { --tw-ring-color: var(--tc-muted); }
+      .bg-muted-foreground { background-color: var(--tc-muted-foreground); }
+      .text-muted-foreground { color: var(--tc-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tc-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tc-muted-foreground); }
+      .bg-accent { background-color: var(--tc-accent); }
+      .text-accent { color: var(--tc-accent); }
+      .border-accent { border-color: var(--tc-accent); }
+      .ring-accent { --tw-ring-color: var(--tc-accent); }
+      .bg-accent-foreground { background-color: var(--tc-accent-foreground); }
+      .text-accent-foreground { color: var(--tc-accent-foreground); }
+      .border-accent-foreground { border-color: var(--tc-accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--tc-accent-foreground); }
+      .bg-border { background-color: var(--tc-border); }
+      .text-border { color: var(--tc-border); }
+      .border-border { border-color: var(--tc-border); }
+      .ring-border { --tw-ring-color: var(--tc-border); }
+      .bg-input { background-color: var(--tc-input); }
+      .text-input { color: var(--tc-input); }
+      .border-input { border-color: var(--tc-input); }
+      .ring-input { --tw-ring-color: var(--tc-input); }
+      .bg-ring { background-color: var(--tc-ring); }
+      .text-ring { color: var(--tc-ring); }
+      .border-ring { border-color: var(--tc-ring); }
+      .ring-ring { --tw-ring-color: var(--tc-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      /* Custom component styles */
+      .tc-card {
+        background-color: var(--tc-card);
+        border: 1px solid var(--tc-border);
+        border-radius: var(--tc-radius-lg);
+        box-shadow: var(--tc-shadow-sm);
+        transition: all 0.2s ease;
+      }
+      .tc-card:hover {
+        box-shadow: var(--tc-shadow-md);
+        border-color: var(--tc-primary-200);
+        transform: translateY(-1px);
+      }
+      .tc-btn-primary {
+        background-color: var(--tc-primary);
+        color: var(--tc-primary-foreground);
+        border-radius: var(--tc-radius-md);
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+      .tc-btn-primary:hover {
+        background-color: var(--tc-primary-hover);
+      }
+      .tc-btn-primary:active {
+        background-color: var(--tc-primary-active);
+      }
+      .tc-btn-secondary {
+        background-color: var(--tc-card);
+        color: var(--tc-foreground);
+        border: 1px solid var(--tc-border);
+        border-radius: var(--tc-radius-md);
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+      .tc-btn-secondary:hover {
+        background-color: var(--tc-accent);
+        border-color: var(--tc-primary-200);
+      }
+      .tc-input {
+        background-color: var(--tc-card);
+        border: 1px solid var(--tc-border);
+        border-radius: var(--tc-radius-md);
+        color: var(--tc-foreground);
+        transition: all 0.15s ease;
+      }
+      .tc-input:focus {
+        outline: none;
+        border-color: var(--tc-ring);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+      .tc-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 10px;
+        border-radius: var(--tc-radius-pill);
+        font-size: var(--tc-text-xs);
+        font-weight: 500;
+        line-height: 1.6;
+      }
+      .tc-priority-high {
+        background-color: var(--tc-error-bg);
+        color: var(--tc-error);
+      }
+      .tc-priority-medium {
+        background-color: var(--tc-warning-bg);
+        color: var(--tc-warning);
+      }
+      .tc-priority-low {
+        background-color: var(--tc-info-bg);
+        color: var(--tc-info);
+      }
+      .tc-nav-item {
+        position: relative;
+        padding: 8px 16px;
+        border-radius: var(--tc-radius-md);
+        font-size: var(--tc-text-sm);
+        color: var(--tc-muted-foreground);
+        transition: all 0.15s ease;
+        cursor: pointer;
+      }
+      .tc-nav-item:hover {
+        color: var(--tc-foreground);
+        background-color: var(--tc-accent);
+      }
+      .tc-nav-item.active {
+        color: var(--tc-primary);
+        background-color: var(--tc-primary-50);
+        font-weight: 500;
+      }
+      .tc-tab {
+        padding: 8px 16px;
+        font-size: var(--tc-text-sm);
+        color: var(--tc-muted-foreground);
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .tc-tab:hover {
+        color: var(--tc-foreground);
+      }
+      .tc-tab.active {
+        color: var(--tc-primary);
+        border-bottom-color: var(--tc-primary);
+        font-weight: 500;
+      }
+      .tc-type-tag {
+        padding: 6px 14px;
+        border: 1px solid var(--tc-border);
+        border-radius: var(--tc-radius-md);
+        font-size: var(--tc-text-sm);
+        color: var(--tc-muted-foreground);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        background: var(--tc-card);
+      }
+      .tc-type-tag:hover {
+        border-color: var(--tc-primary-200);
+        color: var(--tc-foreground);
+      }
+      .tc-type-tag.active {
+        background-color: var(--tc-primary-50);
+        border-color: var(--tc-primary);
+        color: var(--tc-primary);
+        font-weight: 500;
+      }
+      .tc-mono {
+        font-family: var(--tc-font-mono);
+      }
+      .tc-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--tc-radius-md);
+        color: var(--tc-muted-foreground);
+        transition: all 0.15s ease;
+        cursor: pointer;
+      }
+      .tc-icon-btn:hover {
+        background-color: var(--tc-accent);
+        color: var(--tc-foreground);
+      }
+      .tc-slider-track {
+        height: 6px;
+        background: var(--tc-border);
+        border-radius: var(--tc-radius-pill);
+        position: relative;
+      }
+      .tc-slider-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--tc-error) 0%, var(--tc-error) 30%, var(--tc-warning) 30%, var(--tc-warning) 80%, var(--tc-info) 80%, var(--tc-info) 100%);
+        border-radius: var(--tc-radius-pill);
+      }
+      .tc-section-title {
+        font-size: var(--tc-text-lg);
+        font-weight: 600;
+        color: var(--tc-foreground);
+      }
+      .tc-section-desc {
+        font-size: var(--tc-text-sm);
+        color: var(--tc-muted-foreground);
+      }
+      .tc-label {
+        font-size: var(--tc-text-sm);
+        font-weight: 500;
+        color: var(--tc-foreground-secondary);
+      }
+      .tc-badge-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: var(--tc-error);
+        border-radius: 50%;
+        border: 2px solid var(--tc-card);
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="font-family: var(--tc-font-sans); background: var(--tc-background); color: var(--tc-foreground);">
+
+<!-- ===== Top Navigation ===== -->
+<header class="sticky top-0 z-50 bg-card border-b border-border" style="background: var(--tc-card); border-color: var(--tc-border);">
+  <div class="flex items-center justify-between h-16 px-6 max-w-[1600px] mx-auto">
+    <!-- Logo -->
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: var(--tc-primary);">
+        <i data-lucide="sparkles" class="w-5 h-5 text-primary-foreground" style="color: var(--tc-primary-foreground);"></i>
+      </div>
+      <div class="flex flex-col leading-tight">
+        <span class="text-lg font-semibold" style="color: var(--tc-foreground);">TestGen</span>
+        <span class="text-xs" style="color: var(--tc-muted-foreground);">智能测试用例生成平台</span>
+      </div>
+    </div>
+
+    <!-- Nav Items -->
+    <nav class="flex items-center gap-1">
+      <div class="tc-nav-item active">工作台</div>
+      <div class="tc-nav-item">用例库</div>
+      <div class="tc-nav-item">模板中心</div>
+      <div class="tc-nav-item">历史记录</div>
+    </nav>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2">
+      <button class="tc-icon-btn" title="搜索">
+        <i data-lucide="search" class="w-5 h-5"></i>
+      </button>
+      <button class="tc-icon-btn relative" title="通知">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="tc-badge-dot"></span>
+      </button>
+      <div class="flex items-center gap-2 pl-2 ml-1 border-l" style="border-color: var(--tc-border);">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-primary-foreground" style="background: var(--tc-primary);">
+          ZL
+        </div>
+        <span class="text-sm font-medium" style="color: var(--tc-foreground);">张立</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Main Workspace ===== -->
+<main class="max-w-[1600px] mx-auto px-6 py-6">
+  <div class="grid grid-cols-10 gap-6">
+
+    <!-- ===== Left Panel: Input & Config (40%) ===== -->
+    <div class="col-span-4 flex flex-col gap-5">
+
+      <!-- A. PRD Input Section -->
+      <section data-dom-id="input-section" id="input-section" class="tc-card p-5">
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h2 class="tc-section-title">需求输入</h2>
+            <p class="tc-section-desc mt-1">粘贴 PRD 文档或功能描述</p>
+          </div>
+          <span class="tc-tag" style="background: var(--tc-success-bg); color: var(--tc-success);">
+            <i data-lucide="zap" class="w-3 h-3 mr-1"></i>
+            智能解析
+          </span>
+        </div>
+
+        <textarea
+          data-dom-id="input-prd"
+          id="input-prd"
+          class="tc-input w-full p-4 resize-none text-sm leading-relaxed"
+          rows="10"
+          placeholder="请输入产品需求描述...
+
+例如：用户登录功能，支持手机号+密码登录、短信验证码登录、第三方微信登录。登录失败时显示错误提示，连续5次失败锁定账户15分钟。"></textarea>
+
+        <div class="flex items-center justify-between mt-3">
+          <span class="text-xs" style="color: var(--tc-foreground-tertiary);">0 / 5000 字</span>
+          <div class="flex items-center gap-2">
+            <button class="text-sm px-3 py-1.5 rounded-md hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+              清空
+            </button>
+            <button class="tc-btn-secondary text-sm px-3 py-1.5 flex items-center gap-1.5">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              从文件导入
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- B. Config Section -->
+      <section data-dom-id="config-section" id="config-section" class="tc-card p-5">
+        <h2 class="tc-section-title mb-5">生成配置</h2>
+
+        <!-- Template Select -->
+        <div class="mb-5">
+          <label class="tc-label block mb-2">用例模板</label>
+          <div class="relative">
+            <select
+              data-dom-id="select-template"
+              id="select-template"
+              class="tc-input w-full px-4 py-2.5 text-sm appearance-none pr-10 cursor-pointer"
+            >
+              <option>标准功能测试</option>
+              <option>边界值测试</option>
+              <option>等价类划分</option>
+              <option>错误推测法</option>
+              <option>场景法</option>
+              <option>全量覆盖</option>
+            </select>
+            <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--tc-muted-foreground);"></i>
+          </div>
+        </div>
+
+        <!-- Test Type Tags -->
+        <div class="mb-5">
+          <label class="tc-label block mb-2">用例类型</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="tc-type-tag active">功能测试</button>
+            <button class="tc-type-tag active">UI测试</button>
+            <button class="tc-type-tag">接口测试</button>
+            <button class="tc-type-tag">性能测试</button>
+            <button class="tc-type-tag">安全测试</button>
+          </div>
+        </div>
+
+        <!-- Priority Distribution -->
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <label class="tc-label">优先级分布</label>
+          </div>
+          <div class="tc-slider-track mb-2">
+            <div class="tc-slider-fill" style="width: 100%;"></div>
+          </div>
+          <div class="flex justify-between text-xs" style="color: var(--tc-muted-foreground);">
+            <span>高 <strong style="color: var(--tc-error);">30%</strong></span>
+            <span>中 <strong style="color: var(--tc-warning);">50%</strong></span>
+            <span>低 <strong style="color: var(--tc-info);">20%</strong></span>
+          </div>
+        </div>
+
+        <!-- Output Format -->
+        <div class="mb-5">
+          <label class="tc-label block mb-2">输出格式</label>
+          <div class="grid grid-cols-4 gap-2">
+            <label class="relative cursor-pointer">
+              <input type="radio" name="format" class="sr-only peer" checked>
+              <div class="tc-type-tag text-center justify-center w-full peer-checked:bg-primary-50 peer-checked:border-primary peer-checked:text-primary"
+                   style="border-color: var(--tc-primary); background: var(--tc-primary-50); color: var(--tc-primary); font-weight: 500;">
+                Excel
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="format" class="sr-only peer">
+              <div class="tc-type-tag text-center justify-center w-full">
+                XMind
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="format" class="sr-only peer">
+              <div class="tc-type-tag text-center justify-center w-full">
+                Markdown
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="format" class="sr-only peer">
+              <div class="tc-type-tag text-center justify-center w-full">
+                Jira
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Advanced Options (Collapsible) -->
+        <div class="border-t pt-4" style="border-color: var(--tc-border);">
+          <button class="flex items-center justify-between w-full text-left">
+            <span class="tc-label">高级选项</span>
+            <i data-lucide="chevron-down" class="w-4 h-4" style="color: var(--tc-muted-foreground);"></i>
+          </button>
+          <div class="mt-4 space-y-3">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <div class="w-9 h-5 rounded-full p-0.5 relative" style="background: var(--tc-primary);">
+                <div class="w-4 h-4 rounded-full bg-primary-foreground absolute right-0.5 top-0.5" style="background: var(--tc-primary-foreground);"></div>
+              </div>
+              <span class="text-sm" style="color: var(--tc-foreground-secondary);">包含负面用例</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <div class="w-9 h-5 rounded-full p-0.5 relative" style="background: var(--tc-primary);">
+                <div class="w-4 h-4 rounded-full bg-primary-foreground absolute right-0.5 top-0.5" style="background: var(--tc-primary-foreground);"></div>
+              </div>
+              <span class="text-sm" style="color: var(--tc-foreground-secondary);">生成边界值</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <div class="w-9 h-5 rounded-full p-0.5 relative" style="background: var(--tc-border);">
+                <div class="w-4 h-4 rounded-full bg-primary-foreground absolute left-0.5 top-0.5" style="background: var(--tc-card);"></div>
+              </div>
+              <span class="text-sm" style="color: var(--tc-foreground-secondary);">覆盖异常流程</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- C. Generate Button Area -->
+      <section class="generate-actions">
+        <div class="flex gap-3">
+          <button
+            data-dom-id="btn-generate"
+            id="btn-generate"
+            class="tc-btn-primary flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 group"
+          >
+            <span>生成测试用例</span>
+            <i data-lucide="wand-2" class="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></i>
+          </button>
+          <button class="tc-btn-secondary px-5 py-3 text-sm font-medium">
+            保存草稿
+          </button>
+        </div>
+        <p class="text-center text-xs mt-3" style="color: var(--tc-foreground-tertiary);">
+          预计生成 50-80 条用例 · 约需 30 秒
+        </p>
+      </section>
+
+    </div>
+
+    <!-- ===== Right Panel: Results (60%) ===== -->
+    <div class="col-span-6">
+      <section data-dom-id="results-section" id="results-section" class="tc-card flex flex-col h-full" style="min-height: 700px;">
+
+        <!-- Results Header Toolbar -->
+        <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color: var(--tc-border);">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-semibold" style="color: var(--tc-foreground);">共生成 68 条用例</span>
+            <div class="flex items-center gap-1.5">
+              <span class="tc-tag tc-priority-high">高优 21</span>
+              <span class="tc-tag tc-priority-medium">中优 34</span>
+              <span class="tc-tag tc-priority-low">低优 13</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center border rounded-md p-0.5" style="border-color: var(--tc-border);">
+              <button data-dom-id="tab-list" id="tab-list" class="tc-tab active px-3 py-1.5 text-xs rounded-md" style="border: none;">列表</button>
+              <button data-dom-id="tab-table" id="tab-table" class="tc-tab px-3 py-1.5 text-xs rounded-md" style="border: none;">表格</button>
+              <button data-dom-id="tab-code" id="tab-code" class="tc-tab px-3 py-1.5 text-xs rounded-md" style="border: none;">代码</button>
+            </div>
+            <button class="tc-icon-btn w-8 h-8" title="筛选">
+              <i data-lucide="filter" class="w-4 h-4"></i>
+            </button>
+            <button class="tc-btn-secondary px-3 py-1.5 text-sm flex items-center gap-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              导出
+            </button>
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--tc-foreground-tertiary);"></i>
+              <input type="text" placeholder="搜索用例..." class="tc-input pl-8 pr-3 py-1.5 text-sm w-40">
+            </div>
+          </div>
+        </div>
+
+        <!-- Testcase List -->
+        <div class="result-tabs flex-1 overflow-y-auto p-4 space-y-3">
+
+          <!-- Test Case 1 -->
+          <article class="tc-card p-4 testcase-list">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-001</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">手机号+密码正常登录</h3>
+              </div>
+              <span class="tc-tag tc-priority-high">高优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>用户已注册账号，手机号处于未锁定状态
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 2 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-002</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">短信验证码登录成功</h3>
+              </div>
+              <span class="tc-tag tc-priority-high">高优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>用户手机号已注册，验证码有效且未过期
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 3 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-003</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">微信第三方授权登录</h3>
+              </div>
+              <span class="tc-tag tc-priority-medium">中优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>微信 App 已登录，用户首次使用微信授权
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 4 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-004</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">密码错误提示显示</h3>
+              </div>
+              <span class="tc-tag tc-priority-high">高优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>用户输入正确手机号，密码输入错误
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 5 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-005</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">连续5次失败账户锁定</h3>
+              </div>
+              <span class="tc-tag tc-priority-high">高优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>同一手机号连续5次输入错误密码
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 6 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-006</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">锁定15分钟后自动解锁</h3>
+              </div>
+              <span class="tc-tag tc-priority-medium">中优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>账户已被锁定，等待15分钟后尝试登录
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 7 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-007</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">验证码过期后重新获取</h3>
+              </div>
+              <span class="tc-tag tc-priority-medium">中优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>获取验证码后等待超过有效期（5分钟）
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+          <!-- Test Case 8 -->
+          <article class="tc-card p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <span class="tc-mono text-xs font-medium px-2 py-0.5 rounded" style="background: var(--tc-primary-50); color: var(--tc-primary);">TC-008</span>
+                <h3 class="text-sm font-medium" style="color: var(--tc-foreground);">未注册手机号登录提示</h3>
+              </div>
+              <span class="tc-tag tc-priority-low">低优</span>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--tc-muted-foreground);">
+              <span class="font-medium" style="color: var(--tc-foreground-secondary);">前置条件：</span>输入未在系统中注册的手机号进行登录
+            </p>
+            <div class="flex items-center gap-1 pt-2 border-t" style="border-color: var(--tc-border);">
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-primary);">
+                <i data-lucide="eye" class="w-3 h-3"></i> 查看详情
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="pencil" class="w-3 h-3"></i> 编辑
+              </button>
+              <button class="flex items-center gap-1 px-2 py-1 text-xs rounded hover:bg-accent transition-colors" style="color: var(--tc-muted-foreground);">
+                <i data-lucide="copy" class="w-3 h-3"></i> 复制
+              </button>
+            </div>
+          </article>
+
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== Footer ===== -->
+<footer class="footer border-t mt-8" style="border-color: var(--tc-border);">
+  <div class="max-w-[1600px] mx-auto px-6 py-5 flex items-center justify-between">
+    <p class="text-xs" style="color: var(--tc-foreground-tertiary);">
+      © 2025 TestGen. 智能测试用例生成平台
+    </p>
+    <p class="text-xs" style="color: var(--tc-foreground-tertiary);">
+      版本 v2.1.0
+    </p>
+  </div>
+</footer>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

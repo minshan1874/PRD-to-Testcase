@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TestGen · 生成中</title>
+    <style id="theme-vars">
+/* ============================================================
+   TestCase Generator — Glassmorphism Luxury Theme
+   Lavender Purple · Rose Gold Accent · Soft Glass
+   ============================================================ */
+
+:root {
+  /* --- Brand Primary (Lavender Purple) --- */
+  --tc-primary: #8B5CF6;
+  --tc-primary-foreground: #FFFFFF;
+  --tc-primary-hover: #7C3AED;
+  --tc-primary-active: #6D28D9;
+  --tc-primary-50: #F5F3FF;
+  --tc-primary-100: #EDE9FE;
+  --tc-primary-200: #DDD6FE;
+  --tc-primary-300: #C4B5FD;
+
+  /* --- Background & Surfaces --- */
+  --tc-background: #FAF7FF;
+  --tc-foreground: #1E1B4B;
+  --tc-card: rgba(255, 255, 255, 0.55);
+  --tc-card-foreground: #1E1B4B;
+  --tc-popover: rgba(255, 255, 255, 0.85);
+  --tc-popover-foreground: #1E1B4B;
+
+  /* --- Glass Effect Tokens --- */
+  --tc-glass-bg: rgba(255, 255, 255, 0.55);
+  --tc-glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --tc-glass-border: rgba(255, 255, 255, 0.85);
+  --tc-glass-border-soft: rgba(255, 255, 255, 0.5);
+  --tc-glass-blur: 20px;
+  --tc-glass-saturate: 180%;
+
+  /* --- Muted / Secondary Text --- */
+  --tc-muted: #F5F3FF;
+  --tc-muted-foreground: #7C7A9B;
+  --tc-foreground-secondary: #4C4A6B;
+  --tc-foreground-tertiary: #A8A6C0;
+
+  /* --- Border & Input --- */
+  --tc-border: #E8E4F5;
+  --tc-input: rgba(255, 255, 255, 0.72);
+  --tc-ring: #8B5CF6;
+
+  /* --- Accent / Surface-2 --- */
+  --tc-accent: #F5F3FF;
+  --tc-accent-foreground: #1E1B4B;
+  --tc-surface-2: rgba(245, 243, 255, 0.6);
+
+  /* --- State Colors --- */
+  --tc-success: #10B981;
+  --tc-success-foreground: #FFFFFF;
+  --tc-success-bg: #ECFDF5;
+  --tc-warning: #F59E0B;
+  --tc-warning-foreground: #FFFFFF;
+  --tc-warning-bg: #FFFBEB;
+  --tc-error: #F43F5E;
+  --tc-error-foreground: #FFFFFF;
+  --tc-error-bg: #FFF1F2;
+  --tc-info: #6366F1;
+  --tc-info-bg: #EEF2FF;
+
+  /* --- Radius Scale (larger, softer) --- */
+  --tc-radius-sm: 8px;
+  --tc-radius-md: 12px;
+  --tc-radius-lg: 18px;
+  --tc-radius-xl: 24px;
+  --tc-radius-pill: 999px;
+
+  /* --- Shadow Scale (purple-tinted, soft) --- */
+  --tc-shadow-sm: 0 1px 2px rgba(30, 27, 75, 0.04), 0 1px 1px rgba(139, 92, 246, 0.03);
+  --tc-shadow-md: 0 4px 12px -4px rgba(139, 92, 246, 0.10);
+  --tc-shadow-lg: 0 12px 32px -8px rgba(139, 92, 246, 0.18);
+
+  /* --- Spacing (8pt grid) --- */
+  --tc-s-1: 4px;
+  --tc-s-2: 8px;
+  --tc-s-3: 12px;
+  --tc-s-4: 16px;
+  --tc-s-5: 24px;
+  --tc-s-6: 32px;
+  --tc-s-7: 48px;
+  --tc-s-8: 64px;
+
+  /* --- Typography --- */
+  --tc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --tc-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --tc-text-xs: 12px;
+  --tc-text-sm: 13px;
+  --tc-text-base: 14px;
+  --tc-text-lg: 16px;
+  --tc-text-xl: 18px;
+  --tc-text-2xl: 20px;
+  --tc-text-3xl: 24px;
+  --tc-text-4xl: 30px;
+  --tc-text-display: clamp(28px, 3.5vw, 44px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tc-background);
+    --color-foreground: var(--tc-foreground);
+    --color-card: var(--tc-card);
+    --color-card-foreground: var(--tc-card-foreground);
+    --color-popover: var(--tc-popover);
+    --color-popover-foreground: var(--tc-popover-foreground);
+    --color-primary: var(--tc-primary);
+    --color-primary-foreground: var(--tc-primary-foreground);
+    --color-muted: var(--tc-muted);
+    --color-muted-foreground: var(--tc-muted-foreground);
+    --color-accent: var(--tc-accent);
+    --color-accent-foreground: var(--tc-accent-foreground);
+    --color-border: var(--tc-border);
+    --color-input: var(--tc-input);
+    --color-ring: var(--tc-ring);
+    --radius-sm: var(--tc-radius-sm);
+    --radius-md: var(--tc-radius-md);
+    --radius-lg: var(--tc-radius-lg);
+    --radius-xl: var(--tc-radius-xl);
+  }
+  @layer base {
+    body { background: var(--tc-background); color: var(--tc-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tc-background); }
+      .text-background { color: var(--tc-background); }
+      .border-background { border-color: var(--tc-background); }
+      .ring-background { --tw-ring-color: var(--tc-background); }
+      .bg-foreground { background-color: var(--tc-foreground); }
+      .text-foreground { color: var(--tc-foreground); }
+      .border-foreground { border-color: var(--tc-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tc-foreground); }
+      .bg-card { background-color: var(--tc-card); }
+      .text-card { color: var(--tc-card); }
+      .border-card { border-color: var(--tc-card); }
+      .ring-card { --tw-ring-color: var(--tc-card); }
+      .bg-card-foreground { background-color: var(--tc-card-foreground); }
+      .text-card-foreground { color: var(--tc-card-foreground); }
+      .border-card-foreground { border-color: var(--tc-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tc-card-foreground); }
+      .bg-popover { background-color: var(--tc-popover); }
+      .text-popover { color: var(--tc-popover); }
+      .border-popover { border-color: var(--tc-popover); }
+      .ring-popover { --tw-ring-color: var(--tc-popover); }
+      .bg-popover-foreground { background-color: var(--tc-popover-foreground); }
+      .text-popover-foreground { color: var(--tc-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tc-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tc-popover-foreground); }
+      .bg-primary { background-color: var(--tc-primary); }
+      .text-primary { color: var(--tc-primary); }
+      .border-primary { border-color: var(--tc-primary); }
+      .ring-primary { --tw-ring-color: var(--tc-primary); }
+      .bg-primary-foreground { background-color: var(--tc-primary-foreground); }
+      .text-primary-foreground { color: var(--tc-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tc-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tc-primary-foreground); }
+      .bg-muted { background-color: var(--tc-muted); }
+      .text-muted { color: var(--tc-muted); }
+      .border-muted { border-color: var(--tc-muted); }
+      .ring-muted { --tw-ring-color: var(--tc-muted); }
+      .bg-muted-foreground { background-color: var(--tc-muted-foreground); }
+      .text-muted-foreground { color: var(--tc-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tc-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tc-muted-foreground); }
+      .bg-accent { background-color: var(--tc-accent); }
+      .text-accent { color: var(--tc-accent); }
+      .border-accent { border-color: var(--tc-accent); }
+      .ring-accent { --tw-ring-color: var(--tc-accent); }
+      .bg-accent-foreground { background-color: var(--tc-accent-foreground); }
+      .text-accent-foreground { color: var(--tc-accent-foreground); }
+      .border-accent-foreground { border-color: var(--tc-accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--tc-accent-foreground); }
+      .bg-border { background-color: var(--tc-border); }
+      .text-border { color: var(--tc-border); }
+      .border-border { border-color: var(--tc-border); }
+      .ring-border { --tw-ring-color: var(--tc-border); }
+      .bg-input { background-color: var(--tc-input); }
+      .text-input { color: var(--tc-input); }
+      .border-input { border-color: var(--tc-input); }
+      .ring-input { --tw-ring-color: var(--tc-input); }
+      .bg-ring { background-color: var(--tc-ring); }
+      .text-ring { color: var(--tc-ring); }
+      .border-ring { border-color: var(--tc-ring); }
+      .ring-ring { --tw-ring-color: var(--tc-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ============================================================
+         Page-specific styles — Glass Loading State
+         ============================================================ */
+
+      html, body {
+        font-family: var(--tc-font-sans);
+        font-size: var(--tc-text-base);
+        line-height: 1.6;
+      }
+
+      /* --- Ambient background glows --- */
+      .ambient-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: var(--tc-background);
+        overflow: hidden;
+      }
+      .ambient-bg::before,
+      .ambient-bg::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      .ambient-bg::before {
+        width: 520px;
+        height: 520px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+        top: -120px;
+        left: -80px;
+      }
+      .ambient-bg::after {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(196, 181, 253, 0.4) 0%, transparent 70%);
+        bottom: -180px;
+        right: -120px;
+      }
+      .ambient-glow-3 {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+        top: 40%;
+        left: 55%;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      /* --- Glass card base --- */
+      .glass-card {
+        background: var(--tc-glass-bg);
+        backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        -webkit-backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        border: 1px solid var(--tc-glass-border);
+        border-radius: var(--tc-radius-xl);
+        box-shadow: var(--tc-shadow-lg);
+      }
+      .glass-card-strong {
+        background: var(--tc-glass-bg-strong);
+        backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        -webkit-backdrop-filter: blur(var(--tc-glass-blur)) saturate(var(--tc-glass-saturate));
+        border: 1px solid var(--tc-glass-border);
+        border-radius: var(--tc-radius-xl);
+        box-shadow: var(--tc-shadow-lg);
+      }
+
+      /* --- Glass nav --- */
+      .glass-nav {
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+      }
+
+      /* --- Disabled section opacity --- */
+      .section-disabled {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      /* --- Gradient text --- */
+      .gradient-text {
+        background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #C4B5FD 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+      }
+
+      /* --- Analyzing badge --- */
+      .analyzing-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: rgba(139, 92, 246, 0.12);
+        color: var(--tc-primary);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 999px;
+        font-size: var(--tc-text-xs);
+        font-weight: 500;
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+      .analyzing-badge .spin-icon {
+        animation: spin 1s linear infinite;
+      }
+
+      /* --- Generate button loading state --- */
+      .btn-generate-loading {
+        position: relative;
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+        color: #fff;
+        border-radius: var(--tc-radius-md);
+        padding: 14px 28px;
+        font-weight: 600;
+        font-size: var(--tc-text-lg);
+        border: none;
+        cursor: not-allowed;
+        box-shadow: 0 8px 24px -4px rgba(139, 92, 246, 0.45);
+        animation: breath 3s ease-in-out infinite;
+        overflow: visible;
+      }
+      .btn-generate-loading::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: calc(var(--tc-radius-md) + 2px);
+        background: linear-gradient(135deg, #8B5CF6, #C4B5FD, #8B5CF6);
+        background-size: 200% 200%;
+        z-index: -1;
+        opacity: 0.6;
+        animation: flow-gradient 3s linear infinite;
+        filter: blur(8px);
+      }
+      .btn-ripple-wrap {
+        position: relative;
+        display: inline-block;
+      }
+      .btn-ripple-wrap::before,
+      .btn-ripple-wrap::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--tc-radius-md);
+        border: 2px solid rgba(139, 92, 246, 0.5);
+        opacity: 0;
+        animation: ripple 2s ease-out infinite;
+        pointer-events: none;
+      }
+      .btn-ripple-wrap::after {
+        animation-delay: 1s;
+      }
+
+      /* --- Loading spinner --- */
+      .loading-spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      /* --- Progress bar --- */
+      .progress-track {
+        height: 10px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 67%;
+        background: linear-gradient(90deg, #8B5CF6, #A78BFA, #C4B5FD);
+        background-size: 200% 100%;
+        border-radius: 999px;
+        position: relative;
+        animation: flow-gradient 3s linear infinite;
+      }
+      .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30px;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+        animation: shimmer 1.5s linear infinite;
+      }
+
+      /* --- Step indicator --- */
+      .step-item {
+        position: relative;
+        padding-left: 36px;
+      }
+      .step-item::before {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 28px;
+        bottom: -16px;
+        width: 2px;
+        background: var(--tc-border);
+      }
+      .step-item:last-child::before {
+        display: none;
+      }
+      .step-dot {
+        position: absolute;
+        left: 0;
+        top: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .step-dot.completed {
+        background: var(--tc-success);
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+      }
+      .step-dot.active {
+        background: var(--tc-primary);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+      .step-dot.pending {
+        background: transparent;
+        border: 2px solid var(--tc-border);
+      }
+      .step-item.completed::before {
+        background: linear-gradient(to bottom, var(--tc-success), var(--tc-success));
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+      }
+      .step-item.active::before {
+        background: linear-gradient(to bottom, var(--tc-primary), var(--tc-border));
+      }
+
+      /* --- Skeleton shimmer --- */
+      .skeleton-card {
+        background: var(--tc-glass-bg);
+        backdrop-filter: blur(var(--tc-glass-blur));
+        -webkit-backdrop-filter: blur(var(--tc-glass-blur));
+        border: 1px solid var(--tc-glass-border-soft);
+        border-radius: var(--tc-radius-lg);
+        overflow: hidden;
+        position: relative;
+      }
+      .skeleton-line {
+        height: 12px;
+        background: linear-gradient(90deg, rgba(221, 214, 254, 0.4) 0%, rgba(221, 214, 254, 0.8) 50%, rgba(221, 214, 254, 0.4) 100%);
+        background-size: 200% 100%;
+        border-radius: 6px;
+        animation: shimmer 1.5s linear infinite;
+      }
+      .skeleton-line.short {
+        width: 40%;
+      }
+      .skeleton-line.medium {
+        width: 70%;
+      }
+      .skeleton-line.long {
+        width: 100%;
+      }
+      .skeleton-badge {
+        width: 60px;
+        height: 20px;
+        background: linear-gradient(90deg, rgba(221, 214, 254, 0.4) 0%, rgba(221, 214, 254, 0.8) 50%, rgba(221, 214, 254, 0.4) 100%);
+        background-size: 200% 100%;
+        border-radius: 999px;
+        animation: shimmer 1.5s linear infinite;
+      }
+      .skeleton-tag {
+        width: 48px;
+        height: 20px;
+        background: linear-gradient(90deg, rgba(221, 214, 254, 0.4) 0%, rgba(221, 214, 254, 0.8) 50%, rgba(221, 214, 254, 0.4) 100%);
+        background-size: 200% 100%;
+        border-radius: 6px;
+        animation: shimmer 1.5s linear infinite;
+      }
+
+      /* --- Textarea disabled look --- */
+      .textarea-disabled {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid var(--tc-glass-border-soft);
+        color: var(--tc-foreground-secondary);
+        resize: none;
+      }
+
+      /* --- Select disabled --- */
+      .select-disabled {
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid var(--tc-glass-border-soft);
+        color: var(--tc-foreground-secondary);
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      /* --- Mono font --- */
+      .font-mono-tc {
+        font-family: var(--tc-font-mono);
+      }
+
+      /* ============================================================
+         Animation keyframes
+         ============================================================ */
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% {
+          box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.35);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(139, 92, 246, 0);
+        }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      @keyframes flow-gradient {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+      }
+
+      @keyframes ripple {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.25);
+          opacity: 0;
+        }
+      }
+
+      @keyframes breath {
+        0%, 100% {
+          box-shadow: 0 8px 24px -4px rgba(139, 92, 246, 0.45);
+        }
+        50% {
+          box-shadow: 0 12px 32px -4px rgba(139, 92, 246, 0.65);
+        }
+      }
+
+      /* --- Reduced motion fallback --- */
+      @media (prefers-reduced-motion: reduce) {
+        .analyzing-badge,
+        .analyzing-badge .spin-icon,
+        .btn-generate-loading,
+        .btn-generate-loading::before,
+        .btn-ripple-wrap::before,
+        .btn-ripple-wrap::after,
+        .loading-spinner,
+        .progress-fill,
+        .progress-fill::after,
+        .step-dot.active,
+        .skeleton-line,
+        .skeleton-badge,
+        .skeleton-tag {
+          animation: none !important;
+        }
+        .progress-fill::after {
+          display: none;
+        }
+        .btn-generate-loading::before {
+          filter: none;
+          opacity: 0.3;
+        }
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <!-- Ambient background -->
+    <div class="ambient-bg">
+        <div class="ambient-glow-3"></div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav id="top-nav" class="glass-nav sticky top-0 z-50">
+        <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);">
+                    <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <div class="font-bold text-lg tracking-tight" style="color: var(--tc-foreground);">TestGen</div>
+                </div>
+            </div>
+            <!-- User Avatar only -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold" style="background: linear-gradient(135deg, #8B5CF6, #C4B5FD);">
+                    Z
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main>
+        <div class="max-w-[1400px] mx-auto px-6 py-8">
+            <div class="flex gap-6">
+
+                <!-- Left column (40%) -->
+                <div class="w-[40%] flex flex-col gap-5">
+
+                    <!-- Input Section Card -->
+                    <section id="input-section" class="glass-card p-5 section-disabled">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="file-text" class="w-4 h-4" style="color: var(--tc-primary);"></i>
+                                <h3 class="font-semibold text-base" style="color: var(--tc-foreground);">需求描述</h3>
+                            </div>
+                            <span class="analyzing-badge">
+                                <i data-lucide="loader-2" class="w-3 h-3 spin-icon"></i>
+                                分析中
+                            </span>
+                        </div>
+                        <textarea
+                            id="input-prd"
+                            class="textarea-disabled w-full rounded-xl p-4 text-sm leading-relaxed no-scrollbar"
+                            rows="10"
+                            disabled
+                        >用户登录模块 PRD
+
+1. 功能概述
+本模块负责用户身份认证，支持手机号+密码、手机号+验证码、第三方登录（微信/QQ）三种方式。
+
+2. 业务规则
+- 密码长度 8-20 位，需包含字母和数字
+- 验证码 6 位数字，有效期 5 分钟
+- 连续输错 5 次密码，账号锁定 30 分钟
+- 登录成功后返回 token，有效期 7 天
+
+3. 异常场景
+- 网络异常时提示重试
+- 账号不存在时统一提示"账号或密码错误"
+- 第三方登录首次需绑定手机号</textarea>
+                    </section>
+
+                    <!-- Config Section Card -->
+                    <section id="config-section" class="glass-card p-5 section-disabled">
+                        <div class="flex items-center gap-2 mb-4">
+                            <i data-lucide="settings-2" class="w-4 h-4" style="color: var(--tc-primary);"></i>
+                            <h3 class="font-semibold text-base" style="color: var(--tc-foreground);">生成配置</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Template -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--tc-foreground-secondary);">用例模板</label>
+                                <div class="relative">
+                                    <select id="select-template" class="select-disabled w-full rounded-xl px-4 py-2.5 text-sm pr-10" disabled>
+                                        <option>标准功能测试模板</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--tc-muted-foreground);"></i>
+                                </div>
+                            </div>
+
+                            <!-- Priority -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--tc-foreground-secondary);">用例粒度</label>
+                                <div class="flex gap-2">
+                                    <div class="flex-1 rounded-xl px-3 py-2 text-center text-sm border" style="background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); color: var(--tc-primary);">
+                                        标准
+                                    </div>
+                                    <div class="flex-1 rounded-xl px-3 py-2 text-center text-sm border" style="background: rgba(255, 255, 255, 0.3); border-color: var(--tc-glass-border-soft); color: var(--tc-muted-foreground);">
+                                        详细
+                                    </div>
+                                    <div class="flex-1 rounded-xl px-3 py-2 text-center text-sm border" style="background: rgba(255, 255, 255, 0.3); border-color: var(--tc-glass-border-soft); color: var(--tc-muted-foreground);">
+                                        极简
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Coverage -->
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--tc-foreground-secondary);">覆盖类型</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <div class="px-3 py-1.5 rounded-lg text-xs border" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25); color: var(--tc-success);">
+                                        正常用例
+                                    </div>
+                                    <div class="px-3 py-1.5 rounded-lg text-xs border" style="background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25); color: var(--tc-error);">
+                                        异常用例
+                                    </div>
+                                    <div class="px-3 py-1.5 rounded-lg text-xs border" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25); color: var(--tc-warning);">
+                                        边界用例
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Generate Button -->
+                    <div class="generate-actions">
+                        <div class="btn-ripple-wrap w-full">
+                            <button id="btn-generate" class="btn-generate-loading w-full flex items-center justify-center gap-3" disabled>
+                                <div id="loading-spinner" class="loading-spinner"></div>
+                                <span>生成中...</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right column (60%) -->
+                <div id="results-section" class="w-[60%] flex flex-col gap-5">
+
+                    <!-- Loading Progress Card -->
+                    <section id="loading-progress" class="glass-card-strong p-6">
+                        <div class="text-center mb-6">
+                            <div class="font-mono-tc text-6xl font-bold tracking-tight gradient-text mb-2">67%</div>
+                            <div class="text-sm" style="color: var(--tc-muted-foreground);">预计还需约 12 秒</div>
+                        </div>
+                        <div class="progress-track mb-6">
+                            <div class="progress-fill"></div>
+                        </div>
+
+                        <!-- Step Indicator -->
+                        <div class="space-y-4">
+                            <!-- Step 1: completed -->
+                            <div class="step-item completed">
+                                <div class="step-dot completed">
+                                    <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                                </div>
+                                <div class="pt-0.5">
+                                    <div class="font-medium text-sm" style="color: var(--tc-foreground);">解析需求</div>
+                                    <div class="text-xs mt-0.5" style="color: var(--tc-muted-foreground);">已完成需求结构拆解</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: active -->
+                            <div class="step-item active">
+                                <div class="step-dot active"></div>
+                                <div class="pt-0.5">
+                                    <div class="font-medium text-sm" style="color: var(--tc-primary);">提取测试点</div>
+                                    <div class="text-xs mt-0.5" style="color: var(--tc-muted-foreground);">正在分析登录流程...</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: pending -->
+                            <div class="step-item">
+                                <div class="step-dot pending"></div>
+                                <div class="pt-0.5">
+                                    <div class="font-medium text-sm" style="color: var(--tc-foreground-tertiary);">生成用例</div>
+                                    <div class="text-xs mt-0.5" style="color: var(--tc-foreground-tertiary);">待执行</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: pending -->
+                            <div class="step-item">
+                                <div class="step-dot pending"></div>
+                                <div class="pt-0.5">
+                                    <div class="font-medium text-sm" style="color: var(--tc-foreground-tertiary);">质量校验</div>
+                                    <div class="text-xs mt-0.5" style="color: var(--tc-foreground-tertiary);">待执行</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Results Skeleton Area -->
+                    <section class="glass-card p-5">
+                        <!-- Toolbar placeholder -->
+                        <div class="flex items-center justify-between mb-5 pb-4" style="border-bottom: 1px solid var(--tc-border);">
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-mono-tc text-xl font-semibold" style="color: var(--tc-foreground-tertiary);">--/--</span>
+                                    <span class="text-sm" style="color: var(--tc-muted-foreground);">条用例</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 p-1 rounded-xl" style="background: rgba(139, 92, 246, 0.06);">
+                                <div class="px-3 py-1.5 rounded-lg text-sm" style="color: var(--tc-muted-foreground);">
+                                    <i data-lucide="list" class="w-4 h-4"></i>
+                                </div>
+                                <div class="px-3 py-1.5 rounded-lg text-sm" style="color: var(--tc-muted-foreground);">
+                                    <i data-lucide="table" class="w-4 h-4"></i>
+                                </div>
+                                <div class="px-3 py-1.5 rounded-lg text-sm" style="color: var(--tc-muted-foreground);">
+                                    <i data-lucide="code" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skeleton cards -->
+                        <div class="space-y-4">
+                            <!-- Skeleton card 1 -->
+                            <div class="skeleton-card p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-badge"></div>
+                                </div>
+                                <div class="skeleton-line long mb-2"></div>
+                                <div class="skeleton-line medium mb-3"></div>
+                                <div class="flex gap-2">
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skeleton card 2 -->
+                            <div class="skeleton-card p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-badge"></div>
+                                </div>
+                                <div class="skeleton-line long mb-2"></div>
+                                <div class="skeleton-line medium mb-3"></div>
+                                <div class="flex gap-2">
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skeleton card 3 -->
+                            <div class="skeleton-card p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-badge"></div>
+                                </div>
+                                <div class="skeleton-line long mb-2"></div>
+                                <div class="skeleton-line medium mb-3"></div>
+                                <div class="flex gap-2">
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                </div>
+                            </div>
+
+                            <!-- Skeleton card 4 -->
+                            <div class="skeleton-card p-4">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-badge"></div>
+                                </div>
+                                <div class="skeleton-line long mb-2"></div>
+                                <div class="skeleton-line medium mb-3"></div>
+                                <div class="flex gap-2">
+                                    <div class="skeleton-tag"></div>
+                                    <div class="skeleton-tag"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="py-6 mt-4">
+        <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-between text-xs" style="color: var(--tc-foreground-tertiary);">
+            <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5" style="color: var(--tc-primary);"></i>
+                <span>TestGen · AI 测试用例生成器</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>v1.0.0</span>
+                <span>·</span>
+                <span>由 AI 驱动</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

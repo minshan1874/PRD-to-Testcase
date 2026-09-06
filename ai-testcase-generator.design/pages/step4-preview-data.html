@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04 预览导出 / 有数据</title>
+    <style id="theme-vars">
+/* ============================================
+   AI 测试用例生成器 · 设计系统 Tokens
+   风格：专业工具型 / 靛蓝主色 / 数据密集友好
+   ============================================ */
+
+:root {
+  /* ===== 主色系（靛蓝） ===== */
+  --primary-50:  oklch(0.978 0.018 278);
+  --primary-100: oklch(0.946 0.034 278);
+  --primary-200: oklch(0.898 0.064 278);
+  --primary-300: oklch(0.826 0.112 278);
+  --primary-400: oklch(0.728 0.168 276);
+  --primary-500: oklch(0.623 0.214 274);  /* 主色 */
+  --primary-600: oklch(0.546 0.245 272);
+  --primary-700: oklch(0.478 0.258 270);
+  --primary-800: oklch(0.416 0.238 268);
+  --primary-900: oklch(0.356 0.188 266);
+
+  /* ===== 中性色阶 ===== */
+  --gray-50:  oklch(0.985 0.002 262);
+  --gray-100: oklch(0.962 0.004 262);
+  --gray-200: oklch(0.922 0.007 262);
+  --gray-300: oklch(0.872 0.010 262);
+  --gray-400: oklch(0.708 0.014 262);
+  --gray-500: oklch(0.556 0.016 262);
+  --gray-600: oklch(0.439 0.018 262);
+  --gray-700: oklch(0.349 0.018 262);
+  --gray-800: oklch(0.248 0.016 262);
+  --gray-900: oklch(0.145 0.012 262);
+
+  /* ===== 语义状态色 ===== */
+  --success-50:  oklch(0.970 0.032 158);
+  --success-100: oklch(0.936 0.064 158);
+  --success-500: oklch(0.648 0.222 158);  /* 成功 */
+  --success-600: oklch(0.577 0.200 158);
+  --success-700: oklch(0.508 0.164 158);
+
+  --warning-50:  oklch(0.976 0.042 90);
+  --warning-100: oklch(0.948 0.078 90);
+  --warning-500: oklch(0.755 0.182 82);   /* 警告 */
+  --warning-600: oklch(0.682 0.198 70);
+  --warning-700: oklch(0.564 0.202 58);
+
+  --error-50:  oklch(0.968 0.036 24);
+  --error-100: oklch(0.930 0.072 24);
+  --error-500: oklch(0.637 0.228 27);     /* 错误 */
+  --error-600: oklch(0.577 0.245 27);
+  --error-700: oklch(0.508 0.232 26);
+
+  --info-50:  oklch(0.966 0.026 242);
+  --info-100: oklch(0.928 0.052 242);
+  --info-500: oklch(0.588 0.198 250);     /* 信息 */
+  --info-600: oklch(0.514 0.202 252);
+
+  /* ===== 品牌前缀变量 ===== */
+  --tcg-background: var(--gray-50);
+  --tcg-foreground: var(--gray-900);
+  --tcg-card: #ffffff;
+  --tcg-card-foreground: var(--gray-900);
+  --tcg-popover: #ffffff;
+  --tcg-popover-foreground: var(--gray-900);
+  --tcg-primary: var(--primary-600);
+  --tcg-primary-foreground: #ffffff;
+  --tcg-muted: var(--gray-100);
+  --tcg-muted-foreground: var(--gray-500);
+  --tcg-accent: var(--primary-50);
+  --tcg-accent-foreground: var(--primary-700);
+  --tcg-destructive: var(--error-600);
+  --tcg-destructive-foreground: #ffffff;
+  --tcg-border: var(--gray-200);
+  --tcg-input: var(--gray-200);
+  --tcg-ring: var(--primary-500);
+  --tcg-radius-sm: var(--radius-sm);
+  --tcg-radius-md: var(--radius-md);
+  --tcg-radius-lg: var(--radius-lg);
+  --tcg-radius-xl: var(--radius-xl);
+
+  /* ===== 语义别名 ===== */
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --card: #ffffff;
+  --card-foreground: var(--gray-900);
+  --popover: #ffffff;
+  --popover-foreground: var(--gray-900);
+  --primary: var(--primary-600);
+  --primary-foreground: #ffffff;
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --accent: var(--primary-50);
+  --accent-foreground: var(--primary-700);
+  --destructive: var(--error-600);
+  --destructive-foreground: #ffffff;
+  --border: var(--gray-200);
+  --input: var(--gray-200);
+  --ring: var(--primary-500);
+
+  /* ===== 状态色语义 ===== */
+  --state-success: var(--success-500);
+  --state-success-bg: var(--success-50);
+  --state-success-border: var(--success-100);
+  --state-warning: var(--warning-600);
+  --state-warning-bg: var(--warning-50);
+  --state-warning-border: var(--warning-100);
+  --state-error: var(--error-600);
+  --state-error-bg: var(--error-50);
+  --state-error-border: var(--error-100);
+  --state-info: var(--info-500);
+  --state-info-bg: var(--info-50);
+  --state-info-border: var(--info-100);
+
+  /* ===== 圆角 ===== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ===== 阴影 ===== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 1px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 24px -8px rgb(0 0 0 / 0.08), 0 4px 12px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 40px -12px rgb(0 0 0 / 0.10);
+
+  /* ===== 字体 ===== */
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* ===== 间距 ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--state-success);
+  --color-warning: var(--state-warning);
+  --color-error: var(--state-error);
+  --color-info: var(--state-info);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+}
+
+/* ===== 基础样式 ===== */
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 工具类 ===== */
+.text-muted { color: var(--muted-foreground); }
+.text-success { color: var(--state-success); }
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+
+.bg-success { background: var(--state-success-bg); }
+.bg-warning { background: var(--state-warning-bg); }
+.bg-error { background: var(--state-error-bg); }
+.bg-info { background: var(--state-info-bg); }
+
+.border-success { border-color: var(--state-success-border); }
+.border-warning { border-color: var(--state-warning-border); }
+.border-error { border-color: var(--state-error-border); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tcg-background);
+    --color-foreground: var(--tcg-foreground);
+    --color-card: var(--tcg-card);
+    --color-card-foreground: var(--tcg-card-foreground);
+    --color-popover: var(--tcg-popover);
+    --color-popover-foreground: var(--tcg-popover-foreground);
+    --color-primary: var(--tcg-primary);
+    --color-primary-foreground: var(--tcg-primary-foreground);
+    --color-muted: var(--tcg-muted);
+    --color-muted-foreground: var(--tcg-muted-foreground);
+    --color-accent: var(--tcg-accent);
+    --color-accent-foreground: var(--tcg-accent-foreground);
+    --color-destructive: var(--tcg-destructive);
+    --color-destructive-foreground: var(--tcg-destructive-foreground);
+    --color-border: var(--tcg-border);
+    --color-input: var(--tcg-input);
+    --color-ring: var(--tcg-ring);
+    --color-success: var(--state-success);
+    --color-warning: var(--state-warning);
+    --color-error: var(--state-error);
+    --color-info: var(--state-info);
+    --radius-sm: var(--tcg-radius-sm);
+    --radius-md: var(--tcg-radius-md);
+    --radius-lg: var(--tcg-radius-lg);
+    --radius-xl: var(--tcg-radius-xl);
+    --radius-full: var(--radius-full);
+  }
+  @layer base {
+    body { background: var(--tcg-background); color: var(--tcg-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tcg-background); }
+      .text-background { color: var(--tcg-background); }
+      .border-background { border-color: var(--tcg-background); }
+      .ring-background { --tw-ring-color: var(--tcg-background); }
+      .bg-foreground { background-color: var(--tcg-foreground); }
+      .text-foreground { color: var(--tcg-foreground); }
+      .border-foreground { border-color: var(--tcg-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tcg-foreground); }
+      .bg-card { background-color: var(--tcg-card); }
+      .text-card { color: var(--tcg-card); }
+      .border-card { border-color: var(--tcg-card); }
+      .ring-card { --tw-ring-color: var(--tcg-card); }
+      .bg-card-foreground { background-color: var(--tcg-card-foreground); }
+      .text-card-foreground { color: var(--tcg-card-foreground); }
+      .border-card-foreground { border-color: var(--tcg-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tcg-card-foreground); }
+      .bg-popover { background-color: var(--tcg-popover); }
+      .text-popover { color: var(--tcg-popover); }
+      .border-popover { border-color: var(--tcg-popover); }
+      .ring-popover { --tw-ring-color: var(--tcg-popover); }
+      .bg-popover-foreground { background-color: var(--tcg-popover-foreground); }
+      .text-popover-foreground { color: var(--tcg-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tcg-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tcg-popover-foreground); }
+      .bg-primary { background-color: var(--tcg-primary); }
+      .text-primary { color: var(--tcg-primary); }
+      .border-primary { border-color: var(--tcg-primary); }
+      .ring-primary { --tw-ring-color: var(--tcg-primary); }
+      .bg-primary-foreground { background-color: var(--tcg-primary-foreground); }
+      .text-primary-foreground { color: var(--tcg-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tcg-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tcg-primary-foreground); }
+      .bg-muted { background-color: var(--tcg-muted); }
+      .text-muted { color: var(--tcg-muted); }
+      .border-muted { border-color: var(--tcg-muted); }
+      .ring-muted { --tw-ring-color: var(--tcg-muted); }
+      .bg-muted-foreground { background-color: var(--tcg-muted-foreground); }
+      .text-muted-foreground { color: var(--tcg-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tcg-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tcg-muted-foreground); }
+      .bg-accent { background-color: var(--tcg-accent); }
+      .text-accent { color: var(--tcg-accent); }
+      .border-accent { border-color: var(--tcg-accent); }
+      .ring-accent { --tw-ring-color: var(--tcg-accent); }
+      .bg-accent-foreground { background-color: var(--tcg-accent-foreground); }
+      .text-accent-foreground { color: var(--tcg-accent-foreground); }
+      .border-accent-foreground { border-color: var(--tcg-accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--tcg-accent-foreground); }
+      .bg-destructive { background-color: var(--tcg-destructive); }
+      .text-destructive { color: var(--tcg-destructive); }
+      .border-destructive { border-color: var(--tcg-destructive); }
+      .ring-destructive { --tw-ring-color: var(--tcg-destructive); }
+      .bg-destructive-foreground { background-color: var(--tcg-destructive-foreground); }
+      .text-destructive-foreground { color: var(--tcg-destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--tcg-destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--tcg-destructive-foreground); }
+      .bg-border { background-color: var(--tcg-border); }
+      .text-border { color: var(--tcg-border); }
+      .border-border { border-color: var(--tcg-border); }
+      .ring-border { --tw-ring-color: var(--tcg-border); }
+      .bg-input { background-color: var(--tcg-input); }
+      .text-input { color: var(--tcg-input); }
+      .border-input { border-color: var(--tcg-input); }
+      .ring-input { --tw-ring-color: var(--tcg-input); }
+      .bg-ring { background-color: var(--tcg-ring); }
+      .text-ring { color: var(--tcg-ring); }
+      .border-ring { border-color: var(--tcg-ring); }
+      .ring-ring { --tw-ring-color: var(--tcg-ring); }
+      .bg-success { background-color: var(--state-success); }
+      .text-success { color: var(--state-success); }
+      .border-success { border-color: var(--state-success); }
+      .ring-success { --tw-ring-color: var(--state-success); }
+      .bg-warning { background-color: var(--state-warning); }
+      .text-warning { color: var(--state-warning); }
+      .border-warning { border-color: var(--state-warning); }
+      .ring-warning { --tw-ring-color: var(--state-warning); }
+      .bg-error { background-color: var(--state-error); }
+      .text-error { color: var(--state-error); }
+      .border-error { border-color: var(--state-error); }
+      .ring-error { --tw-ring-color: var(--state-error); }
+      .bg-info { background-color: var(--state-info); }
+      .text-info { color: var(--state-info); }
+      .border-info { border-color: var(--state-info); }
+      .ring-info { --tw-ring-color: var(--state-info); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+    <style>
+      /* ===== Page Layout ===== */
+      .page-container {
+        max-width: 1152px;
+        margin: 0 auto;
+        padding: 24px 24px 48px;
+      }
+
+      /* ===== Header ===== */
+      .app-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 0 24px;
+      }
+      .app-header .logo-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-600);
+        color: #fff;
+        border-radius: var(--radius-md);
+      }
+      .app-header .app-title {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        color: var(--gray-900);
+        letter-spacing: -0.01em;
+      }
+
+      /* ===== Step Navigation ===== */
+      .step-nav {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+      }
+      .step-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        color: var(--gray-500);
+        flex-shrink: 0;
+      }
+      .step-item .step-num {
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-full);
+        background: var(--gray-100);
+        color: var(--gray-500);
+        font-size: var(--text-xs);
+        font-weight: 600;
+      }
+      .step-item.completed {
+        color: var(--gray-700);
+      }
+      .step-item.completed .step-num {
+        background: var(--primary-100);
+        color: var(--primary-700);
+      }
+      .step-item.active {
+        background: var(--primary-600);
+        color: #fff;
+      }
+      .step-item.active .step-num {
+        background: rgba(255,255,255,0.2);
+        color: #fff;
+      }
+      .step-divider {
+        flex: 1;
+        height: 1px;
+        background: var(--gray-200);
+        margin: 0 4px;
+        min-width: 24px;
+      }
+
+      /* ===== Card ===== */
+      .preview-card {
+        background: #fff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+      }
+
+      /* ===== Card Toolbar ===== */
+      .card-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .toolbar-title {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        color: var(--gray-900);
+      }
+      .count-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        background: var(--primary-50);
+        color: var(--primary-700);
+        font-size: var(--text-xs);
+        font-weight: 500;
+      }
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: var(--radius-md);
+        font-size: var(--text-sm);
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--primary-600);
+        color: #fff;
+        border-color: var(--primary-600);
+      }
+      .btn-primary:hover {
+        background: var(--primary-700);
+        border-color: var(--primary-700);
+      }
+      .btn-outline {
+        background: #fff;
+        color: var(--gray-700);
+        border-color: var(--gray-300);
+      }
+      .btn-outline:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+      }
+      .btn-outline:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #fff;
+        border-color: var(--gray-200);
+        color: var(--gray-400);
+      }
+      .btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ===== Table ===== */
+      .table-scroll {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 720px;
+      }
+      .data-table {
+        width: 100%;
+        min-width: 1100px;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .data-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--gray-50);
+        color: var(--gray-700);
+        font-weight: 600;
+        font-size: 12px;
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--gray-200);
+        white-space: nowrap;
+      }
+      .data-table tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-800);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+      .data-table tbody tr:nth-child(even) td {
+        background: var(--gray-50);
+      }
+      .data-table tbody tr:hover td {
+        background: var(--gray-100);
+      }
+      .data-table tbody tr:nth-child(even):hover td {
+        background: var(--gray-100);
+      }
+
+      /* Column widths */
+      .col-id { width: 80px; text-align: center; font-family: var(--font-mono); font-size: 12px; color: var(--gray-500); }
+      .col-module { width: 120px; }
+      .col-title { width: 200px; font-weight: 500; color: var(--gray-900); }
+      .col-type { width: 100px; }
+      .col-priority { width: 70px; text-align: center; }
+      .col-precondition { width: 180px; color: var(--gray-500); font-size: 12.5px; }
+      .col-testdata { width: 160px; color: var(--gray-500); font-size: 12.5px; }
+      .col-steps { width: 220px; font-size: 12.5px; }
+      .col-expected { width: 200px; font-size: 12.5px; }
+      .col-status { width: 90px; text-align: center; }
+      .col-remark { width: 120px; color: var(--gray-500); font-size: 12.5px; }
+
+      /* ===== Badges ===== */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.4;
+        white-space: nowrap;
+      }
+      .badge-pill { border-radius: var(--radius-full); }
+      .badge-tag { border-radius: var(--radius-sm); }
+
+      /* Priority badges */
+      .badge-p0 { background: oklch(0.930 0.072 24); color: oklch(0.508 0.232 26); }
+      .badge-p1 { background: oklch(0.948 0.078 70); color: oklch(0.564 0.202 58); }
+      .badge-p2 { background: oklch(0.948 0.078 90); color: oklch(0.682 0.198 70); }
+      .badge-p3 { background: var(--gray-100); color: var(--gray-600); }
+
+      /* Status badges */
+      .badge-pass { background: oklch(0.936 0.064 158); color: oklch(0.508 0.164 158); }
+      .badge-pending { background: var(--gray-100); color: var(--gray-600); }
+      .badge-fail { background: oklch(0.930 0.072 24); color: oklch(0.508 0.232 26); }
+
+      /* Test type badges */
+      .badge-type-func { background: oklch(0.966 0.026 242); color: oklch(0.514 0.202 252); }
+      .badge-type-exception { background: oklch(0.968 0.036 24); color: oklch(0.577 0.245 27); }
+      .badge-type-boundary { background: oklch(0.962 0.038 300); color: oklch(0.514 0.222 292); }
+      .badge-type-permission { background: oklch(0.976 0.042 90); color: oklch(0.682 0.198 70); }
+
+      /* Steps list */
+      .steps-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: step-counter;
+      }
+      .steps-list li {
+        counter-increment: step-counter;
+        position: relative;
+        padding-left: 18px;
+        margin-bottom: 2px;
+        line-height: 1.55;
+      }
+      .steps-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-400);
+        font-family: var(--font-mono);
+      }
+      .steps-list li:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Checkbox column */
+      .col-checkbox {
+        width: 40px;
+        text-align: center;
+      }
+      .row-checkbox {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary-600);
+        cursor: pointer;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased bg-background">
+    <div class="page-container">
+      <!-- Header -->
+      <header class="app-header">
+        <span class="logo-icon">
+          <i data-lucide="clipboard-list" style="width:18px;height:18px;"></i>
+        </span>
+        <span class="app-title">AI生成测试用例</span>
+      </header>
+
+      <!-- Step Navigation -->
+      <nav class="step-nav">
+        <div class="step-item completed" data-dom-id="step-nav-1">
+          <span class="step-num">
+            <i data-lucide="check" style="width:12px;height:12px;"></i>
+          </span>
+          <span>上传文档</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item completed" data-dom-id="step-nav-2">
+          <span class="step-num">
+            <i data-lucide="check" style="width:12px;height:12px;"></i>
+          </span>
+          <span>生成配置</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item completed" data-dom-id="step-nav-3">
+          <span class="step-num">
+            <i data-lucide="check" style="width:12px;height:12px;"></i>
+          </span>
+          <span>生成结果</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step-item active" data-dom-id="step-nav-4">
+          <span class="step-num">4</span>
+          <span>预览导出</span>
+        </div>
+      </nav>
+
+      <!-- Main Content Card -->
+      <main>
+        <div class="preview-card">
+          <!-- Card Toolbar -->
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <span class="toolbar-title">④ Excel 预览</span>
+              <span class="count-badge">36 条用例</span>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-outline" data-dom-id="btn-export-selected" disabled>
+                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                导出勾选（0）
+              </button>
+              <button class="btn btn-primary" data-dom-id="btn-export-all">
+                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                导出全部
+              </button>
+            </div>
+          </div>
+
+          <!-- Table Area -->
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="全选">
+                  </th>
+                  <th class="col-id">用例 ID</th>
+                  <th class="col-module">模块</th>
+                  <th class="col-title">标题</th>
+                  <th class="col-type">测试类型</th>
+                  <th class="col-priority">优先级</th>
+                  <th class="col-precondition">前置条件</th>
+                  <th class="col-testdata">测试数据</th>
+                  <th class="col-steps">操作步骤</th>
+                  <th class="col-expected">预期结果</th>
+                  <th class="col-status">执行状态</th>
+                  <th class="col-remark">备注</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-001">
+                  </td>
+                  <td class="col-id">TC-001</td>
+                  <td class="col-module">登录模块</td>
+                  <td class="col-title">验证正确用户名密码登录</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-func">功能/UI</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p0">P0</span>
+                  </td>
+                  <td class="col-precondition">已注册账号且处于退出登录状态</td>
+                  <td class="col-testdata">用户名: test001<br>密码: Test@123</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>打开登录页</li>
+                      <li>输入正确用户名和密码</li>
+                      <li>点击登录按钮</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">成功跳转至首页/控制台，显示用户头像</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pass">通过</span>
+                  </td>
+                  <td class="col-remark">正向用例</td>
+                </tr>
+                <!-- Row 2 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-002">
+                  </td>
+                  <td class="col-id">TC-002</td>
+                  <td class="col-module">登录模块</td>
+                  <td class="col-title">验证错误密码时的提示</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-exception">异常</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p1">P1</span>
+                  </td>
+                  <td class="col-precondition">已注册账号</td>
+                  <td class="col-testdata">用户名: test001<br>密码: wrong</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>打开登录页</li>
+                      <li>输入错误密码</li>
+                      <li>点击登录</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">页面提示「用户名或密码错误」，不产生登录会话</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pending">未执行</span>
+                  </td>
+                  <td class="col-remark"></td>
+                </tr>
+                <!-- Row 3 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-003">
+                  </td>
+                  <td class="col-id">TC-003</td>
+                  <td class="col-module">登录模块</td>
+                  <td class="col-title">验证空用户名提交</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-boundary">边界</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p2">P2</span>
+                  </td>
+                  <td class="col-precondition">在登录页面</td>
+                  <td class="col-testdata">用户名为空</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>打开登录页</li>
+                      <li>密码输入 test</li>
+                      <li>点击登录</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">输入框下方提示「请输入用户名」</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pending">未执行</span>
+                  </td>
+                  <td class="col-remark"></td>
+                </tr>
+                <!-- Row 4 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-004">
+                  </td>
+                  <td class="col-id">TC-004</td>
+                  <td class="col-module">结算模块</td>
+                  <td class="col-title">优惠券抵扣金额计算</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-func">功能/UI</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p0">P0</span>
+                  </td>
+                  <td class="col-precondition">商品加入购物车，有可用优惠券</td>
+                  <td class="col-testdata">满100减20券</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>进入结算页</li>
+                      <li>选择优惠券</li>
+                      <li>查看应付金额</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">应付金额 = 商品总额 - 优惠券金额</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pending">未执行</span>
+                  </td>
+                  <td class="col-remark">需验证多种满减档位</td>
+                </tr>
+                <!-- Row 5 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-005">
+                  </td>
+                  <td class="col-id">TC-005</td>
+                  <td class="col-module">结算模块</td>
+                  <td class="col-title">优惠券使用权限校验</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-permission">权限</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p1">P1</span>
+                  </td>
+                  <td class="col-precondition">用户A有专属优惠券</td>
+                  <td class="col-testdata">用户B账号</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>用户B登录</li>
+                      <li>尝试使用用户A的优惠券码</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">系统提示「该优惠券不可用」，不抵扣</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pending">未执行</span>
+                  </td>
+                  <td class="col-remark"></td>
+                </tr>
+                <!-- Row 6 -->
+                <tr>
+                  <td class="col-checkbox">
+                    <input type="checkbox" class="row-checkbox" aria-label="选择 TC-006">
+                  </td>
+                  <td class="col-id">TC-006</td>
+                  <td class="col-module">结算模块</td>
+                  <td class="col-title">运费计算规则</td>
+                  <td class="col-type">
+                    <span class="badge badge-tag badge-type-func">功能/UI</span>
+                  </td>
+                  <td class="col-priority">
+                    <span class="badge badge-pill badge-p1">P1</span>
+                  </td>
+                  <td class="col-precondition">商品在购物车中</td>
+                  <td class="col-testdata">3件商品 总重2kg</td>
+                  <td class="col-steps">
+                    <ol class="steps-list">
+                      <li>进入结算页</li>
+                      <li>选择标准配送</li>
+                      <li>查看运费</li>
+                    </ol>
+                  </td>
+                  <td class="col-expected">运费 = 首重8元 + 续重2元/kg×1 = 10元</td>
+                  <td class="col-status">
+                    <span class="badge badge-pill badge-pending">未执行</span>
+                  </td>
+                  <td class="col-remark"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

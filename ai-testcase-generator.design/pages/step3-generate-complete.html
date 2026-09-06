@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03 生成结果 / 生成完成</title>
+    <style id="theme-vars">
+/* ============================================
+   AI 测试用例生成器 · 设计系统 Tokens
+   风格：专业工具型 / 靛蓝主色 / 数据密集友好
+   ============================================ */
+
+:root {
+  /* ===== 主色系（靛蓝） ===== */
+  --primary-50:  oklch(0.978 0.018 278);
+  --primary-100: oklch(0.946 0.034 278);
+  --primary-200: oklch(0.898 0.064 278);
+  --primary-300: oklch(0.826 0.112 278);
+  --primary-400: oklch(0.728 0.168 276);
+  --primary-500: oklch(0.623 0.214 274);  /* 主色 */
+  --primary-600: oklch(0.546 0.245 272);
+  --primary-700: oklch(0.478 0.258 270);
+  --primary-800: oklch(0.416 0.238 268);
+  --primary-900: oklch(0.356 0.188 266);
+
+  /* ===== 中性色阶 ===== */
+  --gray-50:  oklch(0.985 0.002 262);
+  --gray-100: oklch(0.962 0.004 262);
+  --gray-200: oklch(0.922 0.007 262);
+  --gray-300: oklch(0.872 0.010 262);
+  --gray-400: oklch(0.708 0.014 262);
+  --gray-500: oklch(0.556 0.016 262);
+  --gray-600: oklch(0.439 0.018 262);
+  --gray-700: oklch(0.349 0.018 262);
+  --gray-800: oklch(0.248 0.016 262);
+  --gray-900: oklch(0.145 0.012 262);
+
+  /* ===== 语义状态色 ===== */
+  --success-50:  oklch(0.970 0.032 158);
+  --success-100: oklch(0.936 0.064 158);
+  --success-500: oklch(0.648 0.222 158);  /* 成功 */
+  --success-600: oklch(0.577 0.200 158);
+  --success-700: oklch(0.508 0.164 158);
+
+  --warning-50:  oklch(0.976 0.042 90);
+  --warning-100: oklch(0.948 0.078 90);
+  --warning-500: oklch(0.755 0.182 82);   /* 警告 */
+  --warning-600: oklch(0.682 0.198 70);
+  --warning-700: oklch(0.564 0.202 58);
+
+  --error-50:  oklch(0.968 0.036 24);
+  --error-100: oklch(0.930 0.072 24);
+  --error-500: oklch(0.637 0.228 27);     /* 错误 */
+  --error-600: oklch(0.577 0.245 27);
+  --error-700: oklch(0.508 0.232 26);
+
+  --info-50:  oklch(0.966 0.026 242);
+  --info-100: oklch(0.928 0.052 242);
+  --info-500: oklch(0.588 0.198 250);     /* 信息 */
+  --info-600: oklch(0.514 0.202 252);
+
+  /* ===== 品牌前缀变量 ===== */
+  --tcg-background: var(--gray-50);
+  --tcg-foreground: var(--gray-900);
+  --tcg-card: #ffffff;
+  --tcg-card-foreground: var(--gray-900);
+  --tcg-popover: #ffffff;
+  --tcg-popover-foreground: var(--gray-900);
+  --tcg-primary: var(--primary-600);
+  --tcg-primary-foreground: #ffffff;
+  --tcg-muted: var(--gray-100);
+  --tcg-muted-foreground: var(--gray-500);
+  --tcg-accent: var(--primary-50);
+  --tcg-accent-foreground: var(--primary-700);
+  --tcg-destructive: var(--error-600);
+  --tcg-destructive-foreground: #ffffff;
+  --tcg-border: var(--gray-200);
+  --tcg-input: var(--gray-200);
+  --tcg-ring: var(--primary-500);
+  --tcg-radius-sm: var(--radius-sm);
+  --tcg-radius-md: var(--radius-md);
+  --tcg-radius-lg: var(--radius-lg);
+  --tcg-radius-xl: var(--radius-xl);
+
+  /* ===== 语义别名 ===== */
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --card: #ffffff;
+  --card-foreground: var(--gray-900);
+  --popover: #ffffff;
+  --popover-foreground: var(--gray-900);
+  --primary: var(--primary-600);
+  --primary-foreground: #ffffff;
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --accent: var(--primary-50);
+  --accent-foreground: var(--primary-700);
+  --destructive: var(--error-600);
+  --destructive-foreground: #ffffff;
+  --border: var(--gray-200);
+  --input: var(--gray-200);
+  --ring: var(--primary-500);
+
+  /* ===== 状态色语义 ===== */
+  --state-success: var(--success-500);
+  --state-success-bg: var(--success-50);
+  --state-success-border: var(--success-100);
+  --state-warning: var(--warning-600);
+  --state-warning-bg: var(--warning-50);
+  --state-warning-border: var(--warning-100);
+  --state-error: var(--error-600);
+  --state-error-bg: var(--error-50);
+  --state-error-border: var(--error-100);
+  --state-info: var(--info-500);
+  --state-info-bg: var(--info-50);
+  --state-info-border: var(--info-100);
+
+  /* ===== 圆角 ===== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ===== 阴影 ===== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 1px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 24px -8px rgb(0 0 0 / 0.08), 0 4px 12px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 40px -12px rgb(0 0 0 / 0.10);
+
+  /* ===== 字体 ===== */
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* ===== 间距 ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--state-success);
+  --color-warning: var(--state-warning);
+  --color-error: var(--state-error);
+  --color-info: var(--state-info);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+}
+
+/* ===== 基础样式 ===== */
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 工具类 ===== */
+.text-muted { color: var(--muted-foreground); }
+.text-success { color: var(--state-success); }
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+
+.bg-success { background: var(--state-success-bg); }
+.bg-warning { background: var(--state-warning-bg); }
+.bg-error { background: var(--state-error-bg); }
+.bg-info { background: var(--state-info-bg); }
+
+.border-success { border-color: var(--state-success-border); }
+.border-warning { border-color: var(--state-warning-border); }
+.border-error { border-color: var(--state-error-border); }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--tcg-background);
+    --color-foreground: var(--tcg-foreground);
+    --color-card: var(--tcg-card);
+    --color-card-foreground: var(--tcg-card-foreground);
+    --color-popover: var(--tcg-popover);
+    --color-popover-foreground: var(--tcg-popover-foreground);
+    --color-primary: var(--tcg-primary);
+    --color-primary-foreground: var(--tcg-primary-foreground);
+    --color-muted: var(--tcg-muted);
+    --color-muted-foreground: var(--tcg-muted-foreground);
+    --color-accent: var(--tcg-accent);
+    --color-accent-foreground: var(--tcg-accent-foreground);
+    --color-destructive: var(--tcg-destructive);
+    --color-destructive-foreground: var(--tcg-destructive-foreground);
+    --color-border: var(--tcg-border);
+    --color-input: var(--tcg-input);
+    --color-ring: var(--tcg-ring);
+    --color-success: var(--state-success);
+    --color-warning: var(--state-warning);
+    --color-error: var(--state-error);
+    --color-info: var(--state-info);
+    --radius-sm: var(--tcg-radius-sm);
+    --radius-md: var(--tcg-radius-md);
+    --radius-lg: var(--tcg-radius-lg);
+    --radius-xl: var(--tcg-radius-xl);
+    --radius-full: var(--radius-full);
+  }
+  @layer base {
+    body { background: var(--tcg-background); color: var(--tcg-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--tcg-background); }
+      .text-background { color: var(--tcg-background); }
+      .border-background { border-color: var(--tcg-background); }
+      .ring-background { --tw-ring-color: var(--tcg-background); }
+      .bg-foreground { background-color: var(--tcg-foreground); }
+      .text-foreground { color: var(--tcg-foreground); }
+      .border-foreground { border-color: var(--tcg-foreground); }
+      .ring-foreground { --tw-ring-color: var(--tcg-foreground); }
+      .bg-card { background-color: var(--tcg-card); }
+      .text-card { color: var(--tcg-card); }
+      .border-card { border-color: var(--tcg-card); }
+      .ring-card { --tw-ring-color: var(--tcg-card); }
+      .bg-card-foreground { background-color: var(--tcg-card-foreground); }
+      .text-card-foreground { color: var(--tcg-card-foreground); }
+      .border-card-foreground { border-color: var(--tcg-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--tcg-card-foreground); }
+      .bg-popover { background-color: var(--tcg-popover); }
+      .text-popover { color: var(--tcg-popover); }
+      .border-popover { border-color: var(--tcg-popover); }
+      .ring-popover { --tw-ring-color: var(--tcg-popover); }
+      .bg-popover-foreground { background-color: var(--tcg-popover-foreground); }
+      .text-popover-foreground { color: var(--tcg-popover-foreground); }
+      .border-popover-foreground { border-color: var(--tcg-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--tcg-popover-foreground); }
+      .bg-primary { background-color: var(--tcg-primary); }
+      .text-primary { color: var(--tcg-primary); }
+      .border-primary { border-color: var(--tcg-primary); }
+      .ring-primary { --tw-ring-color: var(--tcg-primary); }
+      .bg-primary-foreground { background-color: var(--tcg-primary-foreground); }
+      .text-primary-foreground { color: var(--tcg-primary-foreground); }
+      .border-primary-foreground { border-color: var(--tcg-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--tcg-primary-foreground); }
+      .bg-muted { background-color: var(--tcg-muted); }
+      .text-muted { color: var(--tcg-muted); }
+      .border-muted { border-color: var(--tcg-muted); }
+      .ring-muted { --tw-ring-color: var(--tcg-muted); }
+      .bg-muted-foreground { background-color: var(--tcg-muted-foreground); }
+      .text-muted-foreground { color: var(--tcg-muted-foreground); }
+      .border-muted-foreground { border-color: var(--tcg-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--tcg-muted-foreground); }
+      .bg-accent { background-color: var(--tcg-accent); }
+      .text-accent { color: var(--tcg-accent); }
+      .border-accent { border-color: var(--tcg-accent); }
+      .ring-accent { --tw-ring-color: var(--tcg-accent); }
+      .bg-accent-foreground { background-color: var(--tcg-accent-foreground); }
+      .text-accent-foreground { color: var(--tcg-accent-foreground); }
+      .border-accent-foreground { border-color: var(--tcg-accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--tcg-accent-foreground); }
+      .bg-destructive { background-color: var(--tcg-destructive); }
+      .text-destructive { color: var(--tcg-destructive); }
+      .border-destructive { border-color: var(--tcg-destructive); }
+      .ring-destructive { --tw-ring-color: var(--tcg-destructive); }
+      .bg-destructive-foreground { background-color: var(--tcg-destructive-foreground); }
+      .text-destructive-foreground { color: var(--tcg-destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--tcg-destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--tcg-destructive-foreground); }
+      .bg-border { background-color: var(--tcg-border); }
+      .text-border { color: var(--tcg-border); }
+      .border-border { border-color: var(--tcg-border); }
+      .ring-border { --tw-ring-color: var(--tcg-border); }
+      .bg-input { background-color: var(--tcg-input); }
+      .text-input { color: var(--tcg-input); }
+      .border-input { border-color: var(--tcg-input); }
+      .ring-input { --tw-ring-color: var(--tcg-input); }
+      .bg-ring { background-color: var(--tcg-ring); }
+      .text-ring { color: var(--tcg-ring); }
+      .border-ring { border-color: var(--tcg-ring); }
+      .ring-ring { --tw-ring-color: var(--tcg-ring); }
+      .bg-success { background-color: var(--state-success); }
+      .text-success { color: var(--state-success); }
+      .border-success { border-color: var(--state-success); }
+      .ring-success { --tw-ring-color: var(--state-success); }
+      .bg-warning { background-color: var(--state-warning); }
+      .text-warning { color: var(--state-warning); }
+      .border-warning { border-color: var(--state-warning); }
+      .ring-warning { --tw-ring-color: var(--state-warning); }
+      .bg-error { background-color: var(--state-error); }
+      .text-error { color: var(--state-error); }
+      .border-error { border-color: var(--state-error); }
+      .ring-error { --tw-ring-color: var(--state-error); }
+      .bg-info { background-color: var(--state-info); }
+      .text-info { color: var(--state-info); }
+      .border-info { border-color: var(--state-info); }
+      .ring-info { --tw-ring-color: var(--state-info); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+    <style>
+      /* ===== Page-specific: Step 3 Complete ===== */
+
+      /* Step nav */
+      .step-nav-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .step-nav-item.completed {
+        color: var(--primary);
+        background: var(--primary-50);
+      }
+      .step-nav-item.completed:hover {
+        background: var(--primary-100);
+      }
+      .step-nav-item.active {
+        color: #ffffff;
+        background: var(--primary);
+        font-weight: 500;
+      }
+      .step-nav-item.available {
+        color: var(--gray-600);
+        background: #ffffff;
+        border: 1px solid var(--gray-200);
+      }
+      .step-nav-item.available:hover {
+        color: var(--primary);
+        border-color: var(--primary-200);
+        background: var(--primary-50);
+      }
+      .step-nav-item.locked {
+        color: var(--gray-400);
+        background: var(--gray-100);
+        cursor: not-allowed;
+      }
+      .step-nav-num {
+        width: 20px;
+        height: 20px;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .step-nav-item.completed .step-nav-num {
+        background: var(--primary);
+        color: #ffffff;
+      }
+      .step-nav-item.active .step-nav-num {
+        background: rgba(255,255,255,0.2);
+        color: #ffffff;
+      }
+      .step-nav-item.available .step-nav-num {
+        background: var(--gray-100);
+        color: var(--gray-500);
+      }
+      .step-nav-item.available:hover .step-nav-num {
+        background: var(--primary);
+        color: #ffffff;
+      }
+      .step-nav-item.locked .step-nav-num {
+        background: var(--gray-200);
+        color: var(--gray-400);
+      }
+
+      /* Summary badge */
+      .summary-badge {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--gray-200);
+        background: transparent;
+        color: var(--gray-700);
+        border-radius: 9999px;
+        padding: 4px 12px;
+        font-size: 11px;
+        line-height: 1;
+      }
+
+      /* Success icon with glow */
+      .success-icon-wrap {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .success-icon-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 9999px;
+        background: var(--success-100);
+        opacity: 0.6;
+        animation: success-glow-pulse 2.5s ease-in-out infinite;
+      }
+      .success-icon-circle {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        border-radius: 9999px;
+        background: var(--success-500);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: success-pop 0.5s ease-out;
+      }
+      @keyframes success-glow-pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.08); opacity: 0.7; }
+      }
+      @keyframes success-pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        70% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      /* Stat cards */
+      .stat-card {
+        background: var(--gray-50);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      .stat-label {
+        font-size: 13px;
+        color: var(--gray-500);
+        margin-top: 4px;
+      }
+
+      /* Mini Phase Stepper (smaller for completion view) */
+      .mini-phase-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .mini-phase-circle.completed {
+        background-color: var(--primary);
+        color: #ffffff;
+      }
+      .mini-phase-line {
+        height: 2px;
+        flex: 1;
+        min-width: 24px;
+      }
+      .mini-phase-line.completed {
+        background-color: var(--primary);
+      }
+      .mini-phase-label {
+        font-size: 11px;
+        margin-top: 6px;
+        text-align: center;
+        white-space: nowrap;
+        color: var(--primary);
+        font-weight: 500;
+      }
+
+      /* Primary button */
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 40px;
+        padding: 0 20px;
+        background: var(--primary);
+        color: #ffffff;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        border: none;
+      }
+      .btn-primary:hover {
+        background: var(--primary-700);
+      }
+      .btn-primary svg {
+        width: 16px;
+        height: 16px;
+        margin-left: 8px;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <!-- ===== Header ===== -->
+      <header class="bg-card border-b border-border">
+        <div class="max-w-[1152px] mx-auto px-6 h-14 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <i data-lucide="clipboard-list" style="width:18px;height:18px;"></i>
+          </div>
+          <h1 class="text-base font-semibold text-foreground">AI生成测试用例</h1>
+        </div>
+      </header>
+
+      <!-- ===== Step Navigation ===== -->
+      <div class="bg-card border-b border-border">
+        <div class="max-w-[1152px] mx-auto px-6 py-4 flex items-center gap-2">
+          <button class="step-nav-item completed" data-dom-id="step-nav-1">
+            <span class="step-nav-num">
+              <i data-lucide="check" style="width:12px;height:12px;"></i>
+            </span>
+            <span>上传文档</span>
+          </button>
+          <div class="text-gray-300 text-sm">→</div>
+          <button class="step-nav-item completed" data-dom-id="step-nav-2">
+            <span class="step-nav-num">
+              <i data-lucide="check" style="width:12px;height:12px;"></i>
+            </span>
+            <span>生成配置</span>
+          </button>
+          <div class="text-gray-300 text-sm">→</div>
+          <button class="step-nav-item active" data-dom-id="step-nav-3">
+            <span class="step-nav-num">3</span>
+            <span>生成结果</span>
+          </button>
+          <div class="text-gray-300 text-sm">→</div>
+          <button class="step-nav-item available" data-dom-id="step-nav-4">
+            <span class="step-nav-num">4</span>
+            <span>预览导出</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== Main Content ===== -->
+      <div class="max-w-[1152px] mx-auto px-6 py-8">
+        <div class="bg-card border border-border rounded-lg">
+          <!-- Card Header / Summary Bar -->
+          <div class="px-6 py-5 border-b border-border">
+            <h2 class="text-lg font-semibold text-foreground mb-3">③ 生成测试用例</h2>
+            <div class="flex flex-wrap gap-2">
+              <span class="summary-badge">
+                <i data-lucide="bot" style="width:12px;height:12px;margin-right:6px;"></i>
+                模型：openai/gpt-5.6-luna
+              </span>
+              <span class="summary-badge">
+                <i data-lucide="file-text" style="width:12px;height:12px;margin-right:6px;"></i>
+                2 个文档
+              </span>
+              <span class="summary-badge">
+                <i data-lucide="type" style="width:12px;height:12px;margin-right:6px;"></i>
+                28,640 字符
+              </span>
+              <span class="summary-badge">
+                <i data-lucide="image" style="width:12px;height:12px;margin-right:6px;"></i>
+                5 张图片
+              </span>
+            </div>
+          </div>
+
+          <!-- Success Content Area -->
+          <div class="py-12 px-6">
+            <!-- Success Icon -->
+            <div class="flex justify-center">
+              <div class="success-icon-wrap">
+                <div class="success-icon-circle">
+                  <i data-lucide="check" style="width:28px;height:28px;"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Success Title -->
+            <div class="mt-4 text-center">
+              <p class="text-xl font-semibold text-foreground">生成完成</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="max-w-lg mx-auto mt-6">
+              <div class="grid grid-cols-3 gap-3">
+                <!-- Stat 1: 条用例 -->
+                <div class="stat-card">
+                  <div class="stat-number text-primary">36</div>
+                  <div class="stat-label">条用例</div>
+                </div>
+                <!-- Stat 2: 待确认项 -->
+                <div class="stat-card">
+                  <div class="stat-number text-warning">5</div>
+                  <div class="stat-label">待确认项</div>
+                </div>
+                <!-- Stat 3: 风险与假设 -->
+                <div class="stat-card">
+                  <div class="stat-number text-info">3</div>
+                  <div class="stat-label">风险与假设</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini Phase Indicator -->
+            <div class="mt-8">
+              <div class="max-w-md mx-auto">
+                <div class="flex items-start justify-center">
+                  <!-- Phase 1 -->
+                  <div class="flex flex-col items-center">
+                    <div class="mini-phase-circle completed">
+                      <i data-lucide="check" style="width:14px;height:14px;"></i>
+                    </div>
+                    <span class="mini-phase-label">准备输入</span>
+                  </div>
+                  <!-- Line 1 -->
+                  <div class="mini-phase-line completed" style="margin-top: 15px;"></div>
+                  <!-- Phase 2 -->
+                  <div class="flex flex-col items-center">
+                    <div class="mini-phase-circle completed">
+                      <i data-lucide="check" style="width:14px;height:14px;"></i>
+                    </div>
+                    <span class="mini-phase-label">请求模型</span>
+                  </div>
+                  <!-- Line 2 -->
+                  <div class="mini-phase-line completed" style="margin-top: 15px;"></div>
+                  <!-- Phase 3 -->
+                  <div class="flex flex-col items-center">
+                    <div class="mini-phase-circle completed">
+                      <i data-lucide="check" style="width:14px;height:14px;"></i>
+                    </div>
+                    <span class="mini-phase-label">整理结果</span>
+                  </div>
+                  <!-- Line 3 -->
+                  <div class="mini-phase-line completed" style="margin-top: 15px;"></div>
+                  <!-- Phase 4 -->
+                  <div class="flex flex-col items-center">
+                    <div class="mini-phase-circle completed">
+                      <i data-lucide="check" style="width:14px;height:14px;"></i>
+                    </div>
+                    <span class="mini-phase-label">完成</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Next Step Button -->
+            <div class="mt-8 flex justify-center">
+              <button class="btn-primary" data-dom-id="btn-next-step3">
+                <span>下一步：预览与导出</span>
+                <i data-lucide="file-spreadsheet" style="width:16px;height:16px;margin-left:8px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

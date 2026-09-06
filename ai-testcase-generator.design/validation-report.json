@@ -1,0 +1,231 @@
+{
+  "success": true,
+  "outcome": "passed",
+  "repairable": true,
+  "terminalViolations": [],
+  "terminalBlockingSummary": null,
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": null,
+    "version_source": "unknown",
+    "runtime_skill_dir": null,
+    "recorded_at": null,
+    "expected_version": "2026.08.06.19.15.08",
+    "status": "observed_unknown",
+    "read_status": "missing"
+  },
+  "operatingMode": "free-explore",
+  "renderBlockingErrorCount": 0,
+  "softWarningCount": 32,
+  "renderBlockingErrors": [],
+  "errorSignatures": [],
+  "softWarnings": [
+    "[html-head-style] step1-upload-parsing.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step2-config-default.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step2-config-image-warning.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-complete.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-failed.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-running.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step4-preview-data.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step4-preview-empty.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-quality] colors_and_type.css: free-explore brand CSS must use one primary hue only; forbidden secondary/accent brand variables found (--tcg-accent, --tcg-accent-foreground, --accent, --accent-foreground, --color-accent, --color-accent-foreground). Use --state-success/warning/error/info only for semantic states.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--tcg-radius-xl: var(--radius-xl), --radius-xl: var(--radius-xl)). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 1px 4px -2px rgb(0 0 0 / 0.04), --shadow-lg: 0 12px 24px -8px rgb(0 0 0 / 0.08), 0 4px 12px -4px rgb(0 0 0 / 0.05), --shadow-xl: 0 20px 40px -12px rgb(0 0 0 / 0.10)).",
+    "[html-quality] step1-upload-empty.html: Tailwind named color utilities are forbidden (bg-gray-200, text-gray-400). Use brand CSS variables instead.",
+    "[html-quality] step1-upload-empty.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step1-upload-parsing.html: Tailwind named color utilities are forbidden (bg-amber-50, bg-amber-100, border-amber-200, text-amber-600, text-amber-700, text-gray-300, text-gray-600, bg-gray-100). Use brand CSS variables instead.",
+    "[html-quality] step1-upload-parsing.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step2-config-default.html: Tailwind named color utilities are forbidden (bg-gray-200, bg-gray-50, border-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step2-config-default.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step2-config-image-warning.html: Tailwind named color utilities are forbidden (bg-gray-200, bg-gray-50, border-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step2-config-image-warning.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-complete.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-complete.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-complete.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-failed.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-failed.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-failed.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-running.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-running.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-running.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step4-preview-data.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step4-preview-data.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step4-preview-empty.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step4-preview-empty.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states."
+  ],
+  "repairPlanHints": [
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "step3-generate-complete.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "step3-generate-failed.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "step3-generate-running.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "step4-preview-data.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "step4-preview-empty.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    }
+  ],
+  "repairActionTable": [],
+  "errorCount": 0,
+  "warningCount": 32,
+  "errors": [],
+  "warnings": [
+    "[html-head-style] step1-upload-parsing.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step2-config-default.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step2-config-image-warning.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-complete.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-failed.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step3-generate-running.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step4-preview-data.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] step4-preview-empty.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-quality] colors_and_type.css: free-explore brand CSS must use one primary hue only; forbidden secondary/accent brand variables found (--tcg-accent, --tcg-accent-foreground, --accent, --accent-foreground, --color-accent, --color-accent-foreground). Use --state-success/warning/error/info only for semantic states.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--tcg-radius-xl: var(--radius-xl), --radius-xl: var(--radius-xl)). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--shadow-md: 0 2px 8px -2px rgb(0 0 0 / 0.06), 0 1px 4px -2px rgb(0 0 0 / 0.04), --shadow-lg: 0 12px 24px -8px rgb(0 0 0 / 0.08), 0 4px 12px -4px rgb(0 0 0 / 0.05), --shadow-xl: 0 20px 40px -12px rgb(0 0 0 / 0.10)).",
+    "[html-quality] step1-upload-empty.html: Tailwind named color utilities are forbidden (bg-gray-200, text-gray-400). Use brand CSS variables instead.",
+    "[html-quality] step1-upload-empty.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step1-upload-parsing.html: Tailwind named color utilities are forbidden (bg-amber-50, bg-amber-100, border-amber-200, text-amber-600, text-amber-700, text-gray-300, text-gray-600, bg-gray-100). Use brand CSS variables instead.",
+    "[html-quality] step1-upload-parsing.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step2-config-default.html: Tailwind named color utilities are forbidden (bg-gray-200, bg-gray-50, border-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step2-config-default.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step2-config-image-warning.html: Tailwind named color utilities are forbidden (bg-gray-200, bg-gray-50, border-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step2-config-image-warning.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-complete.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-complete.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-complete.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-failed.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-failed.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-failed.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step3-generate-running.html: Tailwind named color utilities are forbidden (text-gray-300). Use brand CSS variables instead.",
+    "[html-quality] step3-generate-running.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step3-generate-running.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step4-preview-data.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step4-preview-data.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] step4-preview-empty.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] step4-preview-empty.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states."
+  ],
+  "validationRunDisciplineStatus": {
+    "declared": true,
+    "restoreMode": false,
+    "maxFullValidationRuns": null,
+    "validationHistoryCount": 0,
+    "repairLedgerCount": 0,
+    "softWarningsTriggerRepair": null,
+    "terminalState": null,
+    "nextAction": null,
+    "violations": [],
+    "success": true
+  },
+  "terminalState": null,
+  "nextCheck": {
+    "type": "finish-readiness",
+    "command": "node '/Users/f/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs' '/Users/f/Documents/ChatGPT/PRD to Testcase/ai-testcase-generator.design' --check=all",
+    "fullValidationAllowed": false,
+    "reason": "workspace validation passed; run complete finish readiness before final delivery"
+  },
+  "repairBatch": [],
+  "repairContextPacket": {
+    "schema_version": "1.0",
+    "purpose": "small-context repair packet; read this before full validation-report.json",
+    "success": true,
+    "terminalState": null,
+    "skillProvenance": {
+      "name": "solo-design",
+      "version": null,
+      "version_source": "unknown",
+      "runtime_skill_dir": null,
+      "recorded_at": null,
+      "expected_version": "2026.08.06.19.15.08",
+      "status": "observed_unknown",
+      "read_status": "missing"
+    },
+    "renderBlockingErrorCount": 0,
+    "softWarningCount": 32,
+    "renderBlockingErrors": [],
+    "repairActionTable": [],
+    "nextCheck": {
+      "type": "finish-readiness",
+      "command": "node '/Users/f/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/validate-finish-readiness.mjs' '/Users/f/Documents/ChatGPT/PRD to Testcase/ai-testcase-generator.design' --check=all",
+      "fullValidationAllowed": false,
+      "reason": "workspace validation passed; run complete finish readiness before final delivery"
+    },
+    "forbidden": [
+      "do not read validator source",
+      "do not rerun full validation when nextCheck.fullValidationAllowed=false",
+      "do not start preview/browser unless user explicitly asks",
+      "do not hand-edit repair ledger fields"
+    ]
+  },
+  "projectFileHashes": {
+    "ai-testcase-generator.design": "ececf90acd3286352d832745bed7421067ef8c3be6b34accafa95e441958df10",
+    "colors_and_type.css": "3028b8482981727d1849b376abcfcc6d17fc50eadac90f6b8bbbd0f7cc7de038",
+    "runtime-orchestration-summary.json": "5f1ca7083ff270ea7dc6ebd5c03ed98553aa8bacfd61540ad55231db820ee5e6",
+    "pages/step1-upload-empty.html": "b20f0a8f6deb5f00f887d578108f782063f7a961810cf92a9d3c7d1d67c85dd2",
+    "pages/step1-upload-parsing.html": "198fb09c91334911bfb73e0082bda5d86791e8e796f1a9158d2d90bea24b20c2",
+    "pages/step2-config-default.html": "a6d5ef6c961443663c0de3cbdbfeb609a874c7a4b63b62f3bc41781d2fd8471a",
+    "pages/step2-config-image-warning.html": "06a27e9e49f3e23b6293a2c7be057f5ec7b20e98efe5e49b7fd4158c09dc8b77",
+    "pages/step3-generate-complete.html": "a921bf5a8992203a2cfdbe488d30b89a4c3c06810f1c5ae20c7970bcf659dc61",
+    "pages/step3-generate-failed.html": "6a1d00131f623a63aaa9c61937520f13e523a55bcc5bf2c0a7e281937165c399",
+    "pages/step3-generate-running.html": "9a03a9a0deecafb56b3c7190ac44b5d8375a6c39076a461dd5088a638b499607",
+    "pages/step4-preview-data.html": "e76adc9648a0af2ee4ae753b140776a8a52575815d342f56804425ea55a800d2",
+    "pages/step4-preview-empty.html": "2e706f66ea41e2a0172b4a5698501b90e0074de39bfedcf039b23db0dba60515"
+  },
+  "designDir": "/Users/f/Documents/ChatGPT/PRD to Testcase/ai-testcase-generator.design",
+  "expectedPages": null,
+  "requireInteractions": null,
+  "checkedAt": "2026-09-06T13:03:52.298Z"
+}

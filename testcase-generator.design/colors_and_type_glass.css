@@ -1,0 +1,97 @@
+/* ============================================================
+   TestCase Generator — Glassmorphism Luxury Theme
+   Lavender Purple · Rose Gold Accent · Soft Glass
+   ============================================================ */
+
+:root {
+  /* --- Brand Primary (Lavender Purple) --- */
+  --tc-primary: #8B5CF6;
+  --tc-primary-foreground: #FFFFFF;
+  --tc-primary-hover: #7C3AED;
+  --tc-primary-active: #6D28D9;
+  --tc-primary-50: #F5F3FF;
+  --tc-primary-100: #EDE9FE;
+  --tc-primary-200: #DDD6FE;
+  --tc-primary-300: #C4B5FD;
+
+  /* --- Background & Surfaces --- */
+  --tc-background: #FAF7FF;
+  --tc-foreground: #1E1B4B;
+  --tc-card: rgba(255, 255, 255, 0.55);
+  --tc-card-foreground: #1E1B4B;
+  --tc-popover: rgba(255, 255, 255, 0.85);
+  --tc-popover-foreground: #1E1B4B;
+
+  /* --- Glass Effect Tokens --- */
+  --tc-glass-bg: rgba(255, 255, 255, 0.55);
+  --tc-glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --tc-glass-border: rgba(255, 255, 255, 0.85);
+  --tc-glass-border-soft: rgba(255, 255, 255, 0.5);
+  --tc-glass-blur: 20px;
+  --tc-glass-saturate: 180%;
+
+  /* --- Muted / Secondary Text --- */
+  --tc-muted: #F5F3FF;
+  --tc-muted-foreground: #7C7A9B;
+  --tc-foreground-secondary: #4C4A6B;
+  --tc-foreground-tertiary: #A8A6C0;
+
+  /* --- Border & Input --- */
+  --tc-border: #E8E4F5;
+  --tc-input: rgba(255, 255, 255, 0.72);
+  --tc-ring: #8B5CF6;
+
+  /* --- Accent / Surface-2 --- */
+  --tc-accent: #F5F3FF;
+  --tc-accent-foreground: #1E1B4B;
+  --tc-surface-2: rgba(245, 243, 255, 0.6);
+
+  /* --- State Colors --- */
+  --tc-success: #10B981;
+  --tc-success-foreground: #FFFFFF;
+  --tc-success-bg: #ECFDF5;
+  --tc-warning: #F59E0B;
+  --tc-warning-foreground: #FFFFFF;
+  --tc-warning-bg: #FFFBEB;
+  --tc-error: #F43F5E;
+  --tc-error-foreground: #FFFFFF;
+  --tc-error-bg: #FFF1F2;
+  --tc-info: #6366F1;
+  --tc-info-bg: #EEF2FF;
+
+  /* --- Radius Scale (larger, softer) --- */
+  --tc-radius-sm: 8px;
+  --tc-radius-md: 12px;
+  --tc-radius-lg: 18px;
+  --tc-radius-xl: 24px;
+  --tc-radius-pill: 999px;
+
+  /* --- Shadow Scale (purple-tinted, soft) --- */
+  --tc-shadow-sm: 0 1px 2px rgba(30, 27, 75, 0.04), 0 1px 1px rgba(139, 92, 246, 0.03);
+  --tc-shadow-md: 0 4px 12px -4px rgba(139, 92, 246, 0.10);
+  --tc-shadow-lg: 0 12px 32px -8px rgba(139, 92, 246, 0.18);
+
+  /* --- Spacing (8pt grid) --- */
+  --tc-s-1: 4px;
+  --tc-s-2: 8px;
+  --tc-s-3: 12px;
+  --tc-s-4: 16px;
+  --tc-s-5: 24px;
+  --tc-s-6: 32px;
+  --tc-s-7: 48px;
+  --tc-s-8: 64px;
+
+  /* --- Typography --- */
+  --tc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --tc-font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  --tc-text-xs: 12px;
+  --tc-text-sm: 13px;
+  --tc-text-base: 14px;
+  --tc-text-lg: 16px;
+  --tc-text-xl: 18px;
+  --tc-text-2xl: 20px;
+  --tc-text-3xl: 24px;
+  --tc-text-4xl: 30px;
+  --tc-text-display: clamp(28px, 3.5vw, 44px);
+}

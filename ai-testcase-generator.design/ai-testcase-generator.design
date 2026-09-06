@@ -1,0 +1,387 @@
+{
+  "data": [
+    {
+      "id": "page-step1-upload-empty",
+      "title": "01 上传文档 / 空状态",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-5465294d",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step1-upload-empty.html",
+        "interactions": [
+          {
+            "domId": "btn-next-step1",
+            "targetPageId": "page-step2-config-default",
+            "transitionLabel": "下一步：生成配置"
+          }
+        ],
+        "stateGroupId": "step1-upload",
+        "stateRole": "base"
+      }
+    },
+    {
+      "id": "page-step1-upload-parsing",
+      "title": "01 上传文档 / 解析中与异常",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 0,
+        "y": 373,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-35fe6970",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step1-upload-parsing.html",
+        "interactions": [
+          {
+            "domId": "btn-next-step1",
+            "targetPageId": "page-step2-config-default",
+            "transitionLabel": "下一步：生成配置"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          }
+        ],
+        "stateGroupId": "step1-upload",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/step1-upload-empty.html"
+      }
+    },
+    {
+      "id": "page-step2-config-default",
+      "title": "02 生成配置 / 默认状态",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 480,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 941,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-1d2ad273",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step2-config-default.html",
+        "interactions": [
+          {
+            "domId": "btn-prev-step2",
+            "targetPageId": "page-step1-upload-empty",
+            "hideEdge": true,
+            "transitionLabel": "上一步：上传文档"
+          },
+          {
+            "domId": "btn-next-step2",
+            "targetPageId": "page-step3-generate-running",
+            "transitionLabel": "下一步：生成"
+          },
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          }
+        ],
+        "stateGroupId": "step2-config",
+        "stateRole": "base"
+      }
+    },
+    {
+      "id": "page-step2-config-image-warning",
+      "title": "02 生成配置 / 图片输入与模型提醒",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 480,
+        "y": 373,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1027,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-a6eee479",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step2-config-image-warning.html",
+        "interactions": [
+          {
+            "domId": "btn-prev-step2",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "上一步：上传文档"
+          },
+          {
+            "domId": "btn-next-step2",
+            "targetPageId": "page-step3-generate-running",
+            "transitionLabel": "下一步：生成"
+          },
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          }
+        ],
+        "stateGroupId": "step2-config",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/step2-config-default.html"
+      }
+    },
+    {
+      "id": "page-step3-generate-running",
+      "title": "03 生成结果 / 生成中",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 960,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-f3a4d264",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step3-generate-running.html",
+        "interactions": [
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          }
+        ],
+        "stateGroupId": "step3-generate",
+        "stateRole": "base"
+      }
+    },
+    {
+      "id": "page-step3-generate-complete",
+      "title": "03 生成结果 / 生成完成",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 0,
+        "y": 746,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-60e5cd25",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step3-generate-complete.html",
+        "interactions": [
+          {
+            "domId": "btn-next-step3",
+            "targetPageId": "page-step4-preview-data",
+            "transitionLabel": "下一步：预览与导出"
+          },
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          }
+        ],
+        "stateGroupId": "step3-generate",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/step3-generate-running.html"
+      }
+    },
+    {
+      "id": "page-step3-generate-failed",
+      "title": "03 生成结果 / 生成失败",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1119,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-1d4b6be3",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step3-generate-failed.html",
+        "interactions": [
+          {
+            "domId": "btn-retry-step3",
+            "targetPageId": "page-step3-generate-running",
+            "hideEdge": true,
+            "transitionLabel": "重试"
+          },
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          }
+        ],
+        "stateGroupId": "step3-generate",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/step3-generate-running.html"
+      }
+    },
+    {
+      "id": "page-step4-preview-data",
+      "title": "04 预览导出 / 有数据",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 480,
+        "y": 746,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b476723a",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step4-preview-data.html",
+        "interactions": [
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          },
+          {
+            "domId": "step-nav-3",
+            "targetPageId": "page-step3-generate-complete",
+            "hideEdge": true,
+            "transitionLabel": "步骤3"
+          }
+        ],
+        "stateGroupId": "step4-preview",
+        "stateRole": "base"
+      }
+    },
+    {
+      "id": "page-step4-preview-empty",
+      "title": "04 预览导出 / 无结果",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1757145600000,
+      "canvasData": {
+        "x": 480,
+        "y": 1119,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-ca3f0ffc",
+          "measuredAt": 1788699878021
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/step4-preview-empty.html",
+        "interactions": [
+          {
+            "domId": "btn-back-step4",
+            "targetPageId": "page-step3-generate-running",
+            "hideEdge": true,
+            "transitionLabel": "返回生成结果"
+          },
+          {
+            "domId": "step-nav-1",
+            "targetPageId": "page-step1-upload-parsing",
+            "hideEdge": true,
+            "transitionLabel": "步骤1"
+          },
+          {
+            "domId": "step-nav-2",
+            "targetPageId": "page-step2-config-default",
+            "hideEdge": true,
+            "transitionLabel": "步骤2"
+          },
+          {
+            "domId": "step-nav-3",
+            "targetPageId": "page-step3-generate-running",
+            "hideEdge": true,
+            "transitionLabel": "步骤3"
+          }
+        ],
+        "stateGroupId": "step4-preview",
+        "stateRole": "derived",
+        "derivedFromHtmlSrc": "pages/step4-preview-data.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "AI 生成测试用例 · 设计基线"
+  }
+}

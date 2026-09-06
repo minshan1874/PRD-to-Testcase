@@ -1,0 +1,127 @@
+{
+  "root": {
+    "nodeId": "gen-project-shell",
+    "kind": "project-shell",
+    "pageIds": [],
+    "output": "partials/project-shell.html",
+    "sharedRegions": [
+      "global-head",
+      "body-frame",
+      "app-header",
+      "step-nav-wrapper",
+      "main-container",
+      "footer-area"
+    ],
+    "privateRegions": [],
+    "mutableSlots": [
+      "activeStep",
+      "mainContent"
+    ],
+    "status": "planned",
+    "children": [
+      {
+        "nodeId": "gen-step1-base",
+        "kind": "page-leaf",
+        "pageIds": ["page-step1-upload-empty"],
+        "output": "pages/step1-upload-empty.html",
+        "sharedRegions": ["project-shell-all"],
+        "privateRegions": ["step1-card", "upload-area", "source-pool", "stats", "footer-actions"],
+        "mutableSlots": ["activeStep=1", "mainContent"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-step1-parsing",
+            "kind": "page-leaf",
+            "pageIds": ["page-step1-upload-parsing"],
+            "output": "pages/step1-upload-parsing.html",
+            "sharedRegions": ["step1-shell"],
+            "privateRegions": ["source-pool-items", "stats-badges"],
+            "mutableSlots": ["sourcePool", "stats"],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      },
+      {
+        "nodeId": "gen-step2-base",
+        "kind": "page-leaf",
+        "pageIds": ["page-step2-config-default"],
+        "output": "pages/step2-config-default.html",
+        "sharedRegions": ["project-shell-all"],
+        "privateRegions": ["trace-card", "fields-card", "model-card", "footer-actions"],
+        "mutableSlots": ["activeStep=2", "mainContent"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-step2-image-warning",
+            "kind": "page-leaf",
+            "pageIds": ["page-step2-config-image-warning"],
+            "output": "pages/step2-config-image-warning.html",
+            "sharedRegions": ["step2-shell"],
+            "privateRegions": ["model-warnings", "custom-model-input"],
+            "mutableSlots": ["modelSection", "warnings"],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      },
+      {
+        "nodeId": "gen-step3-base",
+        "kind": "page-leaf",
+        "pageIds": ["page-step3-generate-running"],
+        "output": "pages/step3-generate-running.html",
+        "sharedRegions": ["project-shell-all"],
+        "privateRegions": ["generate-summary", "phase-indicator", "status-area", "action-button"],
+        "mutableSlots": ["activeStep=3", "mainContent"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-step3-complete",
+            "kind": "page-leaf",
+            "pageIds": ["page-step3-generate-complete"],
+            "output": "pages/step3-generate-complete.html",
+            "sharedRegions": ["step3-shell"],
+            "privateRegions": ["status-content", "stats-grid", "next-button"],
+            "mutableSlots": ["statusArea", "actionButton"],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-step3-failed",
+            "kind": "page-leaf",
+            "pageIds": ["page-step3-generate-failed"],
+            "output": "pages/step3-generate-failed.html",
+            "sharedRegions": ["step3-shell"],
+            "privateRegions": ["error-content", "retry-button"],
+            "mutableSlots": ["statusArea", "actionButton"],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      },
+      {
+        "nodeId": "gen-step4-base",
+        "kind": "page-leaf",
+        "pageIds": ["page-step4-preview-data"],
+        "output": "pages/step4-preview-data.html",
+        "sharedRegions": ["project-shell-all"],
+        "privateRegions": ["preview-header", "table-toolbar", "data-table", "export-actions"],
+        "mutableSlots": ["activeStep=4", "mainContent"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-step4-empty",
+            "kind": "page-leaf",
+            "pageIds": ["page-step4-preview-empty"],
+            "output": "pages/step4-preview-empty.html",
+            "sharedRegions": ["step4-shell"],
+            "privateRegions": ["empty-state-content"],
+            "mutableSlots": ["tableArea"],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}
