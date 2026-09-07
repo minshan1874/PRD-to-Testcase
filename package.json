@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k -n web,api -c cyan,green \"vite\" \"PORT=4179 tsx watch server/index.ts\"",
-    "build": "tsc -b && vite build && tsc -p tsconfig.server.json && tsc -p tsconfig.worker.json && cp dist/server/index-worker.js dist/server/index.js && node scripts/prepare-worker.mjs",
+    "build": "tsc -b && vite build && tsc -p tsconfig.server.json && tsc -p tsconfig.worker.json && node scripts/prepare-worker.mjs",
     "start": "node dist-server/index.js",
     "preview": "npm run build && npm start",
     "typecheck": "tsc -b --noEmit",

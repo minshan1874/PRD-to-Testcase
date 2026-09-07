@@ -1,4 +1,4 @@
-import { ApiError, generate } from "./openrouter.js";
+import { ApiError, fetchModels, generate } from "./openrouter.js";
 
 interface WorkerEnv {
   OPENROUTER_API_KEY?: string;
@@ -50,8 +50,17 @@ export default {
       });
     }
 
+    if (url.pathname === "/api/models" && request.method === "GET") {
+      return handleModels(request, env);
+    }
+
     if (url.pathname === "/api/generate" && request.method === "POST") {
-      return handleGenerate(request, env);
+      return handleChat(request, env);
+    }
+
+    // AI 审查用例：与生成共用同一条 OpenRouter 调用链路（messages 由前端构造为审查提示词）
+    if (url.pathname === "/api/review" && request.method === "POST") {
+      return handleChat(request, env);
     }
 
     if (url.pathname.startsWith("/api/")) {
@@ -65,7 +74,21 @@ export default {
   },
 };
 
-async function handleGenerate(request: Request, env: WorkerEnv): Promise<Response> {
+async function handleModels(request: Request, env: WorkerEnv): Promise<Response> {
+  try {
+    const models = await fetchModels(env.OPENROUTER_API_KEY);
+    return apiJson(request, { models, mock: false });
+  } catch (err) {
+    if (err instanceof ApiError) {
+      return apiJson(request, {
+        error: { code: err.code, message: err.message, detail: err.detail },
+      }, err.status ?? 502);
+    }
+    return apiJson(request, { error: { code: "upstream", message: "获取模型目录失败" } }, 502);
+  }
+}
+
+async function handleChat(request: Request, env: WorkerEnv): Promise<Response> {
   if (!env.OPENROUTER_API_KEY) {
     return apiJson(request, {
       error: { code: "auth", message: "未配置服务端 API Key" },
@@ -124,11 +147,14 @@ async function handleGenerate(request: Request, env: WorkerEnv): Promise<Respons
       jsonSchema: body.jsonSchema && typeof body.jsonSchema === "object"
         ? body.jsonSchema as Record<string, unknown>
         : undefined,
-      // The hosted Worker can terminate a long-running request before the
-      // browser's ten-minute client timeout. Return a JSON error while the
-      // request is still alive so the UI does not misreport it as localhost
-      // connectivity failure.
-      timeoutMs: 90_000,
+      // The hosted Worker would otherwise terminate a long-running request
+      // before the browser's ten-minute client timeout. Return a JSON error
+      // while the request is still alive so the UI does not misreport it as
+      // localhost connectivity failure.
+      // 95s：在 Cloudflare 约 100s 的单请求墙之前先自行超时并返回 504，
+      // 否则平台会直接切断连接，前端将误报“无法连接到线上 API”（网络错误）。
+      // 若仍需更大余量请改用本地服务或流式输出。
+      timeoutMs: 95_000,
     });
     return apiJson(request, result);
   } catch (err) {

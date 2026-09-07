@@ -21,7 +21,6 @@ export default function StepExcelPreview() {
         fields: config.fields,
         customFields: config.customFields,
         selectedIds: null,
-        traceEnabled: config.trace.enabled,
       });
       toast.success("已导出全部用例");
     } catch (err) {

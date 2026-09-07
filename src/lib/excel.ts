@@ -8,7 +8,6 @@ export interface ExportParams {
   customFields: FieldDef[];
   /** null = 导出全部；非空数组 = 仅导出勾选用例 */
   selectedIds: string[] | null;
-  traceEnabled: boolean;
 }
 
 export interface Column {
@@ -80,7 +79,7 @@ function recomputeCoverage(selectedCases: TestCase[], original: GenerationResult
 
 /** 浏览器端生成 Excel 工作簿并触发下载 */
 export async function exportWorkbook(params: ExportParams): Promise<void> {
-  const { result, fields, customFields, selectedIds, traceEnabled } = params;
+  const { result, fields, customFields, selectedIds } = params;
   const selectedSet = selectedIds ? new Set(selectedIds) : null;
   const exportedCases = selectedSet
     ? result.cases.filter((c) => selectedSet.has(c.id))
@@ -116,7 +115,15 @@ export async function exportWorkbook(params: ExportParams): Promise<void> {
     : result.coverage;
   for (const row of coverRows) wsCover.addRow([row.feature, row.testType, row.count, row.coverageStatus, row.riskLevel]);
 
-  // 3. 待确认项
+  // 3. 风险与假设
+  if (result.risksAndAssumptions.length > 0) {
+    const wsRisk = wb.addWorksheet("风险与假设");
+    wsRisk.columns = [{ header: "序号", key: "no", width: 8 }, { header: "风险与假设", key: "risk", width: 60 }];
+    styleHeaderRow(wsRisk, ["序号", "风险与假设"]);
+    result.risksAndAssumptions.forEach((r, i) => wsRisk.addRow([i + 1, r]));
+  }
+
+  // 4. 待确认项
   const wsConf = wb.addWorksheet("待确认项");
   const confHeaders = ["问题描述", "影响", "来源位置", "建议确认内容"];
   wsConf.columns = confHeaders.map((h) => ({ header: h, key: h, width: 28 }));
@@ -130,16 +137,6 @@ export async function exportWorkbook(params: ExportParams): Promise<void> {
   styleHeaderRow(wsField, fieldHeaders);
   const fieldDict = [...BUILTIN_FIELDS, ...customFields].filter((f) => fields.some((c) => c.key === f.key && c.visible));
   for (const f of fieldDict) wsField.addRow([f.label, f.description, f.example]);
-
-  // 5. 生成依据（仅追溯开启）
-  if (traceEnabled) {
-    const wsEvid = wb.addWorksheet("生成依据");
-    const evidHeaders = ["用例 ID", "PRD 片段", "位置（页码/章节）"];
-    wsEvid.columns = evidHeaders.map((h) => ({ header: h, key: h, width: 32 }));
-    styleHeaderRow(wsEvid, evidHeaders);
-    const evidRows = selectedSet ? result.evidence.filter((e) => selectedSet.has(e.caseId)) : result.evidence;
-    for (const e of evidRows) wsEvid.addRow([e.caseId, e.prdSnippet, e.location]);
-  }
 
   const buffer = await wb.xlsx.writeBuffer();
   const blob = new Blob([buffer], {

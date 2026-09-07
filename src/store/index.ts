@@ -5,18 +5,30 @@ import type {
   GenerateConfig,
   GenPhase,
   GenerationResult,
+  ReviewPhase,
+  ReviewResult,
   SourceItem,
   TestType,
 } from "@/types";
 import { BUILTIN_FIELDS } from "@/fieldSpec";
 import { ingestFile, pasteItem } from "@/lib/ingest";
-import { apiUnavailableMessage, fetchHealth, generateRequest, type CatalogModel } from "@/lib/api";
+import { apiUnavailableMessage, fetchHealth, fetchModels, generateRequest, reviewRequest, type CatalogModel } from "@/lib/api";
 import { buildPrompt, outputFieldKeys } from "@/lib/prompt";
 import { buildOutputJsonSchema, renumberCases, validateGeneration } from "@/lib/schema";
+import { buildReviewJsonSchema, buildReviewMessages, validateReview } from "@/lib/reviewSchema";
 import { DEFAULT_MODEL_ID, effectiveCapabilities } from "@/lib/models";
 import { STATIC_MODELS } from "@/lib/models";
+import {
+  DEMO_MODEL,
+  DEMO_MODEL_ID,
+  delay,
+  isDemoModel,
+  SAMPLE_GENERATION_RESULT,
+  SAMPLE_REVIEW_RESULT,
+} from "@/lib/sampleResults";
 
 let activeGenerationController: AbortController | null = null;
+let activeReviewController: AbortController | null = null;
 
 const DEFAULT_FIELDS: FieldConfig[] = BUILTIN_FIELDS.map((f) => ({
   key: f.key,
@@ -63,6 +75,17 @@ interface AppState {
   generate: () => Promise<void>;
   cancelGeneration: () => void;
   resetGeneration: () => void;
+  openResults: () => void;
+
+  // ── AI 审查 ──
+  reviewModel: string;
+  setReviewModel: (model: string) => void;
+  reviewPhase: ReviewPhase;
+  reviewError: string | null;
+  reviewResult: ReviewResult | null;
+  runReview: () => Promise<void>;
+  cancelReview: () => void;
+  clearReview: () => void;
 
 }
 
@@ -123,10 +146,15 @@ export const useStore = create<AppState>()((set, get) => ({
   },
   loadModels: async () => {
     set({ modelsLoading: true, modelsError: null });
+    const withDemo = (list: CatalogModel[]): CatalogModel[] =>
+      list.some((m) => m.id === DEMO_MODEL_ID) ? list : [...list, DEMO_MODEL];
     try {
-      set({ models: STATIC_MODELS, modelsLoading: false });
+      const { models } = await fetchModels();
+      // 目录加载成功则使用全量模型，失败时回退到内置静态列表；均追加示例模型
+      set({ models: withDemo(models && models.length > 0 ? models : STATIC_MODELS), modelsLoading: false });
     } catch (err) {
       set({
+        models: withDemo(STATIC_MODELS),
         modelsLoading: false,
         modelsError: err instanceof Error ? err.message : "模型目录加载失败",
       });
@@ -273,6 +301,15 @@ export const useStore = create<AppState>()((set, get) => ({
     };
 
     try {
+      if (isDemoModel(config.model)) {
+        // 示例模型：不调用真实 API，模拟 5s 请求中 + 5s 校验中后输出固定示例结果
+        set({ phase: "requesting", lastError: null });
+        await delay(5000, generationController);
+        set({ phase: "validating" });
+        await delay(5000, generationController);
+        set({ phase: "done", result: { ...SAMPLE_GENERATION_RESULT, modelUsed: config.model } });
+        return;
+      }
       await run(null);
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -292,7 +329,110 @@ export const useStore = create<AppState>()((set, get) => ({
     set({ phase: "idle", lastError: null });
   },
 
-  resetGeneration: () => set({ phase: "idle", lastError: null, result: null, attempts: 0 }),
+  resetGeneration: () => set({ phase: "idle", lastError: null, attempts: 0 }),
+  openResults: () => set((s) => (s.result ? { phase: "done" } : s)),
+
+  reviewModel: "",
+  setReviewModel: (reviewModel) => set({ reviewModel }),
+  reviewPhase: "idle",
+  reviewError: null,
+  reviewResult: null,
+  clearReview: () => set({ reviewPhase: "idle", reviewError: null, reviewResult: null }),
+
+  runReview: async () => {
+    const { config, result, reviewModel } = get();
+    if (!result || result.cases.length === 0) {
+      set({ reviewPhase: "error", reviewError: "没有可审查的用例，请先生成测试用例" });
+      return;
+    }
+    const model = reviewModel || DEFAULT_MODEL_ID;
+    if (!model) {
+      set({ reviewPhase: "error", reviewError: "请选择审查模型" });
+      return;
+    }
+    activeReviewController?.abort();
+    const reviewController = new AbortController();
+    activeReviewController = reviewController;
+    let attempts = 0;
+    set({ reviewPhase: "requesting", reviewError: null });
+
+    const outputKeys = outputFieldKeys(config);
+    const customKeys = config.customFields
+      .filter((f) => outputKeys.includes(f.key))
+      .map((f) => f.key);
+
+    const run = async (retryHint: string | null): Promise<void> => {
+      const prompt = buildReviewMessages(get().sources, (get().result?.cases ?? []).slice());
+      if (retryHint) {
+        const msgs = [...prompt.messages];
+        const lastIdx = msgs.length - 1;
+        msgs[lastIdx] = { ...msgs[lastIdx], content: `${msgs[lastIdx].content}\n\n${retryHint}` };
+        prompt.messages = msgs;
+      }
+      const catalog = get().models.find((m) => m.id === model);
+      const cap = effectiveCapabilities(model, catalog);
+      const useJsonSchema = cap.supportsJsonSchema;
+      const jsonSchema = useJsonSchema
+        ? { name: "testcase_review", strict: true, schema: buildReviewJsonSchema(customKeys, outputKeys) }
+        : undefined;
+
+      const resp = await reviewRequest({
+        model,
+        messages: prompt.messages,
+        temperature: config.temperature,
+        maxTokens: 24000,
+        apiKey: config.apiKey || undefined,
+        signal: reviewController.signal,
+        useJsonSchema,
+        jsonSchema,
+      });
+
+      set({ reviewPhase: "validating" });
+      const checked = validateReview(resp.content, customKeys, outputKeys);
+      if (checked.ok) {
+        set({
+          reviewPhase: "done",
+          reviewResult: { ...checked.result, modelUsed: resp.model || checked.result.modelUsed },
+        });
+        return;
+      }
+      if (attempts < 1) {
+        attempts += 1;
+        set({ reviewPhase: "validating" });
+        await run("注意：上一次输出不是合法 JSON，请只输出一个完整合法的 JSON 对象，不要输出任何其他文字或代码块标记。");
+        return;
+      }
+      set({ reviewPhase: "error", reviewError: checked.reason });
+    };
+
+    try {
+      if (isDemoModel(model)) {
+        // 示例模型评审：不调用真实 API，模拟 5s 请求中 + 5s 校验中后输出固定示例评审结果
+        set({ reviewPhase: "requesting", reviewError: null });
+        await delay(5000, reviewController);
+        set({ reviewPhase: "validating" });
+        await delay(5000, reviewController);
+        set({ reviewPhase: "done", reviewResult: { ...SAMPLE_REVIEW_RESULT, modelUsed: model } });
+        return;
+      }
+      await run(null);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        if (get().reviewPhase !== "idle") set({ reviewPhase: "idle", reviewError: null });
+        return;
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ reviewPhase: "error", reviewError: msg });
+    } finally {
+      if (activeReviewController === reviewController) activeReviewController = null;
+    }
+  },
+
+  cancelReview: () => {
+    activeReviewController?.abort();
+    activeReviewController = null;
+    set({ reviewPhase: "idle", reviewError: null });
+  },
 }));
 
 export function useCaseCount(): number {

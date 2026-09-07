@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AlarmClock, FileText, Image as ImageIcon, Loader2, Trash2, UploadCloud, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
@@ -42,14 +42,36 @@ export default function StepUpload() {
     .reduce((n, x) => n + ((x.text?.length ?? 0) + (x.pageImages?.length ?? 0) * 2), 0);
   const imageCount = sources.filter((x) => x.kind === "image").length;
   const scanImages = sources.reduce((n, x) => n + (x.pageImages?.length ?? 0), 0);
+  const imageTotal = imageCount + scanImages;
   const successCount = sources.filter((x) => x.status === "success").length;
+
+  // 超出文本/图片上限时弹窗提示（仅在跨过阈值时弹一次，避免反复轰炸）
+  const warnedOverLimit = useRef(false);
+  useEffect(() => {
+    const overText = totalChars > LIMITS.maxTextChars;
+    const overImage = imageTotal > LIMITS.maxImages;
+    if (overText || overImage) {
+      if (!warnedOverLimit.current) {
+        warnedOverLimit.current = true;
+        if (overText) {
+          toast.error(`文本内容已超过 ${LIMITS.maxTextChars.toLocaleString()} 字符上限（当前 ${totalChars.toLocaleString()}），请删除部分内容后再生成`);
+        }
+        if (overImage) {
+          toast.error(`图片（含扫描转图）已超过 ${LIMITS.maxImages} 张上限（当前 ${imageTotal}），请移除部分后再生成`);
+        }
+      }
+    } else {
+      warnedOverLimit.current = false;
+    }
+  }, [totalChars, imageTotal]);
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="animate-card-hover">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            上传 PRD 文档
+          <CardTitle className="flex flex-col items-start gap-1">
+            <span className="eyebrow">01 · Input</span>
+            <span className="font-display text-base font-semibold tracking-tight">上传 PRD 文档</span>
           </CardTitle>
           <CardDescription>
             单文件 ≤ {formatBytes(LIMITS.maxFileBytes, 0)}；扫描 PDF 最多转 {LIMITS.maxScanPages} 页图片。
@@ -83,13 +105,22 @@ export default function StepUpload() {
                   if (isFileDrag(e)) void onFiles(e.dataTransfer.files);
                 }}
                 onClick={() => inputRef.current?.click()}
-                onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    inputRef.current?.click();
+                  }
+                }}
                 className={cn(
-                  "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-6 py-10 text-center transition-colors",
-                  dragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/30"
+                  "group flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all",
+                  dragOver
+                    ? "border-primary bg-primary/5 shadow-[0_0_0_4px_oklch(0.6_0.12_255/0.15)]"
+                    : "border-border hover:border-primary/60 hover:bg-primary/[0.03]"
                 )}
               >
-                <UploadCloud className="size-8 text-muted-foreground" />
+                <div className={cn("flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform", dragOver ? "translate-y-0" : "group-hover:-translate-y-1")}>
+                  <UploadCloud className="size-6" />
+                </div>
                 <p className="text-sm font-medium">点击选择或拖拽文件到此处</p>
                 <p className="text-xs text-muted-foreground">支持 PDF / DOCX / MD / TXT / PNG / JPG / WEBP，可多选</p>
                 <input
@@ -108,7 +139,7 @@ export default function StepUpload() {
           {sources.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">输入池（{successCount} 个解析成功）</p>
+                <p className="text-sm font-medium">输入池（<span className="font-mono text-xs">{successCount}</span> 个解析成功）</p>
                 <Button variant="ghost" size="sm" onClick={clearSources}>
                   <Trash2 className="size-4" /> 清空
                 </Button>
@@ -122,11 +153,11 @@ export default function StepUpload() {
           {/* 限制统计 */}
           <div className="flex flex-wrap gap-2 text-xs">
             <Badge variant={totalChars > LIMITS.maxTextChars ? "destructive" : totalChars > LIMITS.warnTextChars ? "warning" : "secondary"}>
-              文本 {totalChars.toLocaleString()} / {LIMITS.maxTextChars.toLocaleString()} 字符
+              文本 <span className="font-mono">{totalChars.toLocaleString()} / {LIMITS.maxTextChars.toLocaleString()}</span> 字符
             </Badge>
             <Badge variant={imageCount + scanImages > LIMITS.maxImages ? "destructive" : "secondary"}>
-              图片 {imageCount + scanImages} / {LIMITS.maxImages} 张
-              {scanImages > 0 && <>（含扫描页 {scanImages}）</>}
+              图片 <span className="font-mono">{imageCount + scanImages} / {LIMITS.maxImages}</span> 张
+              {scanImages > 0 && <>（含扫描页 <span className="font-mono">{scanImages}</span>）</>}
             </Badge>
           </div>
 
@@ -159,7 +190,7 @@ function SourceRow({
 
       {item.status === "success" && (
         <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span>{formatBytes(item.size)}</span>
+          <span className="font-mono">{formatBytes(item.size)}</span>
           {item.kind === "pdf" && <Badge variant="outline">PDF · {item.pages ?? "-"} 页</Badge>}
           {isImage && <Badge variant="outline">图片</Badge>}
           {typeof item.text?.length === "number" && item.kind !== "image" && (

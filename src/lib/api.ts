@@ -117,3 +117,38 @@ export async function generateRequest(
     externalSignal?.removeEventListener("abort", abortFromExternal);
   }
 }
+
+/** AI 审查用例请求（复用生成链路，构造不同的 messages） */
+export async function reviewRequest(
+  req: GenerateRequest & { apiKey?: string },
+  timeoutMs = 600_000
+): Promise<GenerateResponse> {
+  const controller = new AbortController();
+  const externalSignal = req.signal;
+  const abortFromExternal = () => controller.abort();
+  externalSignal?.addEventListener("abort", abortFromExternal, { once: true });
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const { signal: _signal, ...bodyReq } = req;
+    const res = await fetch("/api/review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(req.apiKey ? { "x-openrouter-key": req.apiKey } : {}),
+      },
+      body: JSON.stringify(bodyReq as GenerateRequest),
+      signal: controller.signal,
+    });
+    return await handle<GenerateResponse>(res);
+  } catch (err) {
+    if (externalSignal?.aborted) throw new DOMException("请求已停止", "AbortError");
+    if (err instanceof ApiClientError) throw err;
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiClientError("timeout", "请求超时（10 分钟），请重试");
+    }
+    throw new ApiClientError("network", apiUnavailableMessage());
+  } finally {
+    clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", abortFromExternal);
+  }
+}

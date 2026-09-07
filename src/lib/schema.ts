@@ -109,17 +109,37 @@ export function buildOutputJsonSchema(customKeys: string[], fieldKeys: string[] 
       },
       modelUsed: { type: "string" },
     },
-    required: ["cases", "coverage", "risksAndAssumptions", "confirmations", "evidence", "modelUsed"],
+    required: ["cases", "coverage", "risksAndAssumptions", "confirmations", "modelUsed"],
     additionalProperties: false,
   };
 }
 
 // ─── zod 校验（宽松化 + 规范化，容忍模型输出的小偏差） ───
 
+const extractText = (input: unknown): string => {
+  if (input === null || input === undefined) return "";
+  if (typeof input === "string") return input;
+  if (typeof input === "number" || typeof input === "boolean") return String(input);
+  if (Array.isArray(input)) return input.map(extractText).filter((s) => s.length > 0).join("；");
+  if (typeof input === "object") {
+    // 模型可能把整段文本包装成对象（如 { expected: "…" } 或 { text: "…" }），递归提取其中的字符串值
+    const parts = Object.values(input as Record<string, unknown>)
+      .map(extractText)
+      .filter((s) => s.length > 0);
+    if (parts.length > 0) return parts.join("；");
+    try {
+      return JSON.stringify(input);
+    } catch {
+      return "";
+    }
+  }
+  return "";
+};
+
 const toStr = (label: string) =>
   z
-    .union([z.string(), z.number(), z.boolean(), z.null(), z.undefined()])
-    .transform((v) => (v === null || v === undefined ? "" : String(v)))
+    .unknown()
+    .transform((v) => extractText(v))
     .catch(`[${label} 解析失败]`);
 
 const stepsSchema = z
@@ -331,11 +351,19 @@ export function validateGeneration(content: string, customKeys: string[], fieldK
       sourceLocation: String(c.sourceLocation ?? ""),
       confirmSuggestion: String(c.confirmSuggestion ?? ""),
     })),
-    evidence: data.evidence.map((e) => ({
-      caseId: String(e.caseId ?? ""),
-      prdSnippet: String(e.prdSnippet ?? ""),
-      location: String(e.location ?? ""),
-    })),
+    evidence: data.evidence.map((e) => {
+      const id = (e as Record<string, unknown>);
+      // 兼容模型把用例 ID 放在 id / case_id / 用例ID 等不同键的情况
+      const caseId = String(
+        id.caseId ??
+        id.id ??
+        id.case_id ??
+        id["用例ID"] ??
+        id["用例 Id"] ??
+        "",
+      );
+      return { caseId, prdSnippet: String(e.prdSnippet ?? ""), location: String(e.location ?? "") };
+    }),
     modelUsed: String(data.modelUsed ?? ""),
   };
   return { ok: true, result };

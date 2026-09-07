@@ -35,7 +35,7 @@ app.get("/api/models", async (req, res) => {
   }
 });
 
-app.post("/api/generate", async (req, res) => {
+async function handleChat(req: express.Request, res: express.Response) {
   const { model, messages, images, temperature, maxTokens, useJsonSchema, jsonSchema } =
     req.body ?? {};
 
@@ -95,7 +95,11 @@ app.post("/api/generate", async (req, res) => {
     const msg = err instanceof Error ? err.message : String(err);
     res.status(502).json({ error: { code: "network", message: `网络错误：${msg}` } });
   }
-});
+}
+
+app.post("/api/generate", handleChat);
+// AI 审查用例：与生成共用同一条链路（messages 由前端构造为审查提示词）
+app.post("/api/review", handleChat);
 
 // ─── 生产模式：托管构建产物（dist），并提供 SPA 回退 ─────────
 const distDir = path.join(import.meta.dirname, "..", "dist");

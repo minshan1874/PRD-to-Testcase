@@ -44,6 +44,17 @@ export class ApiError extends Error {
   }
 }
 
+/** 从 OpenRouter 返回体判断是否为地域限制类错误 */
+function isGeoError(detail: string): boolean {
+  const low = detail.toLowerCase();
+  if (low.includes("not available in your region")) return true;
+  if (/geo\s*restriction/.test(low)) return true;
+  if (/regional\s*surcharge/.test(low)) return true;
+  if ((low.includes("region") || low.includes("geo") || low.includes("country")) &&
+      /(not available|blocked|forbidden|restrict|unavailabl)/.test(low)) return true;
+  return false;
+}
+
 export function mapHttpError(status: number, bodyText: string): ApiError {
   let detail = "";
   try {
@@ -54,6 +65,9 @@ export function mapHttpError(status: number, bodyText: string): ApiError {
     if (!detail && body) detail = JSON.stringify(body);
   } catch {
     detail = bodyText.slice(0, 300);
+  }
+  if (isGeoError(detail)) {
+    return new ApiError("region_not_supported", "该模型暂不支持您当前的访问区域（地域限制），请更换为其他可用模型后重试。", status, detail);
   }
   switch (status) {
     case 401:
@@ -66,7 +80,9 @@ export function mapHttpError(status: number, bodyText: string): ApiError {
     case 413:
       return new ApiError("payload_too_large", "请求体过大，请减少文档或图片（413）", status, detail);
     case 429:
-      return new ApiError("rate_limited", "请求过于频繁，请稍后重试（429）", status, detail);
+      // 取出 provider 给出的首行原因（去掉 metadata 原始 JSON，避免把整段英文糊到界面）
+      const firstLine = detail.split("| metadata:")[0].trim().slice(0, 160);
+      return new ApiError("rate_limited", "请求过于频繁（429）：当前 AI 服务暂时繁忙或被限流，请稍等片刻后重试，或更换其他模型。", status, firstLine);
     default:
       return new ApiError("upstream", `OpenRouter 服务异常（HTTP ${status}）`, status, detail);
   }

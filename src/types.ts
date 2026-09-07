@@ -53,12 +53,11 @@ export const CASE_TYPES = [
 ] as const;
 export type CaseType = (typeof CASE_TYPES)[number];
 
-/** P0-P3 按绝对风险定义的说明（供提示词与字段说明复用） */
+/** 用例优先级（仅 P0/P1/P2 三档）定义（供提示词与字段说明复用） */
 export const PRIORITY_LEVELS: Array<{ level: string; desc: string }> = [
-  { level: "P0", desc: "阻塞发布、严重数据或安全风险、核心功能完全不可用" },
-  { level: "P1", desc: "核心主流程、关键正向场景和主要业务功能" },
-  { level: "P2", desc: "一般交互、次要流程、常规异常与边界场景" },
-  { level: "P3", desc: "UI 细节、提示文案、体验优化和极端低概率场景" },
+  { level: "P0", desc: "最高：核心业务主流程，阻断业务，上线必须全部通过，每轮必执行（占比控制在 20% 以内）" },
+  { level: "P1", desc: "中：分支业务、常规校验，功能重要，正式测试需执行，回归可抽样" },
+  { level: "P2", desc: "最低：边缘场景、UI 体验细节，非业务阻断，工期紧张可跳过" },
 ];
 
 export const CASE_SCALES = ["精简", "标准", "全面"] as const;
@@ -156,5 +155,33 @@ export interface GenerationResult {
   evidence: EvidenceItem[];
   modelUsed: string;
 }
+
+// ─── AI 审查用例 ────────────────────────────────────────────
+
+export type ReviewSeverity = "高" | "中" | "低";
+
+/** 审查逐条问题清单：用例编号｜问题描述｜严重等级｜明确修改建议 */
+export interface ReviewIssue {
+  caseId: string;
+  issue: string;
+  severity: ReviewSeverity;
+  suggestion: string;
+}
+
+/** AI 审查结果（三部分：整体总结 + 逐条问题清单 + 优化后完整用例） */
+export interface ReviewResult {
+  /** 第一部分：整体评审总结（含问题数量统计、高风险点提醒） */
+  summary: string;
+  /** 高风险点提醒：资金 / 状态流转 / 权限类，需人工重点确认 */
+  highRiskNotes: string[];
+  /** 第二部分：逐条问题清单 */
+  issues: ReviewIssue[];
+  /** 第三部分：修改之后的完整优化版用例 */
+  optimizedCases: TestCase[];
+  /** 实际使用的审查模型 */
+  modelUsed: string;
+}
+
+export type ReviewPhase = "idle" | "requesting" | "validating" | "done" | "error";
 
 export type GenPhase = "idle" | "requesting" | "validating" | "repairing" | "done" | "error";

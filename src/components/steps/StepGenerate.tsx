@@ -20,12 +20,21 @@ export default function StepGenerate() {
   const generate = useStore((s) => s.generate);
   const cancelGeneration = useStore((s) => s.cancelGeneration);
   const resetGeneration = useStore((s) => s.resetGeneration);
+  const reviewPhase = useStore((s) => s.reviewPhase);
   const config = useStore((s) => s.config);
   const sources = useStore((s) => s.sources);
   const health = useStore((s) => s.health);
   const [statusIndex, setStatusIndex] = useState(0);
 
   const running = phase === "requesting" || phase === "validating" || phase === "repairing";
+  const reviewing = reviewPhase === "requesting" || reviewPhase === "validating";
+  const handleGoBack = () => {
+    if (reviewing) {
+      const ok = window.confirm("AI 评审正在进行中，离开当前页面将导致评审中断，且本次评审结果会丢失。确定要返回配置页吗？");
+      if (!ok) return;
+    }
+    resetGeneration();
+  };
   const textSources = sources.filter((s) => s.status === "success");
   const textChars = textSources.reduce((n, x) => n + (x.text?.length ?? 0), 0);
   const imgCount = sources.reduce((n, x) => n + (x.pageImages?.length ?? 0), 0) +
@@ -44,14 +53,19 @@ export default function StepGenerate() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className={phase === "done" && result ? "animate-success-pulse" : "animate-fade-rise"}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            ③ 生成测试用例
-            <Badge variant="outline">模型：{config.model || "未选择"}</Badge>
+            <span className="flex flex-col items-start gap-0.5">
+              <span className="eyebrow">03 · Generate</span>
+              <span className="flex items-center gap-2">
+                <span className="font-display text-base font-semibold tracking-tight">生成测试用例</span>
+                <Badge variant="outline" className="font-mono">模型：{config.model || "未选择"}</Badge>
+              </span>
+            </span>
           </CardTitle>
           <CardDescription>
-            输入：{textSources.length} 个文档（文本 {textChars.toLocaleString()} 字符，图片 {imgCount} 张）
+            输入：<span className="font-mono">{textSources.length}</span> 个文档（文本 <span className="font-mono">{textChars.toLocaleString()}</span> 字符，图片 <span className="font-mono">{imgCount}</span> 张）
             {health?.mock && <> · Mock 模式</>}
           </CardDescription>
         </CardHeader>
@@ -59,7 +73,7 @@ export default function StepGenerate() {
           {phase === "idle" && (
             <div className="flex flex-col items-center gap-3 text-center">
               <Wand2 className="size-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">准备就绪，请在左侧完成配置后点击“开始生成”</p>
+              <p className="text-sm text-muted-foreground">准备就绪，请完成配置后点击“开始生成”</p>
             </div>
           )}
 
@@ -86,7 +100,7 @@ export default function StepGenerate() {
                 <Button onClick={() => generate()}>
                   <RefreshCw className="size-4" /> 重试
                 </Button>
-                <Button variant="outline" onClick={resetGeneration}>返回配置页</Button>
+                <Button variant="outline" onClick={handleGoBack}>返回配置页</Button>
               </div>
             </div>
           )}
@@ -95,11 +109,11 @@ export default function StepGenerate() {
             <div className="flex flex-col items-center gap-3 text-center">
               <CheckCircle2 className="size-10 text-emerald-600" />
               <p className="text-sm font-medium">
-                生成完成：{result.cases.length} 条用例 · {result.confirmations.length} 项待确认 ·{" "}
-                {result.risksAndAssumptions.length} 条风险/假设
+                生成完成：<span className="font-mono">{result.cases.length}</span> 条用例 · <span className="font-mono">{result.confirmations.length}</span> 项待确认 ·{" "}
+                <span className="font-mono">{result.risksAndAssumptions.length}</span> 条风险/假设
               </p>
               <p className="text-xs text-muted-foreground">结果已显示在下方，可直接查看并导出。</p>
-              <Button variant="outline" onClick={resetGeneration}>返回配置页</Button>
+              <Button variant="outline" onClick={handleGoBack}>返回配置页</Button>
             </div>
           )}
         </CardContent>
