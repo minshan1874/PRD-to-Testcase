@@ -185,3 +185,75 @@ export interface ReviewResult {
 export type ReviewPhase = "idle" | "requesting" | "validating" | "done" | "error";
 
 export type GenPhase = "idle" | "requesting" | "validating" | "repairing" | "done" | "error";
+
+// ─── AI 需求预审 ────────────────────────────────────────────
+
+export type PrereviewSeverity = "高" | "中" | "低";
+
+export type PrereviewConclusion = "驳回" | "补充材料" | "通过";
+
+/** 逐条问题清单：序号｜问题等级(高/中/低)｜问题位置&问题描述｜修改补充建议 */
+export interface PrereviewIssue {
+  id: string;
+  severity: PrereviewSeverity;
+  location: string;
+  description: string;
+  suggestion: string;
+  /** 是否标注【需要人工会议确认】 */
+  needConfirmation?: boolean;
+}
+
+/** 分项校验结果（四大类：信息完整性 / 合规风险 / 研发可行性 / 需求清晰度） */
+export interface PrereviewCheck {
+  dimension: string;
+  riskLevel: PrereviewSeverity | "通过";
+  analysis: string;
+  suggestion: string;
+}
+
+/** 三角色评审问题：后端开发 / 前端开发 / 测试工程师 各 4 问 */
+export interface PrereviewRoleQuestions {
+  role: "后端开发" | "前端开发" | "测试工程师";
+  questions: string[];
+}
+
+/** AI 需求预审结果 */
+export interface PrereviewResult {
+  summary: string;
+  score: number;
+  conclusion: PrereviewConclusion;
+  issues: PrereviewIssue[];
+  checks: PrereviewCheck[];
+  roleQuestions: PrereviewRoleQuestions[];
+  modelUsed: string;
+}
+
+export type PrereviewPhase = "idle" | "requesting" | "validating" | "done" | "error";
+
+/** 功能导航：gen=生成用例，preview=需求预审，review=用例评审，bug=Bug分析 */
+export type ActiveFeature = "gen" | "preview" | "review" | "bug";
+
+// ─── AI Bug 分析 ────────────────────────────────────────────
+
+export type BugProblemType = "JS异常" | "接口请求异常" | "渲染样式异常" | "网络&跨域" | "环境兼容" | "其他";
+export type BugBelong = "前端" | "后端服务" | "网络网关" | "浏览器环境" | "无法确定，信息不足";
+
+/** Bug 修复后的回归建议 */
+export interface BugRegressionAdvice {
+  regressionSteps: string[];
+  verifyPoint: string[];
+  compatibleScope: string;
+  riskTip: string;
+}
+
+/** AI Bug 分析结果 */
+export interface BugAnalyseResult {
+  problemType: BugProblemType;
+  belong: BugBelong;
+  reason: string;
+  suggest: string[];
+  focusPoint: string;
+  regressionAdvice?: BugRegressionAdvice | null;
+}
+
+export type BugPhase = "idle" | "requesting" | "validating" | "done" | "error" | "ocr_empty";

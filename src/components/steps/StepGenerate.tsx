@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Square, Wand2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Square } from "lucide-react";
 import { useStore } from "@/store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,22 +19,12 @@ export default function StepGenerate() {
   const result = useStore((s) => s.result);
   const generate = useStore((s) => s.generate);
   const cancelGeneration = useStore((s) => s.cancelGeneration);
-  const resetGeneration = useStore((s) => s.resetGeneration);
-  const reviewPhase = useStore((s) => s.reviewPhase);
   const config = useStore((s) => s.config);
   const sources = useStore((s) => s.sources);
   const health = useStore((s) => s.health);
   const [statusIndex, setStatusIndex] = useState(0);
 
   const running = phase === "requesting" || phase === "validating" || phase === "repairing";
-  const reviewing = reviewPhase === "requesting" || reviewPhase === "validating";
-  const handleGoBack = () => {
-    if (reviewing) {
-      const ok = window.confirm("AI 评审正在进行中，离开当前页面将导致评审中断，且本次评审结果会丢失。确定要返回配置页吗？");
-      if (!ok) return;
-    }
-    resetGeneration();
-  };
   const textSources = sources.filter((s) => s.status === "success");
   const textChars = textSources.reduce((n, x) => n + (x.text?.length ?? 0), 0);
   const imgCount = sources.reduce((n, x) => n + (x.pageImages?.length ?? 0), 0) +
@@ -53,11 +43,10 @@ export default function StepGenerate() {
 
   return (
     <div className="space-y-6">
-      <Card className={phase === "done" && result ? "animate-success-pulse" : "animate-fade-rise"}>
+      <Card id="gen-status" className={phase === "done" && result ? "animate-success-pulse" : "animate-fade-rise"}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span className="flex flex-col items-start gap-0.5">
-              <span className="eyebrow">03 · Generate</span>
               <span className="flex items-center gap-2">
                 <span className="font-display text-base font-semibold tracking-tight">生成测试用例</span>
                 <Badge variant="outline" className="font-mono">模型：{config.model || "未选择"}</Badge>
@@ -70,13 +59,6 @@ export default function StepGenerate() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex min-h-56 flex-col items-center justify-center gap-4">
-          {phase === "idle" && (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <Wand2 className="size-10 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">准备就绪，请完成配置后点击“开始生成”</p>
-            </div>
-          )}
-
           {running && (
             <div className="flex flex-col items-center gap-3 text-center">
               <Loader2 className="size-10 animate-spin text-primary" />
@@ -96,12 +78,9 @@ export default function StepGenerate() {
             <div className="flex flex-col items-center gap-3 text-center">
               <AlertTriangle className="size-10 text-destructive" />
               <p className="max-w-md text-sm text-destructive">{lastError}</p>
-              <div className="flex gap-2">
-                <Button onClick={() => generate()}>
-                  <RefreshCw className="size-4" /> 重试
-                </Button>
-                <Button variant="outline" onClick={handleGoBack}>返回配置页</Button>
-              </div>
+              <Button onClick={() => generate()}>
+                <RefreshCw className="size-4" /> 重试
+              </Button>
             </div>
           )}
 
@@ -112,8 +91,7 @@ export default function StepGenerate() {
                 生成完成：<span className="font-mono">{result.cases.length}</span> 条用例 · <span className="font-mono">{result.confirmations.length}</span> 项待确认 ·{" "}
                 <span className="font-mono">{result.risksAndAssumptions.length}</span> 条风险/假设
               </p>
-              <p className="text-xs text-muted-foreground">结果已显示在下方，可直接查看并导出。</p>
-              <Button variant="outline" onClick={handleGoBack}>返回配置页</Button>
+              <p className="text-xs text-muted-foreground">生成结果预览已显示在下方，可直接查看并导出。</p>
             </div>
           )}
         </CardContent>

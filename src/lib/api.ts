@@ -152,3 +152,109 @@ export async function reviewRequest(
     externalSignal?.removeEventListener("abort", abortFromExternal);
   }
 }
+
+/** AI 需求预审请求（复用生成链路，构造不同的 messages） */
+export async function prereviewRequest(
+  req: GenerateRequest & { apiKey?: string },
+  timeoutMs = 600_000
+): Promise<GenerateResponse> {
+  const controller = new AbortController();
+  const externalSignal = req.signal;
+  const abortFromExternal = () => controller.abort();
+  externalSignal?.addEventListener("abort", abortFromExternal, { once: true });
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const { signal: _signal, ...bodyReq } = req;
+    const res = await fetch("/api/prereview", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(req.apiKey ? { "x-openrouter-key": req.apiKey } : {}),
+      },
+      body: JSON.stringify(bodyReq as GenerateRequest),
+      signal: controller.signal,
+    });
+    return await handle<GenerateResponse>(res);
+  } catch (err) {
+    if (externalSignal?.aborted) throw new DOMException("请求已停止", "AbortError");
+    if (err instanceof ApiClientError) throw err;
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiClientError("timeout", "请求超时（10 分钟），请重试");
+    }
+    throw new ApiClientError("network", apiUnavailableMessage());
+  } finally {
+    clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", abortFromExternal);
+  }
+}
+
+// ─── AI Bug 分析 ────────────────────────────────────────────
+
+export interface BugAnalyseApiResponse {
+  code: number;
+  data?: {
+    problemType: string;
+    belong: string;
+    reason: string;
+    suggest: string[];
+    focusPoint: string;
+    regressionAdvice?: unknown;
+  };
+  message?: string;
+}
+
+export interface BugAnalyseRequest {
+  text: string;
+  imageBase64?: string;
+  signal?: AbortSignal;
+}
+
+/** AI Bug 分析请求：后端负责 OCR + 模型调用 + 结构化输出 */
+export async function bugAnalyseRequest(
+  req: BugAnalyseRequest,
+  timeoutMs = 60_000
+): Promise<BugAnalyseApiResponse["data"] & object> {
+  const controller = new AbortController();
+  const externalSignal = req.signal;
+  const abortFromExternal = () => controller.abort();
+  externalSignal?.addEventListener("abort", abortFromExternal, { once: true });
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const body: Record<string, unknown> = { text: req.text };
+    if (req.imageBase64) body.imageBase64 = req.imageBase64;
+    const res = await fetch("/api/ai/bug-analyse", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    let resp: BugAnalyseApiResponse | null = null;
+    try {
+      resp = (await res.json()) as BugAnalyseApiResponse;
+    } catch {
+      /* 非 JSON 响应 */
+    }
+    if (!res.ok) {
+      const msg = resp?.message ?? `HTTP ${res.status}`;
+      const code = resp?.code !== undefined ? String(resp.code) : "http";
+      throw new ApiClientError(code, msg);
+    }
+    if (!resp || resp.code !== 0 || !resp.data) {
+      throw new ApiClientError(
+        resp?.code !== undefined ? String(resp.code) : "bad_response",
+        resp?.message ?? "接口返回格式异常"
+      );
+    }
+    return resp.data;
+  } catch (err) {
+    if (externalSignal?.aborted) throw new DOMException("请求已停止", "AbortError");
+    if (err instanceof ApiClientError) throw err;
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiClientError("timeout", "AI分析请求超时，请减少内容重试");
+    }
+    throw new ApiClientError("network", apiUnavailableMessage());
+  } finally {
+    clearTimeout(timer);
+    externalSignal?.removeEventListener("abort", abortFromExternal);
+  }
+}

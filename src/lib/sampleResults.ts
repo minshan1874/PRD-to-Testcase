@@ -1,4 +1,4 @@
-import type { GenerationResult, ReviewResult } from "@/types";
+import type { BugAnalyseResult, GenerationResult, PrereviewResult, ReviewResult } from "@/types";
 import type { CatalogModel } from "@/lib/api";
 
 // ===== 示例模型与固定演示结果（由 output/*.xlsx 一次性解析生成，勿手改） =====
@@ -732,4 +732,132 @@ export const SAMPLE_REVIEW_RESULT: ReviewResult = {
     }
   ],
   "modelUsed": ""
+};
+
+export const SAMPLE_PREREVIEW_RESULT: PrereviewResult = {
+  summary:
+    "需求缺少风险评估，未说明兼容旧版本方案，业务描述完整，存在 2 处中等风险，建议补充信息后重新提交。",
+  score: 72,
+  conclusion: "补充材料",
+  issues: [
+    {
+      id: "1",
+      severity: "中",
+      location: "上线约束 / 兼容性",
+      description:
+        "未说明是否需要兼容旧版本方案，版本切换对存量用户与历史数据的影响未描述。",
+      suggestion: "补充回滚方案，描述版本切换对存量功能与存量用户的影响。",
+      needConfirmation: false,
+    },
+    {
+      id: "2",
+      severity: "高",
+      location: "业务背景 / 风险预案",
+      description:
+        "未填写回滚预案；缺少对存量用户的影响说明，存在上线回退风险。",
+      suggestion: "补充风险预案与回滚机制，明确失败时的兜底处理。",
+      needConfirmation: false,
+    },
+    {
+      id: "3",
+      severity: "中",
+      location: "异常场景",
+      description:
+        "只描述正向流程，异常报错、降级逻辑未定义，缺少边界场景处理说明。",
+      suggestion: "补充异常场景处理逻辑与边界条件定义。",
+      needConfirmation: false,
+    },
+    {
+      id: "4",
+      severity: "低",
+      location: "遗漏点 / 埋点",
+      description:
+        "未说明埋点方案；并发重复操作、空数据、极限输入场景缺少说明。",
+      suggestion: "补充埋点设计，覆盖并发、空数据与极限输入场景。",
+      needConfirmation: false,
+    },
+  ],
+  checks: [
+    {
+      dimension: "信息完整性校验",
+      riskLevel: "中",
+      analysis:
+        "业务背景、目标、影响范围基本完整；未填写回滚预案，缺少对存量用户的影响说明。",
+      suggestion: "补充回滚方案，描述版本切换对存量功能影响。",
+    },
+    {
+      dimension: "合规&风险校验",
+      riskLevel: "通过",
+      analysis: "需求仅做业务调整，无数据采集、权限改动，合规校验通过。",
+      suggestion: "无需处理。",
+    },
+    {
+      dimension: "研发可行性初判",
+      riskLevel: "中",
+      analysis: "期望上线周期偏紧，部分实现依赖未排期，存在周期预估风险。",
+      suggestion: "调整期望上线时间，确认依赖项目排期。",
+    },
+    {
+      dimension: "需求清晰度校验",
+      riskLevel: "中",
+      analysis: "需求描述整体清晰，但异常报错、降级逻辑未定义，存在少量模糊描述。",
+      suggestion: "补充异常场景处理逻辑与边界场景。",
+    },
+  ],
+  roleQuestions: [
+    {
+      role: "后端开发",
+      questions: [
+        "版本切换对存量用户和历史数据的迁移/兼容方案是什么？未明确将影响上线风险。",
+        "异常、超时、服务中断等失败场景的降级逻辑是否有明确约定？",
+        "并发重复操作（重复提交/重复创建）的幂等机制是否已定义？",
+        "新版本的接口协议与旧版本是否兼容，是否需要双写或灰度？",
+      ],
+    },
+    {
+      role: "前端开发",
+      questions: [
+        "页面在弱网、接口超时、请求失败场景的用户反馈是否有明确约定？",
+        "交互中的边界状态（空数据、极限输入、超长文本）如何处理与回显？",
+        "新旧版本切换时前端是否有版本兼容与降级策略？",
+        "埋点需求是否明确，是否需要在本次改动中补充埋点上报？",
+      ],
+    },
+    {
+      role: "测试工程师",
+      questions: [
+        "验收标准是否可验证？哪些场景无法自动化断言需要人工兜底？",
+        "并发重复操作、极限输入等边界场景的测试数据能否在测试环境构造？",
+        "异常场景（服务异常、超时、降级）如何模拟与验证？",
+        "是否需要覆盖旧版本兼容性、存量用户回归及历史数据校验？",
+      ],
+    },
+  ],
+  modelUsed: "",
+};
+
+export const SAMPLE_BUG_RESULT: BugAnalyseResult = {
+  problemType: "JS异常",
+  belong: "前端",
+  reason: "报错堆栈显示 `Cannot read properties of undefined (reading 'map')`，位于 `UserList` 组件渲染阶段，推测是接口返回的用户列表字段为空或格式不一致，前端未做空值保护直接调用 `.map()` 导致渲染崩溃。【AI推测，需要进一步验证】",
+  suggest: [
+    "打开浏览器控制台，定位具体报错行号与组件，确认是哪个数据字段为 undefined",
+    "在 Network 面板查看对应接口返回，检查列表字段是否存在、是否为数组类型",
+    "在调用 .map() 前添加可选链或空值兜底（如 `users?.map(...)` 或 `(users || []).map(...)`）",
+    "检查接口契约与前端类型定义是否一致，确认字段命名是否匹配",
+  ],
+  focusPoint: "重点关注报错堆栈中的 `UserList` 组件第 42 行，以及 `/api/users` 接口返回的 `data.list` 字段结构。",
+  regressionAdvice: {
+    regressionSteps: [
+      "在用户列表接口正常返回数据的场景下，验证页面正常渲染且无控制台报错",
+      "模拟接口返回空列表或缺失 list 字段，验证页面仍正常渲染并给出空态提示",
+      "在 Chrome、Edge 及移动端各主要浏览器重复上述操作，确认渲染兼容性",
+    ],
+    verifyPoint: [
+      "控制台无任何 JS 异常堆栈",
+      "空数据场景下用户列表区域展示空态文案，不触发崩溃",
+    ],
+    compatibleScope: "Chrome 最新版、Edge 最新版、主流移动端浏览器（含 iOS Safari、Android 内嵌 WebView）",
+    riskTip: "注意偶现问题需要多次复现验证；需确认接口在弱网或慢速响应下是否同样触发未定义字段，修复时建议同时补强契约防御。【AI推测，仅供参考】",
+  },
 };

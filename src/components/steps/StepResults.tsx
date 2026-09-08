@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { FileDown, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
 import { exportWorkbook, visibleColumns } from "@/lib/excel";
-import { DEFAULT_MODEL_ID } from "@/lib/models";
-import { ModelSelect } from "@/components/ModelSelect";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HelpTip from "@/components/HelpTip";
+import { scrollElementToStart } from "@/lib/utils";
 import type { TestCase } from "@/types";
 
 export default function StepResults() {
   const result = useStore((s) => s.result);
   const config = useStore((s) => s.config);
-  const [reviewOpen, setReviewOpen] = useState(false);
+  const reviewOpen = useStore((s) => s.reviewOpen);
+  const setReviewOpen = useStore((s) => s.setReviewOpen);
   const reviewRef = useRef<HTMLDivElement | null>(null);
   const cols = visibleColumns(config.fields, config.customFields);
   const cases = result?.cases ?? [];
@@ -46,7 +46,7 @@ export default function StepResults() {
   }
 
   return (
-    <Card>
+    <Card id="results-view">
       <CardHeader className="flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
         <div className="space-y-1.5">
           <CardTitle className="flex items-center gap-2 font-display tracking-tight">
@@ -62,7 +62,7 @@ export default function StepResults() {
           </div>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <Button className="w-full sm:w-auto" variant="outline" onClick={() => setReviewOpen((v) => !v)}>
+          <Button className="w-full sm:w-auto" variant="outline" onClick={() => setReviewOpen(!reviewOpen)}>
             <Sparkles className="size-4" /> {reviewOpen ? "收起 AI 评审" : "AI 评审用例"}
           </Button>
           <Button className="w-full sm:w-auto" onClick={() => void doExport()}>
@@ -164,8 +164,6 @@ function renderCaseCell(item: TestCase, key: string) {
 function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null> }) {
   const config = useStore((s) => s.config);
   const result = useStore((s) => s.result);
-  const reviewModel = useStore((s) => s.reviewModel);
-  const setReviewModel = useStore((s) => s.setReviewModel);
   const reviewPhase = useStore((s) => s.reviewPhase);
   const reviewError = useStore((s) => s.reviewError);
   const reviewResult = useStore((s) => s.reviewResult);
@@ -173,8 +171,17 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
   const cancelReview = useStore((s) => s.cancelReview);
   const cols = visibleColumns(config.fields, config.customFields);
 
-  const model = reviewModel || DEFAULT_MODEL_ID;
+  const model = config.model;
   const busy = reviewPhase === "requesting" || reviewPhase === "validating";
+
+  const prevReviewPhase = useRef(reviewPhase);
+  useEffect(() => {
+    if (reviewPhase === "done" && prevReviewPhase.current !== "done") {
+      const el = document.getElementById("review-result");
+      if (el) scrollElementToStart(el);
+    }
+    prevReviewPhase.current = reviewPhase;
+  }, [reviewPhase]);
 
   async function exportOptimized() {
     if (!reviewResult) return;
@@ -217,7 +224,7 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
 
   if (reviewResult && (reviewPhase === "done" || reviewPhase === "idle")) {
     return (
-      <div className="space-y-4 border-t pt-4">
+      <div id="review-result" className="space-y-4 border-t pt-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex animate-success-pulse items-center gap-2">
             <Sparkles className="size-4 text-primary" />
@@ -318,13 +325,7 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
       </div>
 
       <div ref={anchorRef} className="flex flex-wrap items-center gap-2">
-        <ModelSelect
-          value={model}
-          onValueChange={setReviewModel}
-          showCapabilityBadges={false}
-          placeholder="选择评审模型…"
-          triggerClassName="w-72"
-        />
+        {model && <Badge variant="outline" className="font-mono">全局模型：{model}</Badge>}
         {busy ? (
           <Button onClick={() => cancelReview()} disabled={false}>
             <Loader2 className="size-4 animate-spin" /> 取消评审

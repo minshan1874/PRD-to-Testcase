@@ -1,21 +1,29 @@
 import { create } from "zustand";
 import type {
+  ActiveFeature,
+  BugAnalyseResult,
+  BugPhase,
+  BugRegressionAdvice,
   FieldConfig,
   FieldDef,
   GenerateConfig,
   GenPhase,
   GenerationResult,
+  PrereviewPhase,
+  PrereviewResult,
   ReviewPhase,
   ReviewResult,
   SourceItem,
+  TestCase,
   TestType,
 } from "@/types";
 import { BUILTIN_FIELDS } from "@/fieldSpec";
 import { ingestFile, pasteItem } from "@/lib/ingest";
-import { apiUnavailableMessage, fetchHealth, fetchModels, generateRequest, reviewRequest, type CatalogModel } from "@/lib/api";
+import { apiUnavailableMessage, bugAnalyseRequest, fetchHealth, fetchModels, generateRequest, prereviewRequest, reviewRequest, type CatalogModel } from "@/lib/api";
 import { buildPrompt, outputFieldKeys } from "@/lib/prompt";
 import { buildOutputJsonSchema, renumberCases, validateGeneration } from "@/lib/schema";
 import { buildReviewJsonSchema, buildReviewMessages, validateReview } from "@/lib/reviewSchema";
+import { buildPrereviewJsonSchema, buildPrereviewMessages, validatePrereview } from "@/lib/prereviewSchema";
 import { DEFAULT_MODEL_ID, effectiveCapabilities } from "@/lib/models";
 import { STATIC_MODELS } from "@/lib/models";
 import {
@@ -23,12 +31,17 @@ import {
   DEMO_MODEL_ID,
   delay,
   isDemoModel,
+  SAMPLE_BUG_RESULT,
   SAMPLE_GENERATION_RESULT,
+  SAMPLE_PREREVIEW_RESULT,
   SAMPLE_REVIEW_RESULT,
 } from "@/lib/sampleResults";
 
 let activeGenerationController: AbortController | null = null;
 let activeReviewController: AbortController | null = null;
+let activePrereviewController: AbortController | null = null;
+let activeStandaloneController: AbortController | null = null;
+let activeBugController: AbortController | null = null;
 
 const DEFAULT_FIELDS: FieldConfig[] = BUILTIN_FIELDS.map((f) => ({
   key: f.key,
@@ -37,6 +50,10 @@ const DEFAULT_FIELDS: FieldConfig[] = BUILTIN_FIELDS.map((f) => ({
 }));
 
 interface AppState {
+  // ── 功能导航 ──
+  activeFeature: ActiveFeature;
+  setActiveFeature: (f: ActiveFeature) => void;
+
   // ── 输入 ──
   sources: SourceItem[];
   pastedText: string;
@@ -78,18 +95,53 @@ interface AppState {
   openResults: () => void;
 
   // ── AI 审查 ──
-  reviewModel: string;
-  setReviewModel: (model: string) => void;
   reviewPhase: ReviewPhase;
   reviewError: string | null;
   reviewResult: ReviewResult | null;
+  reviewOpen: boolean;
+  setReviewOpen: (v: boolean) => void;
   runReview: () => Promise<void>;
   cancelReview: () => void;
   clearReview: () => void;
 
+  // ── AI 需求预审 ──
+  prereviewPhase: PrereviewPhase;
+  prereviewError: string | null;
+  prereviewResult: PrereviewResult | null;
+  prereviewRuleSet: string;
+  setPrereviewRuleSet: (s: string) => void;
+  runPrereview: () => Promise<void>;
+  cancelPrereview: () => void;
+  clearPrereview: () => void;
+
+  // ── 独立 AI 用例评审（评审页） ──
+  standaloneExcel: { cases: TestCase[]; columns: { key: string; label: string }[]; fileName: string } | null;
+  setStandaloneExcel: (d: { cases: TestCase[]; columns: { key: string; label: string }[]; fileName: string } | null) => void;
+  standalonePhase: ReviewPhase;
+  standaloneError: string | null;
+  standaloneResult: ReviewResult | null;
+  runStandaloneReview: () => Promise<void>;
+  cancelStandaloneReview: () => void;
+  clearStandaloneReview: () => void;
+
+  // ── AI Bug 分析 ──
+  bugText: string;
+  setBugText: (t: string) => void;
+  bugImage: { dataUrl: string; fileName: string } | null;
+  setBugImage: (img: { dataUrl: string; fileName: string } | null) => void;
+  bugPhase: BugPhase;
+  bugError: string | null;
+  bugResult: BugAnalyseResult | null;
+  runBugAnalyse: () => Promise<void>;
+  cancelBugAnalyse: () => void;
+  clearBugAnalyse: () => void;
+
 }
 
 export const useStore = create<AppState>()((set, get) => ({
+  activeFeature: "gen",
+  setActiveFeature: (f) => set({ activeFeature: f }),
+
   sources: [],
   pastedText: "",
   setPastedText: (pastedText) => set({ pastedText }),
@@ -332,22 +384,22 @@ export const useStore = create<AppState>()((set, get) => ({
   resetGeneration: () => set({ phase: "idle", lastError: null, attempts: 0 }),
   openResults: () => set((s) => (s.result ? { phase: "done" } : s)),
 
-  reviewModel: "",
-  setReviewModel: (reviewModel) => set({ reviewModel }),
   reviewPhase: "idle",
   reviewError: null,
   reviewResult: null,
+  reviewOpen: false,
+  setReviewOpen: (v) => set({ reviewOpen: v }),
   clearReview: () => set({ reviewPhase: "idle", reviewError: null, reviewResult: null }),
 
   runReview: async () => {
-    const { config, result, reviewModel } = get();
+    const { config, result } = get();
     if (!result || result.cases.length === 0) {
       set({ reviewPhase: "error", reviewError: "没有可审查的用例，请先生成测试用例" });
       return;
     }
-    const model = reviewModel || DEFAULT_MODEL_ID;
+    const model = config.model;
     if (!model) {
-      set({ reviewPhase: "error", reviewError: "请选择审查模型" });
+      set({ reviewPhase: "error", reviewError: "请先在侧边栏选择模型" });
       return;
     }
     activeReviewController?.abort();
@@ -433,8 +485,320 @@ export const useStore = create<AppState>()((set, get) => ({
     activeReviewController = null;
     set({ reviewPhase: "idle", reviewError: null });
   },
+
+  prereviewPhase: "idle",
+  prereviewError: null,
+  prereviewResult: null,
+  prereviewRuleSet: "默认规则",
+  setPrereviewRuleSet: (s) => set({ prereviewRuleSet: s }),
+  clearPrereview: () => set({ prereviewPhase: "idle", prereviewError: null, prereviewResult: null }),
+
+  runPrereview: async () => {
+    const { config, sources } = get();
+    const active = sources.filter((s) => s.status === "success");
+    if (active.length === 0) {
+      set({ prereviewPhase: "error", prereviewError: "没有可预审的需求文档，请先上传或粘贴 PRD" });
+      return;
+    }
+    const model = config.model;
+    if (!model) {
+      set({ prereviewPhase: "error", prereviewError: "请先在侧边栏选择模型" });
+      return;
+    }
+    activePrereviewController?.abort();
+    const prereviewController = new AbortController();
+    activePrereviewController = prereviewController;
+    let attempts = 0;
+    set({ prereviewPhase: "requesting", prereviewError: null });
+
+    const run = async (retryHint: string | null): Promise<void> => {
+      const prompt = buildPrereviewMessages(get().sources, get().prereviewRuleSet);
+      if (retryHint) {
+        const msgs = [...prompt.messages];
+        const lastIdx = msgs.length - 1;
+        msgs[lastIdx] = { ...msgs[lastIdx], content: `${msgs[lastIdx].content}\n\n${retryHint}` };
+        prompt.messages = msgs;
+      }
+      const catalog = get().models.find((m) => m.id === model);
+      const cap = effectiveCapabilities(model, catalog);
+      const useJsonSchema = cap.supportsJsonSchema;
+      const jsonSchema = useJsonSchema
+        ? { name: "prereview", strict: true, schema: buildPrereviewJsonSchema() }
+        : undefined;
+
+      const resp = await prereviewRequest({
+        model,
+        messages: prompt.messages,
+        images: prompt.images,
+        temperature: config.temperature,
+        maxTokens: 24000,
+        apiKey: config.apiKey || undefined,
+        signal: prereviewController.signal,
+        useJsonSchema,
+        jsonSchema,
+      });
+
+      set({ prereviewPhase: "validating" });
+      const checked = validatePrereview(resp.content);
+      if (checked.ok) {
+        set({
+          prereviewPhase: "done",
+          prereviewResult: { ...checked.result, modelUsed: resp.model || checked.result.modelUsed },
+        });
+        return;
+      }
+      if (attempts < 1) {
+        attempts += 1;
+        set({ prereviewPhase: "validating" });
+        await run("注意：上一次输出不是合法 JSON，请只输出一个完整合法的 JSON 对象，不要输出任何其他文字或代码块标记。");
+        return;
+      }
+      set({ prereviewPhase: "error", prereviewError: checked.reason });
+    };
+
+    try {
+      if (isDemoModel(model)) {
+        // 示例模型预审：不调用真实 API，模拟 4s 请求中 + 4s 校验中后输出固定示例结果
+        set({ prereviewPhase: "requesting", prereviewError: null });
+        await delay(4000, prereviewController);
+        set({ prereviewPhase: "validating" });
+        await delay(4000, prereviewController);
+        set({ prereviewPhase: "done", prereviewResult: { ...SAMPLE_PREREVIEW_RESULT, modelUsed: model } });
+        return;
+      }
+      await run(null);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        if (get().prereviewPhase !== "idle") set({ prereviewPhase: "idle", prereviewError: null });
+        return;
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ prereviewPhase: "error", prereviewError: msg });
+    } finally {
+      if (activePrereviewController === prereviewController) activePrereviewController = null;
+    }
+  },
+
+  cancelPrereview: () => {
+    activePrereviewController?.abort();
+    activePrereviewController = null;
+    set({ prereviewPhase: "idle", prereviewError: null });
+  },
+
+  standaloneExcel: null,
+  setStandaloneExcel: (d) => set({ standaloneExcel: d }),
+  standalonePhase: "idle",
+  standaloneError: null,
+  standaloneResult: null,
+  runStandaloneReview: async () => {
+    const { config, sources, standaloneExcel } = get();
+    if (!standaloneExcel || standaloneExcel.cases.length === 0) {
+      set({ standalonePhase: "error", standaloneError: "请先上传测试用例 Excel" });
+      return;
+    }
+    if (!sources.some((s) => s.status === "success")) {
+      set({ standalonePhase: "error", standaloneError: "请先上传需求文档" });
+      return;
+    }
+    const model = config.model;
+    if (!model) {
+      set({ standalonePhase: "error", standaloneError: "请先在侧边栏选择模型" });
+      return;
+    }
+    activeStandaloneController?.abort();
+    const standaloneController = new AbortController();
+    activeStandaloneController = standaloneController;
+    let attempts = 0;
+    set({ standalonePhase: "requesting", standaloneError: null });
+
+    const fieldKeys = standaloneExcel.columns.map((c) => c.key);
+    const customKeys: string[] = [];
+
+    const run = async (retryHint: string | null): Promise<void> => {
+      const prompt = buildReviewMessages(get().sources, standaloneExcel.cases.slice());
+      if (retryHint) {
+        const msgs = [...prompt.messages];
+        const lastIdx = msgs.length - 1;
+        msgs[lastIdx] = { ...msgs[lastIdx], content: `${msgs[lastIdx].content}\n\n${retryHint}` };
+        prompt.messages = msgs;
+      }
+      const catalog = get().models.find((m) => m.id === model);
+      const cap = effectiveCapabilities(model, catalog);
+      const useJsonSchema = cap.supportsJsonSchema;
+      const jsonSchema = useJsonSchema
+        ? { name: "testcase_review", strict: true, schema: buildReviewJsonSchema(customKeys, fieldKeys) }
+        : undefined;
+
+      const resp = await reviewRequest({
+        model,
+        messages: prompt.messages,
+        temperature: config.temperature,
+        maxTokens: 24000,
+        apiKey: config.apiKey || undefined,
+        signal: standaloneController.signal,
+        useJsonSchema,
+        jsonSchema,
+      });
+
+      set({ standalonePhase: "validating" });
+      const checked = validateReview(resp.content, customKeys, fieldKeys);
+      if (checked.ok) {
+        set({
+          standalonePhase: "done",
+          standaloneResult: { ...checked.result, modelUsed: resp.model || checked.result.modelUsed },
+        });
+        return;
+      }
+      if (attempts < 1) {
+        attempts += 1;
+        set({ standalonePhase: "validating" });
+        await run("注意：上一次输出不是合法 JSON，请只输出一个完整合法的 JSON 对象，不要输出任何其他文字或代码块标记。");
+        return;
+      }
+      set({ standalonePhase: "error", standaloneError: checked.reason });
+    };
+
+    try {
+      if (isDemoModel(model)) {
+        set({ standalonePhase: "requesting", standaloneError: null });
+        await delay(5000, standaloneController);
+        set({ standalonePhase: "validating" });
+        await delay(5000, standaloneController);
+        set({ standalonePhase: "done", standaloneResult: { ...SAMPLE_REVIEW_RESULT, modelUsed: model } });
+        return;
+      }
+      await run(null);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        if (get().standalonePhase !== "idle") set({ standalonePhase: "idle", standaloneError: null });
+        return;
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ standalonePhase: "error", standaloneError: msg });
+    } finally {
+      if (activeStandaloneController === standaloneController) activeStandaloneController = null;
+    }
+  },
+  cancelStandaloneReview: () => {
+    activeStandaloneController?.abort();
+    activeStandaloneController = null;
+    set({ standalonePhase: "idle", standaloneError: null });
+  },
+  clearStandaloneReview: () => set({ standalonePhase: "idle", standaloneError: null, standaloneResult: null }),
+
+  bugText: "",
+  setBugText: (t) => set({ bugText: t }),
+  bugImage: null,
+  setBugImage: (img) => set({ bugImage: img }),
+  bugPhase: "idle",
+  bugError: null,
+  bugResult: null,
+
+  runBugAnalyse: async () => {
+    const { bugText, bugImage, config } = get();
+    const trimmed = bugText.trim();
+    const hasImage = Boolean(bugImage);
+    if (!trimmed && !hasImage) {
+      set({ bugPhase: "error", bugError: "请输入报错信息或上传截图" });
+      return;
+    }
+    activeBugController?.abort();
+    const bugController = new AbortController();
+    activeBugController = bugController;
+    set({ bugPhase: "requesting", bugError: null, bugResult: null });
+
+    try {
+      if (isDemoModel(config.model)) {
+        // 示例模型：模拟 5 秒后返回示例结果
+        await delay(5000, bugController);
+        set({ bugPhase: "done", bugResult: { ...SAMPLE_BUG_RESULT } });
+        return;
+      }
+      const imageBase64 = bugImage?.dataUrl;
+      const data = await bugAnalyseRequest({
+        text: trimmed,
+        imageBase64,
+        signal: bugController.signal,
+      });
+      set({ bugPhase: "validating" });
+      // 简单的类型校验和字段兜底
+      const result: BugAnalyseResult = {
+        problemType: (data.problemType as BugAnalyseResult["problemType"]) ?? "其他",
+        belong: (data.belong as BugAnalyseResult["belong"]) ?? "无法确定，信息不足",
+        reason: data.reason || "",
+        suggest: Array.isArray(data.suggest) ? data.suggest.filter(Boolean) : [],
+        focusPoint: data.focusPoint || "",
+      };
+      // 保证 reason 结尾带标注
+      const tag = "【AI推测，需要进一步验证】";
+      if (result.reason && !result.reason.endsWith(tag)) {
+        result.reason = `${result.reason}${tag}`;
+      }
+      // 保证 suggest 在 2-4 条之间
+      if (result.suggest.length < 2) result.suggest = [...result.suggest, "复现问题并收集完整报错信息", "检查浏览器控制台与网络请求"];
+      if (result.suggest.length > 4) result.suggest = result.suggest.slice(0, 4);
+      // 解析 regressionAdvice（缺失或为空时置 null，前端隐藏模块）
+      result.regressionAdvice = normalizeBugRegression(data);
+      set({ bugPhase: "done", bugResult: result });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        if (get().bugPhase !== "idle") set({ bugPhase: "idle", bugError: null });
+        return;
+      }
+      const msg = err instanceof Error ? err.message : String(err);
+      // OCR 无有效文字的特殊错误码
+      if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "ocr_empty") {
+        set({ bugPhase: "ocr_empty", bugError: "未能识别图片中的报错文字，请改用粘贴文本方式" });
+        return;
+      }
+      set({ bugPhase: "error", bugError: msg });
+    } finally {
+      if (activeBugController === bugController) activeBugController = null;
+    }
+  },
+  cancelBugAnalyse: () => {
+    activeBugController?.abort();
+    activeBugController = null;
+    set({ bugPhase: "idle", bugError: null });
+  },
+  clearBugAnalyse: () =>
+    set({
+      bugText: "",
+      bugImage: null,
+      bugPhase: "idle",
+      bugError: null,
+      bugResult: null,
+    }),
 }));
 
 export function useCaseCount(): number {
   return useStore((s) => s.result?.cases.length ?? 0);
+}
+
+/** 从后端返回的 data 中解析回归建议；无实质内容时返回 null */
+function normalizeBugRegression(data: {
+  regressionAdvice?: unknown;
+}): BugRegressionAdvice | null {
+  const value = data.regressionAdvice;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const v = value as Record<string, unknown>;
+  const lists = (x: unknown): string[] =>
+    Array.isArray(x) ? x.map((s) => String(s)).filter((s) => s.trim().length > 0) : [];
+  let regressionSteps = lists(v.regressionSteps);
+  if (regressionSteps.length < 2) regressionSteps = [];
+  if (regressionSteps.length > 4) regressionSteps = regressionSteps.slice(0, 4);
+  let verifyPoint = lists(v.verifyPoint);
+  if (verifyPoint.length < 2) verifyPoint = [];
+  if (verifyPoint.length > 3) verifyPoint = verifyPoint.slice(0, 3);
+  const compatibleScope = typeof v.compatibleScope === "string" ? v.compatibleScope.trim() : "";
+  let riskTip = typeof v.riskTip === "string" ? v.riskTip.trim() : "";
+  const riskToken = "AI推测，仅供参考";
+  const riskTag = "【AI推测，仅供参考】";
+  if (riskTip && !riskTip.endsWith(riskToken) && !riskTip.endsWith(riskTag)) {
+    riskTip = `${riskTip}${riskTag}`;
+  }
+  if (regressionSteps.length === 0 && verifyPoint.length === 0 && !compatibleScope && !riskTip) {
+    return null;
+  }
+  return { regressionSteps, verifyPoint, compatibleScope, riskTip };
 }

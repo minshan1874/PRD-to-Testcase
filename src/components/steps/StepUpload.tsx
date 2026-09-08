@@ -70,7 +70,6 @@ export default function StepUpload() {
       <Card className="animate-card-hover">
         <CardHeader>
           <CardTitle className="flex flex-col items-start gap-1">
-            <span className="eyebrow">01 · Input</span>
             <span className="font-display text-base font-semibold tracking-tight">上传 PRD 文档</span>
           </CardTitle>
           <CardDescription>
