@@ -37,6 +37,7 @@ export default function StepResults() {
         fields: config.fields,
         customFields: config.customFields,
         selectedIds: null,
+        filenameSuffix: "原始版本",
       });
       toast.success("已导出全部用例");
     } catch (err) {
@@ -46,7 +47,7 @@ export default function StepResults() {
 
   return (
     <Card>
-      <CardHeader className="flex-row items-start justify-between gap-4">
+      <CardHeader className="flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
         <div className="space-y-1.5">
           <CardTitle className="flex items-center gap-2 font-display tracking-tight">
             生成结果
@@ -60,18 +61,18 @@ export default function StepResults() {
             {result.modelUsed && (<span className="flex items-center gap-1"><span className="hidden sm:inline">模型</span><Badge variant="outline" className="font-mono">{result.modelUsed}</Badge></span>)}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setReviewOpen((v) => !v)}>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <Button className="w-full sm:w-auto" variant="outline" onClick={() => setReviewOpen((v) => !v)}>
             <Sparkles className="size-4" /> {reviewOpen ? "收起 AI 评审" : "AI 评审用例"}
           </Button>
-          <Button onClick={() => void doExport()}>
+          <Button className="w-full sm:w-auto" onClick={() => void doExport()}>
             <FileDown className="size-4" /> 导出 Excel
           </Button>
         </div>
       </CardHeader>
       <CardContent className="relative z-0">
         <Tabs defaultValue="cases" className="space-y-4">
-          <TabsList className="flex-wrap">
+          <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:flex sm:flex-wrap">
             <TabsTrigger value="cases">测试用例（<span className="font-mono">{result.cases.length}</span>）</TabsTrigger>
             <TabsTrigger value="coverage">覆盖概览（<span className="font-mono">{result.coverage.length}</span>）</TabsTrigger>
             <TabsTrigger value="risks">风险与假设（<span className="font-mono">{result.risksAndAssumptions.length}</span>）</TabsTrigger>
@@ -190,6 +191,7 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
         fields: config.fields,
         customFields: config.customFields,
         selectedIds: null,
+        filenameSuffix: "优化版本",
       });
       toast.success("已导出优化版用例");
     } catch (err) {
@@ -205,6 +207,7 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
         fields: config.fields,
         customFields: config.customFields,
         selectedIds: null,
+        filenameSuffix: "原始版本",
       });
       toast.success("已导出原始用例");
     } catch (err) {

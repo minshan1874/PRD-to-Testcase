@@ -8,6 +8,7 @@ export interface ExportParams {
   customFields: FieldDef[];
   /** null = 导出全部；非空数组 = 仅导出勾选用例 */
   selectedIds: string[] | null;
+  filenameSuffix?: string;
 }
 
 export interface Column {
@@ -79,7 +80,7 @@ function recomputeCoverage(selectedCases: TestCase[], original: GenerationResult
 
 /** 浏览器端生成 Excel 工作簿并触发下载 */
 export async function exportWorkbook(params: ExportParams): Promise<void> {
-  const { result, fields, customFields, selectedIds } = params;
+  const { result, fields, customFields, selectedIds, filenameSuffix } = params;
   const selectedSet = selectedIds ? new Set(selectedIds) : null;
   const exportedCases = selectedSet
     ? result.cases.filter((c) => selectedSet.has(c.id))
@@ -148,7 +149,7 @@ export async function exportWorkbook(params: ExportParams): Promise<void> {
   const pad = (n: number) => String(n).padStart(2, "0");
   const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
   a.href = url;
-  a.download = `PRD测试用例_${stamp}.xlsx`;
+  a.download = `PRD测试用例_${stamp}${filenameSuffix ? `_${filenameSuffix}` : ""}.xlsx`;
   document.body.appendChild(a);
   a.click();
   a.remove();
