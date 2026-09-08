@@ -117,7 +117,7 @@ export default function Sidebar() {
         </div>
         <div className="min-w-0">
           <p className="font-display text-base font-bold leading-tight tracking-tight text-foreground">
-            AI 测试工作台
+            AI测试效能工作台
           </p>
         </div>
       </div>
