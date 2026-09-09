@@ -8,13 +8,15 @@ import { Switch } from "@/components/ui/switch";
 import { LIMITS } from "@/lib/limits";
 import { cn, formatBytes } from "@/lib/utils";
 
-/** 需求文档上传（与「AI 生成测试用例」页交互一致，输入池写入全局 store） */
-export default function SourceUploader() {
-  const sources = useStore((s) => s.sources);
-  const addFiles = useStore((s) => s.addFiles);
-  const removeSource = useStore((s) => s.removeSource);
-  const clearSources = useStore((s) => s.clearSources);
-  const setForceAsImage = useStore((s) => s.setForceAsImage);
+/** 需求文档上传。pool 决定写入/读取哪个独立输入池，实现各功能输入隔离。 */
+export default function SourceUploader({ pool }: { pool: "prereview" | "review" }) {
+  const store = useStore();
+  const isPrereview = pool === "prereview";
+  const sources = isPrereview ? store.prereviewSources : store.reviewSources;
+  const addFiles = isPrereview ? store.prereviewAddFiles : store.reviewAddFiles;
+  const removeSource = isPrereview ? store.prereviewRemoveSource : store.reviewRemoveSource;
+  const clearSources = isPrereview ? store.prereviewClearSources : store.reviewClearSources;
+  const setForceAsImage = isPrereview ? store.prereviewSetForceAsImage : store.reviewSetForceAsImage;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);

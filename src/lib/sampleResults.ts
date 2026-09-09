@@ -481,7 +481,29 @@ export const SAMPLE_GENERATION_RESULT: GenerationResult = {
 export const SAMPLE_REVIEW_RESULT: ReviewResult = {
   "summary": "评审完成：共 13 条优化后用例。已修复原用例中优先级滥用（P0/P1 占比）、测试数据占位为「无」、前置条件与操作步骤不自洽、预期结果表述条件化/不可判定等共性问题；模型名称、支持格式、字符上限及部分默认值仍标注「需人工确认」。本示例仅为演示固定输出，真实评审请选用非演示模型。",
   "highRiskNotes": [],
-  "issues": [],
+  "issues": [
+    {
+      "caseId": "TC-008",
+      "issue": "操作步骤第 2 步没有检查时点：除非限制在开启与关闭之间切换并以独立步骤逐步检查，否则无法唯一判定开关是否互不误改，预期结果不可验证。",
+      "severity": "高",
+      "suggestion": "拆分为独立步骤，每步点击后单独检查该开关状态，并分别校验另一开关未被改变。",
+      "confidence": 0.85
+    },
+    {
+      "caseId": "TC-002",
+      "issue": "涉及业务规则边界：上传 5MB 是否在允许范围内、选择与上传是否为不同校验阶段，AI 无法自动确认【人工确认】。",
+      "severity": "中",
+      "suggestion": "需业务人员确认上传大小限制与校验阶段的判定规则。",
+      "confidence": 0.6
+    },
+    {
+      "caseId": "TC-005",
+      "issue": "优化建议：固定描述文本建议纳入测试资产，补充 1499/1500 边界字符用例的复用说明，提高可复现性。",
+      "severity": "低",
+      "suggestion": "将 1500 中文字符与 1499 版本文本固化为测试资产文件。",
+      "confidence": 0.4
+    }
+  ],
   "optimizedCases": [
     {
       "id": "",

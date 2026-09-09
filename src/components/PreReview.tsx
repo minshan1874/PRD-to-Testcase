@@ -303,10 +303,10 @@ function SparkleIcon() {
 
 export default function PreReview() {
   const store = useStore();
-  const { sources, prereviewPhase, prereviewResult, prereviewError, prereviewRuleSet, setPrereviewRuleSet } = store;
+  const { prereviewSources, prereviewPhase, prereviewResult, prereviewError, prereviewRuleSet, setPrereviewRuleSet } = store;
   const busy = prereviewPhase === "requesting" || prereviewPhase === "validating";
 
-  const active = sources.filter((s) => s.status === "success");
+  const active = prereviewSources.filter((s) => s.status === "success");
 
   return (
     <div className="min-h-0">
@@ -328,7 +328,7 @@ export default function PreReview() {
               <CardTitle>需求基础信息</CardTitle>
             </CardHeader>
             <CardContent>
-              <SourceUploader />
+              <SourceUploader pool="prereview" />
             </CardContent>
           </Card>
 

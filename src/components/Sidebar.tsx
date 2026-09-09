@@ -36,9 +36,11 @@ function SectionLabel({ children }: { children: ReactNode }) {
 function ModelConfigSection() {
   const store = useStore();
   const { config } = store;
-  const hasImages = store.sources.some(
-    (s) => s.kind === "image" || (s.pageImages && s.pageImages.length > 0)
-  );
+  const hasImages = [
+    ...(store.sources ?? []),
+    ...(store.prereviewSources ?? []),
+    ...(store.reviewSources ?? []),
+  ].some((s) => s.kind === "image" || (s.pageImages && s.pageImages.length > 0));
 
   useEffect(() => {
     if (store.models.length === 0 && !store.modelsError) store.loadModels();

@@ -160,26 +160,61 @@ export interface GenerationResult {
 
 export type ReviewSeverity = "高" | "中" | "低";
 
-/** 审查逐条问题清单：用例编号｜问题描述｜严重等级｜明确修改建议 */
+/** 评审条目分类：blocking=阻断缺陷 / manual=待人工业务核验 / optimize=可选优化建议 */
+export type ReviewCategory = "blocking" | "manual" | "optimize";
+
+/** 审查逐条问题清单：用例编号｜问题描述｜严重等级｜明确修改建议（后处理补充分类与置信度） */
 export interface ReviewIssue {
   caseId: string;
   issue: string;
   severity: ReviewSeverity;
   suggestion: string;
+  /** 分类标签：阻断缺陷 / 待人工核验 / 可选优化建议 */
+  category?: ReviewCategory;
+  /** 置信度 0-1 */
+  confidence?: number;
+  /** 是否阻断缺陷 */
+  isBlocking?: boolean;
+  /** 同类问题聚合后的用例编号集合（首项即 caseId） */
+  caseIds?: string[];
 }
 
-/** AI 审查结果（三部分：整体总结 + 逐条问题清单 + 优化后完整用例） */
+/** 评审基础统计 */
+export interface ReviewStat {
+  /** 总用例数量 */
+  totalCases: number;
+  /** 阻断缺陷条数 */
+  blocking: number;
+  /** 待人工核验项条数 */
+  manual: number;
+  /** 可选优化建议条数 */
+  optimize: number;
+}
+
+/** AI 审查结果（含三分类聚合、质量评分、评审模式） */
 export interface ReviewResult {
   /** 第一部分：整体评审总结（含问题数量统计、高风险点提醒） */
   summary: string;
   /** 高风险点提醒：资金 / 状态流转 / 权限类，需人工重点确认 */
   highRiskNotes: string[];
-  /** 第二部分：逐条问题清单 */
+  /** 第二部分：逐条问题清单（后处理已分类） */
   issues: ReviewIssue[];
   /** 第三部分：修改之后的完整优化版用例 */
   optimizedCases: TestCase[];
   /** 实际使用的审查模型 */
   modelUsed: string;
+  /** 本次评审基础统计 */
+  stat?: ReviewStat;
+  /** 阻断缺陷清单（聚合后） */
+  blockingIssues?: ReviewIssue[];
+  /** 待人工业务核验清单（聚合后） */
+  manualIssues?: ReviewIssue[];
+  /** 可选优化建议清单（聚合后） */
+  optimizeIssues?: ReviewIssue[];
+  /** 用例质量评分 0-100 */
+  score?: number;
+  /** 质量文字评价（例如：整体可用，少量阻断缺陷需要修复） */
+  scoreText?: string;
 }
 
 export type ReviewPhase = "idle" | "requesting" | "validating" | "done" | "error";

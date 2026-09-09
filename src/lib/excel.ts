@@ -259,20 +259,41 @@ export async function parseWorkbookFile(file: File): Promise<ParsedWorkbook> {
   return { cases, columns: cols.map(({ key, label }) => ({ key, label })), fileName: file.name };
 }
 
-/** 将用例导出为 Excel（仅含优化后用例） */
+/** 将优化后的用例导出一份只含「测试用例」工作表的 Excel */
 export async function exportCasesWorkbook(
   cases: TestCase[],
   columns: { key: string; label: string }[],
   filenameSuffix: string
 ): Promise<void> {
-  const fields: FieldConfig[] = columns.map((c) => ({ key: c.key, visible: true, enabled: true }));
-  const result: GenerationResult = {
-    cases,
-    coverage: [],
-    risksAndAssumptions: [],
-    confirmations: [],
-    evidence: [],
-    modelUsed: "",
-  };
-  await exportWorkbook({ result, fields, customFields: [], selectedIds: null, filenameSuffix });
+  if (cases.length === 0) throw new Error("没有可导出的优化用例");
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "PRD 测试用例生成器";
+  wb.created = new Date();
+  const ws = wb.addWorksheet("测试用例");
+  ws.columns = columns.map((c) => ({ header: c.label, key: c.key, width: 18 }));
+  styleHeaderRow(ws, columns.map((c) => c.label));
+  for (const c of cases) {
+    const row: Record<string, string | number> = {};
+    for (const col of columns) row[col.key] = cellValue(c, col.key);
+    const r = ws.addRow(row);
+    for (const col of columns) {
+      if (WRAP_KEYS.has(col.key)) r.getCell(col.key).alignment = { wrapText: true, vertical: "top" };
+    }
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+  a.href = url;
+  a.download = `PRD测试用例_${stamp}${filenameSuffix ? `_${filenameSuffix}` : ""}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }

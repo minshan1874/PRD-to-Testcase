@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  ChevronDown,
   FileDown,
   FileSpreadsheet,
   FileText,
@@ -12,26 +13,20 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
-import type { TestCase } from "@/types";
+import type { ReviewIssue, ReviewResult, TestCase } from "@/types";
 import { exportCasesWorkbook, parseWorkbookFile } from "@/lib/excel";
 import { scrollElementToStart } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import SourceUploader from "@/components/SourceUploader";
 import { cn } from "@/lib/utils";
-
-const SEVERITY_VARIANT: Record<string, "destructive" | "warning" | "outline"> = {
-  高: "destructive",
-  中: "warning",
-  低: "outline",
-};
+import SourceUploader from "@/components/SourceUploader";
 
 export default function ReviewPage() {
   const store = useStore();
   const {
-    sources,
+    reviewSources,
     config,
     standaloneExcel,
     setStandaloneExcel,
@@ -44,10 +39,11 @@ export default function ReviewPage() {
 
   const [dragOver, setDragOver] = useState(false);
   const [parsing, setParsing] = useState(false);
+  const [optimizeOpen, setOptimizeOpen] = useState(true);
   const excelInputRef = useRef<HTMLInputElement>(null);
 
   const busy = standalonePhase === "requesting" || standalonePhase === "validating";
-  const prdReady = sources.some((s) => s.status === "success");
+  const prdReady = reviewSources.some((s) => s.status === "success");
   const excelReady = Boolean(standaloneExcel && standaloneExcel.cases.length > 0);
 
   // 评审完成：将结果模块从页面顶部开始展示
@@ -100,10 +96,10 @@ export default function ReviewPage() {
           <CardTitle className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
             <FileText className="size-4 text-primary" /> 需求文档（PRD）
           </CardTitle>
-          <CardDescription>与生成测试用例 / 需求预审共用同一输入池，切换功能后内容保留。</CardDescription>
+          <CardDescription>以下需求文档输入池独立，仅作用于本页 AI 用例评审，不会影响生成测试用例 / 需求预审的输入。</CardDescription>
         </CardHeader>
         <CardContent>
-          <SourceUploader />
+          <SourceUploader pool="review" />
         </CardContent>
       </Card>
 
@@ -237,58 +233,47 @@ export default function ReviewPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {standaloneResult.summary && (
-              <div className="relative overflow-hidden rounded-md border bg-muted/30 p-3 pl-4 text-sm">
-                <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-sky-400 to-indigo-500" />
-                <div className="mb-1 font-mono text-[11px] font-medium tracking-wider text-muted-foreground">01 · 评审总结</div>
-                <p className="whitespace-pre-wrap">{standaloneResult.summary}</p>
-              </div>
-            )}
+            {/* 模块1：评审总览摘要 */}
+            <ReviewOverview result={standaloneResult} />
 
-            {standaloneResult.highRiskNotes.length > 0 && (
-              <div className="space-y-2">
-                <div className="font-mono text-[11px] font-medium tracking-wider text-muted-foreground">02 · 高风险点提醒（需人工重点确认）</div>
-                {standaloneResult.highRiskNotes.map((note, i) => (
-                  <div key={i} className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm">
-                    <Badge variant="destructive" className="shrink-0">高</Badge>
-                    <span>{note}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* 模块2：阻断缺陷 */}
+            <ReviewSection
+              title="阻断缺陷"
+              tag="🔴"
+              badge="高优先级 · 需修复"
+              badgeClass="bg-red-100 text-red-700"
+              note="以下为阻断性缺陷，不修复会导致用例无法执行，必须处理。"
+              items={standaloneResult.blockingIssues ?? []}
+              emptyText="未发现阻断缺陷，用例均可执行。"
+              ring="border-red-200"
+            />
 
+            {/* 模块3：待人工业务核验清单 */}
+            <ReviewSection
+              title="待人工业务核验清单"
+              tag="🟠"
+              badge="不属于用例缺陷"
+              badgeClass="bg-amber-100 text-amber-700"
+              note="不属于用例缺陷。AI 无法自动判定业务规则/环境边界，需要业务人员人工确认。"
+              items={standaloneResult.manualIssues ?? []}
+              emptyText="无需人工核验的业务项。"
+              ring="border-amber-200"
+              manual
+            />
+
+            {/* 模块4：可选优化建议（默认折叠） */}
+            <OptimizeSection
+              open={optimizeOpen}
+              setOpen={setOptimizeOpen}
+              items={standaloneResult.optimizeIssues ?? []}
+              count={(standaloneResult.optimizeIssues ?? []).length}
+            />
+
+            {/* 优化后的用例 */}
             <div>
-              <div className="mb-2 font-mono text-[11px] font-medium tracking-wider text-muted-foreground">03 · 问题清单（<span className="font-mono">{standaloneResult.issues.length}</span> 条）</div>
-              {standaloneResult.issues.length === 0 ? (
-                <div className="rounded-md border px-3 py-4 text-center text-sm text-muted-foreground">未发现问题，用例整体规范。</div>
-              ) : (
-                <div className="overflow-x-auto rounded-md border">
-                  <Table className="min-w-max">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>用例编号</TableHead>
-                        <TableHead>问题描述</TableHead>
-                        <TableHead>严重等级</TableHead>
-                        <TableHead>修改建议</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {standaloneResult.issues.map((item, i) => (
-                        <TableRow key={i} className="align-top">
-                          <TableCell className="whitespace-nowrap font-mono text-xs">{item.caseId || "-"}</TableCell>
-                          <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.issue}</TableCell>
-                          <TableCell><Badge variant={SEVERITY_VARIANT[item.severity] ?? "outline"}>{item.severity}</Badge></TableCell>
-                          <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.suggestion}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 font-mono text-[11px] font-medium tracking-wider text-muted-foreground">04 · 优化用例（<span className="font-mono">{standaloneResult.optimizedCases.length}</span> 条）</div>
+              <div className="mb-2 font-mono text-[11px] font-medium tracking-wider text-muted-foreground">
+                优化用例（<span className="font-mono">{standaloneResult.optimizedCases.length}</span> 条）
+              </div>
               <RaceTable cases={standaloneResult.optimizedCases} columns={standaloneExcel?.columns ?? []} />
             </div>
           </CardContent>
@@ -309,8 +294,9 @@ export default function ReviewPage() {
 }
 
 function cellValue(c: TestCase, key: string) {
-  const v = (c as unknown as Record<string, unknown>)[key];
-  return v === null || v === undefined ? "" : String(v);
+  const raw = (c as unknown as Record<string, unknown>)[key];
+  if (key === "steps" && Array.isArray(raw)) return raw.join("\n");
+  return raw === null || raw === undefined ? "" : String(raw);
 }
 
 function CellContent({ c, field }: { c: TestCase; field: string }) {
@@ -362,6 +348,189 @@ function RaceTable({
           ))}
         </TableBody>
       </Table>
+    </div>
+  );
+}
+
+function ReviewOverview({ result }: { result: ReviewResult }) {
+  const stat = result.stat;
+  const score = result.score ?? 100;
+  const scoreText = result.scoreText;
+  return (
+    <div className="space-y-3">
+      {/* 基础统计 + 质量评分 */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <OverviewStat label="总用例数量" value={stat?.totalCases ?? result.optimizedCases.length} tone="default" />
+        <OverviewStat label="阻断缺陷" value={stat?.blocking ?? 0} tone="red" />
+        <OverviewStat label="待人工核验项" value={stat?.manual ?? 0} tone="amber" />
+        <OverviewStat label="可选优化建议" value={stat?.optimize ?? 0} tone="gray" />
+      </div>
+      {typeof stat !== "undefined" && (
+        <div className="rounded-md border bg-muted/30 p-3 text-sm">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <span className="font-semibold">质量评分</span>
+            <span className={cn("font-mono text-xl font-bold", score >= 80 ? "text-emerald-600" : score >= 60 ? "text-amber-600" : "text-red-600")}>
+              {score} 分
+            </span>
+            <span className="text-xs text-muted-foreground">基础 100 分：阻断缺陷每条 -10，优化建议每条 -2，待核验不扣分</span>
+          </div>
+          <p className="text-sm text-muted-foreground">{scoreText}</p>
+          <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed">{result.summary}</p>
+        </div>
+      )}
+      {result.highRiskNotes.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-[11px] font-semibold tracking-wider text-muted-foreground">高风险点提醒（需人工重点确认）</div>
+          {result.highRiskNotes.map((note, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm">
+              <Badge variant="destructive" className="shrink-0">高</Badge>
+              <span>{note}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OverviewStat({ label, value, tone }: { label: string; value: number; tone: "default" | "red" | "amber" | "gray" }) {
+  const toneClass: Record<string, string> = {
+    default: "text-sky-700",
+    red: "text-red-600",
+    amber: "text-amber-600",
+    gray: "text-slate-600",
+  };
+  return (
+    <div className="rounded-md border bg-card p-3">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className={cn("mt-0.5 font-mono text-2xl font-bold", toneClass[tone])}>{value}</div>
+    </div>
+  );
+}
+
+function ReviewSection({
+  title,
+  tag,
+  badge,
+  badgeClass,
+  note,
+  items,
+  emptyText,
+  ring,
+  manual,
+}: {
+  title: string;
+  tag: string;
+  badge: string;
+  badgeClass: string;
+  note: string;
+  items: ReviewIssue[];
+  emptyText: string;
+  ring: string;
+  manual?: boolean;
+}) {
+  return (
+    <div className={cn("space-y-2 rounded-md border p-3", ring)}>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-base">{tag}</span>
+        <span className="font-semibold">{title}</span>
+        <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", badgeClass)}>{badge}</span>
+        {items.length > 0 && <span className="ml-auto font-mono text-xs text-muted-foreground">共 {items.length} 条</span>}
+      </div>
+      <p className="text-xs text-muted-foreground">{note}</p>
+      {items.length === 0 ? (
+        <div className="rounded-md border border-dashed px-3 py-3 text-center text-sm text-muted-foreground">{emptyText}</div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border">
+          <Table className="min-w-max">
+            <TableHeader>
+              <TableRow>
+                <TableHead>用例编号</TableHead>
+                <TableHead>{manual ? "待核验描述" : "缺陷描述"}</TableHead>
+                <TableHead>{manual ? "核验提示" : "修改建议"}</TableHead>
+                <TableHead>置信度</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item, i) => (
+                <TableRow key={i} className="align-top">
+                  <TableCell className="whitespace-nowrap font-mono text-xs">
+                    {(item.caseIds ?? [item.caseId]).map((id, idx) => <div key={idx} className={idx > 0 ? "mt-0.5 text-muted-foreground/60" : ""}>{id || "-"}</div>)}
+                  </TableCell>
+                  <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.issue}</TableCell>
+                  <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.suggestion}</TableCell>
+                  <TableCell className="whitespace-nowrap text-xs">
+                    {typeof item.confidence === "number" ? <span className={cn("font-mono", item.confidence >= 0.8 ? "text-red-600" : "text-muted-foreground")}>{Math.round(item.confidence * 100)}%</span> : "-"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OptimizeSection({
+  open,
+  setOpen,
+  items,
+  count,
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  items: ReviewIssue[];
+  count: number;
+}) {
+  return (
+    <div className="space-y-2 rounded-md border border-slate-200 p-3">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full flex-wrap items-center gap-2 text-left"
+      >
+        <span className="text-base">🟡</span>
+        <span className="font-semibold text-slate-600">可选优化建议</span>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">低优先级 · 按需修改</span>
+        <span className="ml-auto flex items-center gap-2">
+          {count > 0 && <span className="font-mono text-xs text-muted-foreground">共 {count} 条</span>}
+          <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+        </span>
+      </button>
+      <p className="text-xs text-muted-foreground">
+        仅提升用例可读性，不影响用例执行，按需选择是否修改。
+      </p>
+      {open && (
+        items.length === 0 ? (
+          <div className="rounded-md border border-dashed px-3 py-3 text-center text-sm text-muted-foreground">暂无优化建议。</div>
+        ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <Table className="min-w-max">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>用例编号</TableHead>
+                  <TableHead>优化描述</TableHead>
+                  <TableHead>优化建议</TableHead>
+                  <TableHead>置信度</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item, i) => (
+                  <TableRow key={i} className="align-top">
+                    <TableCell className="whitespace-nowrap font-mono text-xs">
+                      {(item.caseIds ?? [item.caseId]).map((id, idx) => <div key={idx} className={idx > 0 ? "mt-0.5 text-muted-foreground/60" : ""}>{id || "-"}</div>)}
+                    </TableCell>
+                    <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.issue}</TableCell>
+                    <TableCell className="max-w-[360px] whitespace-pre-wrap">{item.suggestion}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{typeof item.confidence === "number" ? <span className="font-mono text-muted-foreground">{Math.round(item.confidence * 100)}%</span> : "-"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )
+      )}
     </div>
   );
 }

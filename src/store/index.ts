@@ -23,6 +23,7 @@ import { apiUnavailableMessage, bugAnalyseRequest, fetchHealth, fetchModels, gen
 import { buildPrompt, outputFieldKeys } from "@/lib/prompt";
 import { buildOutputJsonSchema, renumberCases, validateGeneration } from "@/lib/schema";
 import { buildReviewJsonSchema, buildReviewMessages, validateReview } from "@/lib/reviewSchema";
+import { postProcessReview } from "@/lib/reviewPostProcess";
 import { buildPrereviewJsonSchema, buildPrereviewMessages, validatePrereview } from "@/lib/prereviewSchema";
 import { DEFAULT_MODEL_ID, effectiveCapabilities } from "@/lib/models";
 import { STATIC_MODELS } from "@/lib/models";
@@ -64,6 +65,20 @@ interface AppState {
   removeSource: (id: string) => void;
   clearSources: () => void;
   setForceAsImage: (id: string, v: boolean) => void;
+
+  // ── 独立输入：AI 需求预审 ──
+  prereviewSources: SourceItem[];
+  prereviewAddFiles: (files: File[]) => Promise<void>;
+  prereviewRemoveSource: (id: string) => void;
+  prereviewClearSources: () => void;
+  prereviewSetForceAsImage: (id: string, v: boolean) => void;
+
+  // ── 独立输入：AI 用例评审（评审页需求文档） ──
+  reviewSources: SourceItem[];
+  reviewAddFiles: (files: File[]) => Promise<void>;
+  reviewRemoveSource: (id: string) => void;
+  reviewClearSources: () => void;
+  reviewSetForceAsImage: (id: string, v: boolean) => void;
 
   // ── 配置 ──
   config: GenerateConfig;
@@ -138,7 +153,21 @@ interface AppState {
 
 }
 
-export const useStore = create<AppState>()((set, get) => ({
+export const useStore = create<AppState>()((set, get) => {
+  /** 将文件解析后并入指定输入池（同名同大小去重） */
+  async function ingestInto(pool: SourceItem[], add: (items: SourceItem[]) => void, files: File[]) {
+    const items: SourceItem[] = [];
+    for (const file of files) {
+      const res = await ingestFile(file);
+      const dup = pool.some(
+        (s) => res.item.name === s.name && res.item.size === s.size
+      );
+      if (!dup) items.push(res.item);
+    }
+    if (items.length > 0) add(items);
+  }
+
+  return {
   activeFeature: "gen",
   setActiveFeature: (f) => set({ activeFeature: f }),
 
@@ -152,20 +181,35 @@ export const useStore = create<AppState>()((set, get) => ({
     return true;
   },
   addFiles: async (files) => {
-    for (const file of files) {
-      const res = await ingestFile(file);
-      // 同一文件去重（同名同大小视为重复）
-      const dup = get().sources.some(
-        (s) => res.item.name === s.name && res.item.size === s.size
-      );
-      set((s) => ({ sources: dup ? s.sources : [...s.sources, res.item] }));
-    }
+    await ingestInto(get().sources, (items) => set((s) => ({ sources: [...s.sources, ...items] })), files);
   },
   removeSource: (id) => set((s) => ({ sources: s.sources.filter((x) => x.id !== id) })),
   clearSources: () => set({ sources: [] }),
   setForceAsImage: (id, v) =>
     set((s) => ({
       sources: s.sources.map((x) => (x.id === id ? { ...x, forceAsImage: v } : x)),
+    })),
+
+  prereviewSources: [],
+  prereviewAddFiles: async (files) => {
+    await ingestInto(get().prereviewSources, (items) => set((s) => ({ prereviewSources: [...s.prereviewSources, ...items] })), files);
+  },
+  prereviewRemoveSource: (id) => set((s) => ({ prereviewSources: s.prereviewSources.filter((x) => x.id !== id) })),
+  prereviewClearSources: () => set({ prereviewSources: [] }),
+  prereviewSetForceAsImage: (id, v) =>
+    set((s) => ({
+      prereviewSources: s.prereviewSources.map((x) => (x.id === id ? { ...x, forceAsImage: v } : x)),
+    })),
+
+  reviewSources: [],
+  reviewAddFiles: async (files) => {
+    await ingestInto(get().reviewSources, (items) => set((s) => ({ reviewSources: [...s.reviewSources, ...items] })), files);
+  },
+  reviewRemoveSource: (id) => set((s) => ({ reviewSources: s.reviewSources.filter((x) => x.id !== id) })),
+  reviewClearSources: () => set({ reviewSources: [] }),
+  reviewSetForceAsImage: (id, v) =>
+    set((s) => ({
+      reviewSources: s.reviewSources.map((x) => (x.id === id ? { ...x, forceAsImage: v } : x)),
     })),
 
   config: {
@@ -494,8 +538,8 @@ export const useStore = create<AppState>()((set, get) => ({
   clearPrereview: () => set({ prereviewPhase: "idle", prereviewError: null, prereviewResult: null }),
 
   runPrereview: async () => {
-    const { config, sources } = get();
-    const active = sources.filter((s) => s.status === "success");
+    const { config, prereviewSources } = get();
+    const active = prereviewSources.filter((s) => s.status === "success");
     if (active.length === 0) {
       set({ prereviewPhase: "error", prereviewError: "没有可预审的需求文档，请先上传或粘贴 PRD" });
       return;
@@ -512,7 +556,7 @@ export const useStore = create<AppState>()((set, get) => ({
     set({ prereviewPhase: "requesting", prereviewError: null });
 
     const run = async (retryHint: string | null): Promise<void> => {
-      const prompt = buildPrereviewMessages(get().sources, get().prereviewRuleSet);
+      const prompt = buildPrereviewMessages(get().prereviewSources, get().prereviewRuleSet);
       if (retryHint) {
         const msgs = [...prompt.messages];
         const lastIdx = msgs.length - 1;
@@ -591,12 +635,12 @@ export const useStore = create<AppState>()((set, get) => ({
   standaloneError: null,
   standaloneResult: null,
   runStandaloneReview: async () => {
-    const { config, sources, standaloneExcel } = get();
+    const { config, reviewSources, standaloneExcel } = get();
     if (!standaloneExcel || standaloneExcel.cases.length === 0) {
       set({ standalonePhase: "error", standaloneError: "请先上传测试用例 Excel" });
       return;
     }
-    if (!sources.some((s) => s.status === "success")) {
+    if (!reviewSources.some((s) => s.status === "success")) {
       set({ standalonePhase: "error", standaloneError: "请先上传需求文档" });
       return;
     }
@@ -615,7 +659,7 @@ export const useStore = create<AppState>()((set, get) => ({
     const customKeys: string[] = [];
 
     const run = async (retryHint: string | null): Promise<void> => {
-      const prompt = buildReviewMessages(get().sources, standaloneExcel.cases.slice());
+      const prompt = buildReviewMessages(get().reviewSources, standaloneExcel.cases.slice());
       if (retryHint) {
         const msgs = [...prompt.messages];
         const lastIdx = msgs.length - 1;
@@ -641,11 +685,21 @@ export const useStore = create<AppState>()((set, get) => ({
       });
 
       set({ standalonePhase: "validating" });
-      const checked = validateReview(resp.content, customKeys, fieldKeys);
+      const checked = validateReview(
+        resp.content,
+        customKeys,
+        fieldKeys,
+        standaloneExcel.columns.map((c) => c.label),
+        standaloneExcel.cases.length,
+        standaloneExcel.cases
+      );
       if (checked.ok) {
         set({
           standalonePhase: "done",
-          standaloneResult: { ...checked.result, modelUsed: resp.model || checked.result.modelUsed },
+          standaloneResult: postProcessReview({
+            ...checked.result,
+            modelUsed: resp.model || checked.result.modelUsed,
+          }),
         });
         return;
       }
@@ -664,7 +718,13 @@ export const useStore = create<AppState>()((set, get) => ({
         await delay(5000, standaloneController);
         set({ standalonePhase: "validating" });
         await delay(5000, standaloneController);
-        set({ standalonePhase: "done", standaloneResult: { ...SAMPLE_REVIEW_RESULT, modelUsed: model } });
+        set({
+          standalonePhase: "done",
+          standaloneResult: postProcessReview({
+            ...SAMPLE_REVIEW_RESULT,
+            modelUsed: model,
+          }),
+        });
         return;
       }
       await run(null);
@@ -769,7 +829,8 @@ export const useStore = create<AppState>()((set, get) => ({
       bugError: null,
       bugResult: null,
     }),
-}));
+  };
+});
 
 export function useCaseCount(): number {
   return useStore((s) => s.result?.cases.length ?? 0);
