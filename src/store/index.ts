@@ -484,7 +484,13 @@ export const useStore = create<AppState>()((set, get) => {
       });
 
       set({ reviewPhase: "validating" });
-      const checked = validateReview(resp.content, customKeys, outputKeys);
+      const originCases = (get().result?.cases ?? []).slice();
+      const labelById = new Map<string, string>();
+      for (const f of BUILTIN_FIELDS) labelById.set(f.key, f.label);
+      for (const cf of get().config.customFields) labelById.set(cf.key, cf.label ?? cf.key);
+      const fieldLabels: string[] = [];
+      for (const f of get().config.fields) if (outputKeys.includes(f.key)) fieldLabels.push(labelById.get(f.key) ?? f.key);
+      const checked = validateReview(resp.content, customKeys, outputKeys, fieldLabels, originCases.length, originCases);
       if (checked.ok) {
         set({
           reviewPhase: "done",

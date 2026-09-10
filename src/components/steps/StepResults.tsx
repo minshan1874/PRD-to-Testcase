@@ -17,6 +17,7 @@ export default function StepResults() {
   const config = useStore((s) => s.config);
   const reviewOpen = useStore((s) => s.reviewOpen);
   const setReviewOpen = useStore((s) => s.setReviewOpen);
+  const runReview = useStore((s) => s.runReview);
   const reviewRef = useRef<HTMLDivElement | null>(null);
   const cols = visibleColumns(config.fields, config.customFields);
   const cases = result?.cases ?? [];
@@ -62,7 +63,18 @@ export default function StepResults() {
           </div>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <Button className="w-full sm:w-auto" variant="outline" onClick={() => setReviewOpen(!reviewOpen)}>
+          <Button
+            className="w-full sm:w-auto"
+            variant="outline"
+            onClick={() => {
+              if (reviewOpen) {
+                setReviewOpen(false);
+                return;
+              }
+              setReviewOpen(true);
+              void runReview();
+            }}
+          >
             <Sparkles className="size-4" /> {reviewOpen ? "收起 AI 评审" : "AI 评审用例"}
           </Button>
           <Button className="w-full sm:w-auto" onClick={() => void doExport()}>
@@ -171,7 +183,6 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
   const cancelReview = useStore((s) => s.cancelReview);
   const cols = visibleColumns(config.fields, config.customFields);
 
-  const model = config.model;
   const busy = reviewPhase === "requesting" || reviewPhase === "validating";
 
   const prevReviewPhase = useRef(reviewPhase);
@@ -325,7 +336,6 @@ function ReviewPanel({ anchorRef }: { anchorRef: RefObject<HTMLDivElement | null
       </div>
 
       <div ref={anchorRef} className="flex flex-wrap items-center gap-2">
-        {model && <Badge variant="outline" className="font-mono">全局模型：{model}</Badge>}
         {busy ? (
           <Button onClick={() => cancelReview()} disabled={false}>
             <Loader2 className="size-4 animate-spin" /> 取消评审

@@ -136,8 +136,8 @@ export function ModelSelect({
       )}
     >
       <span className="flex min-w-0 flex-col">
-        <span className="truncate">{label}</span>
-        <span className="truncate font-mono text-[10px] text-muted-foreground">{sub}</span>
+        <span className="truncate" title={label}>{label}</span>
+        <span className="truncate font-mono text-[10px] text-muted-foreground" title={sub}>{sub}</span>
       </span>
       {badges}
     </button>
@@ -155,7 +155,9 @@ export function ModelSelect({
           current || inList ? "text-foreground" : "text-muted-foreground",
         )}
       >
-        <span className="truncate">{current?.name ?? (inList ? value : placeholder)}</span>
+        <span className="truncate" title={current?.name ?? (inList ? value : "")}>
+          {current?.name ?? (inList ? value : placeholder)}
+        </span>
         <ChevronDown className={cn("size-4 shrink-0 opacity-50 transition-transform", open && "rotate-180")} />
       </button>
 
