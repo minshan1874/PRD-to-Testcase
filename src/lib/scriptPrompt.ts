@@ -2,23 +2,30 @@ import type { TestCase } from "@/types";
 import { renumberCases, salvageJson, tryParseJson, validateGeneration } from "@/lib/schema";
 
 /**
- * 固定的自动化脚本生成约束。
- * 这里生成的是便于人工补齐定位符的 Robot Framework WebUI 骨架，
- * 不尝试访问真实页面，也不把脚本输出包装成 JSON。
+ * HTML 源码已提供：解析 HTML 提取真实 id/xpath 定位符，生成尽量可直接运行的脚本。
  */
-export const SCRIPT_SYSTEM_PROMPT = `你是资深 Web UI 自动化测试工程师。请把用户提供的一条手工测试用例转换为 Robot Framework + SeleniumLibrary 的 WebUI 自动化脚本骨架。
+export const SCRIPT_PROMPT_WITH_HTML = `你是专业自动化脚本生成工具。
+输入包含手工测试用例、网页HTML源码。
+任务：解析提供的HTML源码，找出操作步骤对应的页面控件，提取真实id或者简洁xpath定位器，生成Robot Framework + SeleniumLibrary WebUI自动化脚本。
 
-必须遵守以下规则：
-1. 只根据测试用例的标题、前置条件、操作步骤和预期结果生成脚本，不要臆造需求中没有出现的业务规则。
-2. 只输出完整的 Robot Framework 纯文本脚本，不要输出 Markdown 代码围栏、解释、分析或其他前后缀。
-3. 脚本必须包含 *** Settings *** 段，并引入 SeleniumLibrary；必须包含 *** Test Cases *** 段和一个清晰的测试用例名称。
-4. 把手工步骤映射为可读的 SeleniumLibrary 关键字，例如 Open Browser、Input Text、Input Password、Click Element、Wait Until Element Is Visible、Page Should Contain、Sleep、Close Browser。根据原用例语义选择关键字，不要为了凑数量添加无关操作。
-5. 页面 URL 未明确时使用占位符 \${url}；元素定位统一使用占位符 \${locator}，可以按用途区分为 \${username_locator}、\${password_locator} 等变量，但不要编造真实 CSS、XPath、ID 或 URL。
-6. 将预期结果转换为明确的断言或验证步骤；无法自动断言的内容用注释标明需要人工补充，不要假装已经验证。
-7. 前置条件需要在脚本中以注释或初始化步骤体现；步骤应保持原始顺序，必要时添加合理的等待关键字。
-8. 脚本应具备可读的缩进、变量命名和注释，末尾负责清理浏览器资源。不要生成接口测试、移动端 App 测试或其他非 WebUI 脚本。
+严格遵守规则：
+1、输出完整标准robot脚本，包含***Settings***、***Test Cases***段落，使用SeleniumLibrary官方原生关键字。
+2、优先使用id定位元素，没有id就写简短稳定xpath；禁止使用绝对xpath。
+3、根据用例操作步骤：打开页面、输入文本、点击元素、页面等待；根据预期结果自动编写断言关键字。
+4、加入合理Sleep等待，适配页面加载。
+5、脚本缩进格式严格正确，只输出脚本内容，不要任何解释、不要markdown多余文字。`;
 
-输出目标：一个可供测试工程师继续补充定位符和环境配置的 Robot Framework WebUI 脚本骨架。`;
+/**
+ * HTML 源码为空：生成带注释占位符的脚本骨架，由用户自行替换元素定位。
+ */
+export const SCRIPT_PROMPT_WITHOUT_HTML = `你是专业的自动化脚本生成工具，根据用户提供的手工测试用例，生成标准 Robot Framework + SeleniumLibrary WebUI 自动化脚本。
+
+严格遵守规则：
+1、输出完整标准robot脚本，包含***Settings***、***Test Cases***段落，使用SeleniumLibrary官方原生关键字。
+2、所有页面元素使用带注释的占位符，格式 \${变量名} #这里写元素中文说明，提示用户替换为真实id/xpath定位。
+3、根据操作步骤完成逻辑：打开浏览器、输入、点击、等待；根据预期结果生成断言。
+4、脚本缩进格式整洁规范。
+5、只输出robot脚本，不要任何额外解释文字。`;
 
 /** 测试用例文档解析使用的固定提示词。输出只保留手工用例，不生成脚本。 */
 export const SCRIPT_EXTRACTION_SYSTEM_PROMPT = `你是测试用例文档解析助手。请从用户提供的测试用例文档中提取已有的手工测试用例，并整理为 JSON。
@@ -38,24 +45,33 @@ function valueOrNone(value: string | undefined | null): string {
   return text || "无";
 }
 
-/** 组装单条测试用例的脚本生成消息。 */
-export function buildScriptMessages(testCase: TestCase): Array<{ role: "system" | "user"; content: string }> {
+/** 组装单条测试用例的脚本生成消息。htmlSource 非空时使用带 HTML 解析的 Prompt，为空时使用占位符骨架 Prompt。 */
+export function buildScriptMessages(
+  testCase: TestCase,
+  htmlSource?: string,
+): Array<{ role: "system" | "user"; content: string }> {
+  const hasHtml = Boolean(htmlSource?.trim());
   const steps = testCase.steps?.length > 0 ? testCase.steps.join("\n") : "无";
-  const userContent = [
-    "请将下面这条手工测试用例转换为 Robot Framework + SeleniumLibrary WebUI 自动化脚本。",
-    "",
+  const caseSections = [
     `【用例 ID】${valueOrNone(testCase.id)}`,
     `【用例标题】${valueOrNone(testCase.title)}`,
     `【前置条件】${valueOrNone(testCase.precondition)}`,
     "【操作步骤】",
     steps,
     `【预期结果】${valueOrNone(testCase.expected)}`,
-    "",
-    "补充约束（固定，不可修改）：页面 URL 未明确时使用占位符 \${url}；元素定位统一使用 \${locator}；只输出 Robot Framework 纯文本脚本，不要输出 Markdown 代码围栏或解释。",
   ].join("\n");
 
+  const userContent = hasHtml
+    ? ["【手工测试用例】", caseSections, "", "【网页HTML源码】", htmlSource!.trim()].join("\n")
+    : [
+        "请将下面这条手工测试用例转换为 Robot Framework + SeleniumLibrary WebUI 自动化脚本。",
+        "",
+        caseSections,
+        "只输出 Robot Framework 纯文本脚本，不要输出 Markdown 代码围栏或解释。",
+      ].join("\n");
+
   return [
-    { role: "system", content: SCRIPT_SYSTEM_PROMPT },
+    { role: "system", content: hasHtml ? SCRIPT_PROMPT_WITH_HTML : SCRIPT_PROMPT_WITHOUT_HTML },
     { role: "user", content: userContent },
   ];
 }

@@ -312,7 +312,7 @@ export default function PreReview() {
     <div className="min-h-0">
       {/* 页面头部 */}
       <div className="mb-5">
-        <h1 className="font-display text-xl font-semibold tracking-tight">AI 需求预审</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">需求预审</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           需求提报之后、人工评审之前，由 AI 做前置预审，过滤明显不合规、信息残缺、风险类需求，输出预审报告供参考。
         </p>

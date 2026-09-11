@@ -121,7 +121,7 @@ export async function generateRequest(
   }
 }
 
-/** 将一条手工测试用例转换为 Robot Framework 脚本（复用生成 API）。 */
+/** 将一条手工测试用例转换为 Robot Framework 脚本（复用生成 API）。htmlSource 非空时按带 HTML 解析的 Prompt 生成真实定位脚本。 */
 export async function generateScriptRequest(
   testCase: TestCase,
   options: {
@@ -129,12 +129,13 @@ export async function generateScriptRequest(
     apiKey?: string;
     signal?: AbortSignal;
     timeoutMs?: number;
+    htmlSource?: string;
   }
 ): Promise<GenerateResponse> {
   return generateRequest(
     {
       model: options.model,
-      messages: buildScriptMessages(testCase),
+      messages: buildScriptMessages(testCase, options.htmlSource),
       temperature: 0.2,
       maxTokens: 4000,
       apiKey: options.apiKey,

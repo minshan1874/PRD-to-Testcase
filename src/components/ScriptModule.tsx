@@ -56,6 +56,9 @@ const SCRIPT_STATUS_MESSAGES = [
 
 const SCRIPT_GENERATION_MESSAGE = "正在为当前用例生成 Robot Framework 脚本…";
 
+const MAX_HTML_CHARS = 30000;
+const SCRIPT_GENERATION_FAILED = "脚本生成失败，请重试";
+
 /** 演示模型下返回的固定可执行示例（老照片修复页面），由本地生成器确定性生成 */
 const DEMO_SCRIPT_CASES: TestCase[] = [
   {
@@ -160,6 +163,7 @@ export default function ScriptModule() {
   const [scriptResults, setScriptResults] = useState<ScriptResultItem[]>([]);
   const [phase, setPhase] = useState<ScriptPhase>("idle");
   const [mode, setMode] = useState<"fast" | "ai">("fast");
+  const [htmlSource, setHtmlSource] = useState("");
   const [statusIndex, setStatusIndex] = useState(0);
   const [statusDetail, setStatusDetail] = useState("");
   const [error, setError] = useState("");
@@ -169,6 +173,7 @@ export default function ScriptModule() {
   const controllerRef = useRef<AbortController | null>(null);
 
   const busy = phase === "parsing" || phase === "generating";
+  const htmlChars = htmlSource.length;
   const successfulSources = sources.filter((item) => item.status === "success");
   const textChars = inputText.length + successfulSources.reduce((total, item) => total + (item.text?.length ?? 0), 0);
   const imageCount = successfulSources.reduce(
@@ -246,6 +251,15 @@ export default function ScriptModule() {
     setPhase("idle");
     setStatusDetail("");
     setError("");
+  }
+
+  function handleHtmlChange(value: string) {
+    if (value.length > MAX_HTML_CHARS) {
+      toast.error(`HTML源码不能超过 ${MAX_HTML_CHARS.toLocaleString()} 字符`);
+      setHtmlSource(value.slice(0, MAX_HTML_CHARS));
+      return;
+    }
+    setHtmlSource(value);
   }
 
   async function generateScripts() {
@@ -349,6 +363,7 @@ export default function ScriptModule() {
             model: config.model,
             apiKey: config.apiKey || undefined,
             signal: controller.signal,
+            htmlSource,
           });
           const script = sanitizeAIScript(stripCodeFences(response.content));
           if (!script) throw new Error("模型未返回脚本内容");
@@ -364,7 +379,7 @@ export default function ScriptModule() {
             testCase,
             model: config.model,
             generatedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
-            error: err instanceof Error ? err.message : "脚本生成失败",
+            error: SCRIPT_GENERATION_FAILED,
           });
         }
         setScriptResults([...generated]);
@@ -425,6 +440,8 @@ export default function ScriptModule() {
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="space-y-4">
           <Textarea
             value={inputText}
             onChange={(event) => setInputText(event.target.value)}
@@ -528,7 +545,35 @@ export default function ScriptModule() {
             </div>
           )}
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <label htmlFor="html-source-input" className="text-sm font-medium">
+                  粘贴网页HTML源码
+                  <span className="ml-1 text-xs font-normal text-muted-foreground">（选填，粘贴后可生成带真实元素定位的脚本）</span>
+                </label>
+                <span className={cn("shrink-0 font-mono text-xs", htmlChars > MAX_HTML_CHARS ? "text-destructive" : "text-muted-foreground")}>
+                  {htmlChars.toLocaleString()} / {MAX_HTML_CHARS.toLocaleString()}
+                </span>
+              </div>
+              <Textarea
+                id="html-source-input"
+                value={htmlSource}
+                onChange={(event) => handleHtmlChange(event.target.value)}
+                placeholder="浏览器F12，复制页面完整HTML源码粘贴到此处，为空则生成带占位符脚本骨架"
+                className="h-[220px] resize-none overflow-auto font-mono text-xs leading-relaxed"
+                disabled={busy}
+                spellCheck={false}
+                aria-label="网页HTML源码输入框"
+              />
+              <p className="text-xs text-muted-foreground">
+                直接在浏览器按 F12 复制页面完整 HTML 粘贴于此，模型将从源码中提取真实 id / xpath 生成尽量可直接运行的脚本；留空则生成带注释占位符的脚本骨架。
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-1 self-start rounded-md border bg-muted/50 p-0.5">
               <button
                 type="button"
@@ -562,6 +607,8 @@ export default function ScriptModule() {
             </div>
           </div>
           {!config.model.trim() && <p className="text-right text-xs text-destructive">请先在左侧模型配置中选择模型</p>}
+          </div>
+          </div>
         </CardContent>
       </Card>
 

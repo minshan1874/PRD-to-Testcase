@@ -69,7 +69,7 @@ export default function App() {
           ) : (
             <div className="space-y-6">
               <div className="mt-8">
-                <h1 className="font-display text-xl font-semibold tracking-tight">AI 生成测试用例</h1>
+                <h1 className="font-display text-xl font-semibold tracking-tight">生成测试用例</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
                   上传 PRD 文档并配置字段与模型，一键生成结构化测试用例；生成完成后在下方直接预览与导出结果。
                 </p>

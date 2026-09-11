@@ -84,7 +84,7 @@ export default function ReviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-xl font-semibold tracking-tight">AI 用例评审</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">用例评审</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           上传需求文档与测试用例 Excel，AI 对用例做预审评审（AI 初筛，业务正确性仍需人工复核），输出问题清单并生成优化版用例。
         </p>

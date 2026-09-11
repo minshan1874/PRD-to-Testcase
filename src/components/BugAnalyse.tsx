@@ -127,7 +127,7 @@ export default function BugAnalyse() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-xl font-semibold tracking-tight">AI Bug 分析</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">Bug 分析</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           粘贴报错日志、接口返回、异常堆栈，或上传报错截图，AI 快速给出问题定位与排查建议（AI 推测，仅供参考）。
         </p>

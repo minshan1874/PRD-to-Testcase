@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 type NavKey = "preview" | "gen" | "review" | "bug" | "script";
 
 const NAV_ITEMS: { key: NavKey; label: string; icon: typeof ClipboardList }[] = [
-  { key: "preview", label: "AI需求预审", icon: FileSearch },
-  { key: "gen", label: "AI生成测试用例", icon: ClipboardList },
-  { key: "review", label: "AI用例评审", icon: ListChecks },
+  { key: "preview", label: "需求预审", icon: FileSearch },
+  { key: "gen", label: "生成测试用例", icon: ClipboardList },
+  { key: "review", label: "用例评审", icon: ListChecks },
   { key: "script", label: "自动化脚本", icon: FileCode2 },
-  { key: "bug", label: "AI Bug分析", icon: Bug },
+  { key: "bug", label: "Bug分析", icon: Bug },
 ];
 
 const FUNCTIONAL_KEYS: NavKey[] = ["gen", "preview", "review", "bug", "script"];
