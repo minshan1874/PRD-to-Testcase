@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { Bug, ClipboardList, FileSearch, ListChecks } from "lucide-react";
+import { Bug, ClipboardList, FileCode2, FileSearch, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
 import type { ActiveFeature } from "@/types";
@@ -8,17 +8,17 @@ import { effectiveCapabilities } from "@/lib/models";
 import { ModelSelect } from "@/components/ModelSelect";
 import { Input } from "@/components/ui/input";
 
-type NavKey = "preview" | "gen" | "review" | "bug";
+type NavKey = "preview" | "gen" | "review" | "bug" | "script";
 
 const NAV_ITEMS: { key: NavKey; label: string; icon: typeof ClipboardList }[] = [
   { key: "preview", label: "AI需求预审", icon: FileSearch },
   { key: "gen", label: "AI生成测试用例", icon: ClipboardList },
   { key: "review", label: "AI用例评审", icon: ListChecks },
+  { key: "script", label: "自动化脚本", icon: FileCode2 },
   { key: "bug", label: "AI Bug分析", icon: Bug },
 ];
 
-const BUILT_KEY = "gen";
-const FUNCTIONAL_KEYS: NavKey[] = ["gen", "preview", "review", "bug"];
+const FUNCTIONAL_KEYS: NavKey[] = ["gen", "preview", "review", "bug", "script"];
 
 /** 分组标题：功能入口 / 模型配置同级使用 */
 function SectionLabel({ children }: { children: ReactNode }) {
@@ -78,11 +78,11 @@ function ModelConfigSection() {
 }
 
 export default function Sidebar() {
-  const [active, setActive] = useState<NavKey>(BUILT_KEY);
+  const active = useStore((s) => s.activeFeature);
   const setActiveFeature = useStore((s) => s.setActiveFeature);
+  const caseCount = useStore((s) => s.result?.cases.length ?? 0);
 
   const handleClick = (item: { key: NavKey; label: string }) => {
-    setActive(item.key);
     if (FUNCTIONAL_KEYS.includes(item.key)) {
       setActiveFeature(item.key as ActiveFeature);
       return;
@@ -154,6 +154,11 @@ export default function Sidebar() {
                 }`}
               />
               <span className="truncate">{item.label}</span>
+              {item.key === "script" && caseCount > 0 && (
+                <span className={`ml-auto rounded px-1.5 py-0.5 text-[9px] font-medium ${isActive ? "bg-white/20 text-white" : "bg-sky-100 text-sky-700"}`}>
+                  {caseCount}
+                </span>
+              )}
               {!isFunctional && (
                 <span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-muted-foreground/70">
                   Soon

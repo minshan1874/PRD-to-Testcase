@@ -265,8 +265,8 @@ export interface PrereviewResult {
 
 export type PrereviewPhase = "idle" | "requesting" | "validating" | "done" | "error";
 
-/** 功能导航：gen=生成用例，preview=需求预审，review=用例评审，bug=Bug分析 */
-export type ActiveFeature = "gen" | "preview" | "review" | "bug";
+/** 功能导航：gen=生成用例，preview=需求预审，review=用例评审，bug=Bug分析，script=自动化脚本 */
+export type ActiveFeature = "gen" | "preview" | "review" | "bug" | "script";
 
 // ─── AI Bug 分析 ────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
-import { useEffect, useRef, type RefObject } from "react";
-import { FileDown, Loader2, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { FileCode2, FileDown, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
 import { exportWorkbook, visibleColumns } from "@/lib/excel";
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HelpTip from "@/components/HelpTip";
 import { scrollElementToStart } from "@/lib/utils";
 import type { TestCase } from "@/types";
+import ScriptDialog from "@/components/ScriptDialog";
 
 export default function StepResults() {
   const result = useStore((s) => s.result);
@@ -19,6 +20,7 @@ export default function StepResults() {
   const setReviewOpen = useStore((s) => s.setReviewOpen);
   const runReview = useStore((s) => s.runReview);
   const reviewRef = useRef<HTMLDivElement | null>(null);
+  const [scriptCase, setScriptCase] = useState<TestCase | null>(null);
   const cols = visibleColumns(config.fields, config.customFields);
   const cases = result?.cases ?? [];
 
@@ -47,6 +49,7 @@ export default function StepResults() {
   }
 
   return (
+    <>
     <Card id="results-view">
       <CardHeader className="flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-start">
         <div className="space-y-1.5">
@@ -95,8 +98,8 @@ export default function StepResults() {
             {cases.length === 0 ? <EmptyHint text="暂无测试用例" /> : cols.length === 0 ? <EmptyHint text="暂无可见字段，请先在字段配置中显示至少一个字段。" /> : (
               <div className="overflow-x-auto rounded-md border">
                 <Table className="min-w-max">
-                  <TableHeader><TableRow>{cols.map((col) => <TableHead key={col.key} className="min-w-24 bg-muted/30">{col.label}</TableHead>)}</TableRow></TableHeader>
-                  <TableBody>{cases.map((item) => <TableRow key={item.id} className="align-top">{cols.map((col) => <TableCell key={col.key} className="max-w-[360px] whitespace-pre-wrap">{renderCaseCell(item, col.key)}</TableCell>)}</TableRow>)}</TableBody>
+                  <TableHeader><TableRow>{cols.map((col) => <TableHead key={col.key} className="min-w-24 bg-muted/30">{col.label}</TableHead>)}<TableHead className="min-w-40 bg-muted/30">操作</TableHead></TableRow></TableHeader>
+                  <TableBody>{cases.map((item) => <TableRow key={item.id} className="align-top">{cols.map((col) => <TableCell key={col.key} className="max-w-[360px] whitespace-pre-wrap">{renderCaseCell(item, col.key)}</TableCell>)}<TableCell><Button className="whitespace-nowrap" variant="outline" size="sm" onClick={() => setScriptCase(item)}><FileCode2 className="size-4" /> 一键转为自动化脚本</Button></TableCell></TableRow>)}</TableBody>
                 </Table>
               </div>
             )}
@@ -110,6 +113,8 @@ export default function StepResults() {
         {reviewOpen && <ReviewPanel anchorRef={reviewRef} />}
       </CardContent>
     </Card>
+    <ScriptDialog testCase={scriptCase} open={Boolean(scriptCase)} onOpenChange={(open) => { if (!open) setScriptCase(null); }} />
+    </>
   );
 }
 

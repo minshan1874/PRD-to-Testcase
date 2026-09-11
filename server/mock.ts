@@ -97,6 +97,24 @@ function validFixture(model: string): string {
   });
 }
 
+function scriptFixture(): string {
+  return [
+    "*** Settings ***",
+    "Library    SeleniumLibrary",
+    "",
+    "*** Test Cases ***",
+    "手工用例自动化骨架",
+    "    [Documentation]    请根据实际页面补充 URL、元素定位符和环境配置",
+    "    Open Browser    ${url}    chrome",
+    "    Wait Until Element Is Visible    ${locator}    10s",
+    "    # TODO: 按手工测试步骤补充或替换以下操作",
+    "    Input Text    ${locator}    示例输入",
+    "    Click Element    ${locator}",
+    "    Page Should Contain    预期结果文本",
+    "    Close Browser",
+  ].join("\n");
+}
+
 function badJsonFixture(): string {
   return `{
     "cases": [
@@ -148,7 +166,15 @@ export async function mockGenerate(params: {
     throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
   }
 
-  const content = model.includes("badjson") ? badJsonFixture() : validFixture(model);
+  const isScriptExtractionRequest = lastUser.includes("SCRIPT_CASE_EXTRACTION");
+  const isScriptRequest = lastUser.includes("Robot Framework") && lastUser.includes("${locator}");
+  const content = isScriptExtractionRequest
+    ? validFixture(model)
+    : isScriptRequest
+      ? scriptFixture()
+      : model.includes("badjson")
+        ? badJsonFixture()
+        : validFixture(model);
 
   return {
     content:

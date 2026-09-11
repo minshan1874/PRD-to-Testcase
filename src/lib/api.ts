@@ -1,5 +1,8 @@
 /** 前端到 API 的调用封装。API Key 通过请求头传递，仅存内存。 */
 
+import type { TestCase } from "@/types";
+import { buildScriptMessages, buildTestCaseExtractionMessages } from "@/lib/scriptPrompt";
+
 export interface CatalogModel {
   id: string;
   name: string;
@@ -116,6 +119,54 @@ export async function generateRequest(
     clearTimeout(timer);
     externalSignal?.removeEventListener("abort", abortFromExternal);
   }
+}
+
+/** 将一条手工测试用例转换为 Robot Framework 脚本（复用生成 API）。 */
+export async function generateScriptRequest(
+  testCase: TestCase,
+  options: {
+    model: string;
+    apiKey?: string;
+    signal?: AbortSignal;
+    timeoutMs?: number;
+  }
+): Promise<GenerateResponse> {
+  return generateRequest(
+    {
+      model: options.model,
+      messages: buildScriptMessages(testCase),
+      temperature: 0.2,
+      maxTokens: 4000,
+      apiKey: options.apiKey,
+      signal: options.signal,
+      useJsonSchema: false,
+    },
+    options.timeoutMs ?? 600_000,
+  );
+}
+
+/** 从测试用例文档中提取全部手工测试用例（复用 /api/generate 链路）。 */
+export async function extractTestCasesRequest(options: {
+  documentText: string;
+  images?: Array<{ mime: string; dataUrl: string }>;
+  model: string;
+  apiKey?: string;
+  signal?: AbortSignal;
+  timeoutMs?: number;
+}): Promise<GenerateResponse> {
+  return generateRequest(
+    {
+      model: options.model,
+      messages: buildTestCaseExtractionMessages(options.documentText),
+      images: options.images,
+      temperature: 0.1,
+      maxTokens: 12000,
+      apiKey: options.apiKey,
+      signal: options.signal,
+      useJsonSchema: false,
+    },
+    options.timeoutMs ?? 600_000,
+  );
 }
 
 /** AI 审查用例请求（复用生成链路，构造不同的 messages） */
