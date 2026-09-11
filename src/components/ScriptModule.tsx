@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clipboard,
+  Download,
   FileCode2,
   FileSpreadsheet,
   FileText,
@@ -18,6 +19,8 @@ import type { SourceItem, TestCase } from "@/types";
 import { extractTestCasesRequest, generateScriptRequest } from "@/lib/api";
 import { buildBody } from "@/lib/prompt";
 import { ingestFile } from "@/lib/ingest";
+import { isDemoModel } from "@/lib/sampleResults";
+import { buildExecutableRobotScript } from "@/lib/robotGenerator";
 import { LIMITS } from "@/lib/limits";
 import { parseTestCaseExtraction } from "@/lib/scriptPrompt";
 import { renumberCases } from "@/lib/schema";
@@ -53,10 +56,80 @@ const SCRIPT_STATUS_MESSAGES = [
 
 const SCRIPT_GENERATION_MESSAGE = "正在为当前用例生成 Robot Framework 脚本…";
 
+/** 演示模型下返回的固定可执行示例（老照片修复页面），由本地生成器确定性生成 */
+const DEMO_SCRIPT_CASES: TestCase[] = [
+  {
+    id: "RC-001",
+    module: "老照片修复",
+    title: "验证老照片修复页面能正常打开",
+    featurePoint: "",
+    testType: "功能",
+    caseType: "功能测试",
+    priority: "P0",
+    precondition: "已部署老照片修复网页",
+    testData: "浏览器",
+    steps: ["打开浏览器访问老照片修复页面", "等待页面加载完成"],
+    expected: "页面正常打开并显示标题「老照片修复」",
+    status: "未执行",
+    actualResult: "",
+    defectId: "",
+    remark: "",
+  },
+  {
+    id: "RC-002",
+    module: "老照片修复",
+    title: "验证上传图片后可选分辨率并点击立即尝试",
+    featurePoint: "",
+    testType: "功能",
+    caseType: "功能测试",
+    priority: "P1",
+    precondition: "已进入老照片修复页面",
+    testData: "一张本地 JPG 图片",
+    steps: ["点击图片上传区域", "上传本地图片", "选择分辨率", "点击立即尝试"],
+    expected: "图片上传成功，分辨率可选项展示，点击立即尝试后进入处理中状态",
+    status: "未执行",
+    actualResult: "",
+    defectId: "",
+    remark: "",
+  },
+  {
+    id: "RC-003",
+    module: "老照片修复",
+    title: "验证未上传图片时立即尝试被限制",
+    featurePoint: "",
+    testType: "异常",
+    caseType: "功能测试",
+    priority: "P1",
+    precondition: "已进入老照片修复页面，未上传图片",
+    testData: "",
+    steps: ["点击立即尝试"],
+    expected: "提示需先上传图片，无法继续执行",
+    status: "未执行",
+    actualResult: "",
+    defectId: "",
+    remark: "",
+  },
+];
+
 function stripCodeFences(content: string): string {
   const trimmed = content.trim();
   const fenced = trimmed.match(/^```(?:robotframework|robot|text)?\s*([\s\S]*?)\s*```$/i);
   return (fenced?.[1] ?? trimmed).trim();
+}
+
+function downloadRobotScript(item: ScriptResultItem): void {
+  if (!item.script) return;
+  const safeTitle = (item.testCase.title || item.testCase.id || "script")
+    .trim()
+    .replace(/[\\/:*?"<>|\r\n]/g, "_");
+  const fileName = `${item.testCase.id || "TC"}_${safeTitle}.robot`;
+  const blob = new Blob([item.script], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function sourceTextItem(text: string): SourceItem {
@@ -86,6 +159,7 @@ export default function ScriptModule() {
   const [parsedCases, setParsedCases] = useState<TestCase[]>([]);
   const [scriptResults, setScriptResults] = useState<ScriptResultItem[]>([]);
   const [phase, setPhase] = useState<ScriptPhase>("idle");
+  const [mode, setMode] = useState<"fast" | "ai">("fast");
   const [statusIndex, setStatusIndex] = useState(0);
   const [statusDetail, setStatusDetail] = useState("");
   const [error, setError] = useState("");
@@ -202,6 +276,22 @@ export default function ScriptModule() {
     }
 
     try {
+      // 演示模型：无论输入什么，固定返回可执行示例脚本
+      if (isDemoModel(config.model)) {
+        const now = new Date().toLocaleString("zh-CN", { hour12: false });
+        const demos: ScriptResultItem[] = DEMO_SCRIPT_CASES.map((testCase) => ({
+          testCase,
+          script: buildExecutableRobotScript(testCase),
+          model: config.model,
+          generatedAt: now,
+        }));
+        setParsedCases(DEMO_SCRIPT_CASES);
+        setScriptResults(demos);
+        setPhase("done");
+        setStatusDetail(`演示模型：返回 ${demos.length} 条固定可执行示例脚本`);
+        return;
+      }
+
       const promptSources = inputText.trim() ? [...sources, sourceTextItem(inputText)] : sources;
       const body = buildBody(promptSources);
       let cases: TestCase[] = spreadsheetFiles.flatMap((file) => file.cases);
@@ -232,6 +322,22 @@ export default function ScriptModule() {
       if (cases.length === 0) throw new Error("未能从文档中解析出测试用例，请检查文档内容或换一种格式重试");
 
       setParsedCases(cases);
+
+      // 快速可执行模式：本地确定性生成，不依赖 AI，输出可直接运行的 .robot
+      if (mode === "fast") {
+        const now = new Date().toLocaleString("zh-CN", { hour12: false });
+        const generated: ScriptResultItem[] = cases.map((testCase) => ({
+          testCase,
+          script: buildExecutableRobotScript(testCase),
+          model: config.model,
+          generatedAt: now,
+        }));
+        setScriptResults(generated);
+        setPhase("done");
+        setStatusDetail(`生成完成：${generated.length} 条可执行脚本（本地确定性生成，未调用模型）`);
+        return;
+      }
+
       setPhase("generating");
       const generated: ScriptResultItem[] = [];
       for (let index = 0; index < cases.length; index += 1) {
@@ -301,7 +407,7 @@ export default function ScriptModule() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-xl font-semibold tracking-tight">AI 生成自动化测试脚本</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">生成自动化测试脚本</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           输入或上传已有测试用例文档，AI 会自动解析全部用例，并为每条用例生成 Robot Framework + SeleniumLibrary WebUI 脚本骨架。
         </p>
@@ -313,8 +419,10 @@ export default function ScriptModule() {
             <FileCode2 className="size-4 text-primary" /> 输入测试用例文档
           </CardTitle>
           <CardDescription>
-            支持直接粘贴文本，或上传 PDF / DOCX / MD / TXT / 图片 / Excel 用例文档；可一次处理多条用例。脚本中的 {`${"${url}"}`} 和 {`${"${locator}"}`} 需要按实际页面替换。
-          </CardDescription>
+              支持直接粘贴文本，或上传 PDF / DOCX / MD / TXT / 图片 / Excel 用例文档；可一次处理多条用例。
+              选择「快速可执行」由本地程序即时生成可直接运行的 .robot（不调用模型）；选择「AI 生成」则调用所选模型生成更贴近语义的脚本。
+              脚本中的 {`${"${BASE_URL}"}`} 与 {`${"${locator_N}"}`} 需按实际页面替换。
+            </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Textarea
@@ -420,12 +528,38 @@ export default function ScriptModule() {
             </div>
           )}
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-            {busy && <Button variant="outline" onClick={cancelGeneration}><Square className="size-4" /> 停止生成</Button>}
-            <Button disabled={!canRun} onClick={() => void generateScripts()}>
-              {busy ? <Loader2 className="size-4 animate-spin" /> : <FileCode2 className="size-4" />}
-              {phase === "done" ? "重新生成自动化测试脚本" : "生成自动化测试脚本"}
-            </Button>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-1 self-start rounded-md border bg-muted/50 p-0.5">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setMode("fast")}
+                className={cn(
+                  "rounded px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                  mode === "fast" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                快速可执行
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => setMode("ai")}
+                className={cn(
+                  "rounded px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                  mode === "ai" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                AI 生成
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              {busy && <Button variant="outline" onClick={cancelGeneration}><Square className="size-4" /> 停止生成</Button>}
+              <Button disabled={!canRun} onClick={() => void generateScripts()}>
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <FileCode2 className="size-4" />}
+                {phase === "done" ? "重新生成自动化测试脚本" : "生成自动化测试脚本"}
+              </Button>
+            </div>
           </div>
           {!config.model.trim() && <p className="text-right text-xs text-destructive">请先在左侧模型配置中选择模型</p>}
         </CardContent>
@@ -468,7 +602,7 @@ export default function ScriptModule() {
               <CardTitle className="flex items-center gap-2 font-display text-base font-semibold tracking-tight">
                 生成结果 <Badge variant="secondary" className="font-mono">{scriptResults.filter((item) => item.script).length}/{scriptResults.length}</Badge>
               </CardTitle>
-              <CardDescription>每条手工测试用例对应一份 Robot Framework + SeleniumLibrary WebUI 脚本骨架，可继续补充定位符和环境配置。</CardDescription>
+              <CardDescription>每条用例对应一份可执行的 Robot Framework + SeleniumLibrary WebUI 脚本。快速可执行模式为本地确定性生成，语法合法可直接运行；AI 生成模式则调用模型生成更丰富的步骤。</CardDescription>
             </div>
             <input
               value={query}
@@ -516,7 +650,12 @@ function ScriptResultCard({ item, onCopy }: { item: ScriptResultItem; onCopy: (s
           <h3 className="text-sm font-semibold">{testCase.title || "未命名用例"}</h3>
           <p className="text-xs text-muted-foreground">步骤 {testCase.steps.length} 步 · 预期：{testCase.expected || "无"}</p>
         </div>
-        {item.script && <Button variant="outline" size="sm" className="w-full shrink-0 sm:w-auto" onClick={() => onCopy(item.script!)}><Clipboard className="size-4" /> 复制脚本</Button>}
+        {item.script && (
+          <div className="flex w-full shrink-0 flex-row gap-2 sm:w-auto">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={() => onCopy(item.script!)}><Clipboard className="size-4" /> 复制脚本</Button>
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none" onClick={() => downloadRobotScript(item)}><Download className="size-4" /> 下载脚本</Button>
+          </div>
+        )}
       </div>
 
       {item.error ? (
