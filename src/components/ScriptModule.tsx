@@ -20,7 +20,7 @@ import { extractTestCasesRequest, generateScriptRequest } from "@/lib/api";
 import { buildBody } from "@/lib/prompt";
 import { ingestFile } from "@/lib/ingest";
 import { isDemoModel } from "@/lib/sampleResults";
-import { buildExecutableRobotScript } from "@/lib/robotGenerator";
+import { buildExecutableRobotScript, sanitizeAIScript } from "@/lib/robotGenerator";
 import { LIMITS } from "@/lib/limits";
 import { parseTestCaseExtraction } from "@/lib/scriptPrompt";
 import { renumberCases } from "@/lib/schema";
@@ -350,7 +350,7 @@ export default function ScriptModule() {
             apiKey: config.apiKey || undefined,
             signal: controller.signal,
           });
-          const script = stripCodeFences(response.content);
+          const script = sanitizeAIScript(stripCodeFences(response.content));
           if (!script) throw new Error("模型未返回脚本内容");
           generated.push({
             testCase,

@@ -126,3 +126,41 @@ export function buildExecutableRobotScript(
     `# 由「本地确定性生成」产生，可执行。${"${BASE_URL}"} 与各 ${"${locator_N}"} 请按被测页面替换。`,
   ].join("\n");
 }
+
+/**
+ * 对 AI 生成的脚本做「可执行化补全」：
+ * 1) 去掉反引号（Robot 中反引号不是字符串定界符，会污染 url 等值）；
+ * 2) 扫描正文引用的 ${...}，把未在 *** Variables *** 中定义的变量自动补默认值，
+ *    避免运行时报 "Variable '${x}' not found"。返回可直接 robot 运行的脚本。
+ */
+export function sanitizeAIScript(raw: string): string {
+  if (!raw) return raw;
+  let out = raw.replace(/`/g, "");
+
+  const used = new Set<string>();
+  const refRe = /\$\{([^}\s]+)\}/g;
+  let match: RegExpExecArray | null;
+  while ((match = refRe.exec(out)) !== null) used.add(match[1]);
+  if (used.size === 0) return out;
+
+  const defined = new Set<string>();
+  const defRe = /^\$\{([^}]+)\}\s+/gm;
+  while ((match = defRe.exec(out)) !== null) defined.add(match[1]);
+  if (defined.size === used.size) return out;
+
+  const missing = [...used].filter((name) => !defined.has(name));
+  if (missing.length === 0) return out;
+
+  const defaults = (name: string): string => {
+    if (/url/i.test(name)) return "http://localhost";
+    if (/browser/i.test(name)) return "chrome";
+    if (/file_path|path/i.test(name)) return "C:/path/to/your/file";
+    return "id=element";
+  };
+
+  const block = missing
+    .map((name) => `${"${" + name + "}"}    ${defaults(name)}`)
+    .join("\n");
+  out += `\n*** Variables ***\n${block}\n`;
+  return out;
+}
