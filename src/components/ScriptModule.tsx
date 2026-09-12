@@ -8,6 +8,7 @@ import {
   FileSpreadsheet,
   FileText,
   Loader2,
+  Plus,
   RefreshCw,
   Square,
   Trash2,
@@ -48,6 +49,16 @@ interface SpreadsheetFile {
   cases: TestCase[];
 }
 
+interface HtmlBlock {
+  id: string;
+  page: string;
+  source: string;
+}
+
+function nextPageLabel(index: number): string {
+  return index < 26 ? String.fromCharCode(65 + index) : String(index + 1);
+}
+
 const SCRIPT_STATUS_MESSAGES = [
   "正在解析测试用例文档…",
   "正在识别用例标题、步骤和预期结果…",
@@ -56,7 +67,6 @@ const SCRIPT_STATUS_MESSAGES = [
 
 const SCRIPT_GENERATION_MESSAGE = "正在为当前用例生成 Robot Framework 脚本…";
 
-const MAX_HTML_CHARS = 30000;
 const SCRIPT_GENERATION_FAILED = "脚本生成失败，请重试";
 
 /** 演示模型下返回的固定可执行示例（老照片修复页面），由本地生成器确定性生成 */
@@ -120,6 +130,35 @@ function stripCodeFences(content: string): string {
   return (fenced?.[1] ?? trimmed).trim();
 }
 
+/** 解析失败时，把用户直接粘贴的叙述式文本本地拆成单条用例作为回退，保证流程可继续。 */
+function deriveCaseFromInput(text: string): TestCase {
+  const cleaned = text.trim();
+  const expMatch = cleaned.match(/(?:预期结果|预期|结果)\s*[:：]?\s*(.+?)(?:[。.]|$)/);
+  const expected = expMatch ? expMatch[1].trim() : "操作成功完成";
+  const body = expMatch ? cleaned.slice(0, expMatch.index).trim() : cleaned;
+  const steps = body
+    .split(/[\n、]|－|\s*-\s*/u)
+    .map((step) => step.trim())
+    .filter(Boolean);
+  return {
+    id: "",
+    module: "",
+    featurePoint: "",
+    title: body.slice(0, 24) || "用例",
+    testType: "功能",
+    caseType: "功能测试",
+    priority: "P1",
+    precondition: "",
+    testData: "",
+    steps,
+    expected,
+    status: "未执行",
+    actualResult: "",
+    defectId: "",
+    remark: "",
+  };
+}
+
 function downloadRobotScript(item: ScriptResultItem): void {
   if (!item.script) return;
   const safeTitle = (item.testCase.title || item.testCase.id || "script")
@@ -163,7 +202,7 @@ export default function ScriptModule() {
   const [scriptResults, setScriptResults] = useState<ScriptResultItem[]>([]);
   const [phase, setPhase] = useState<ScriptPhase>("idle");
   const [mode, setMode] = useState<"fast" | "ai">("fast");
-  const [htmlSource, setHtmlSource] = useState("");
+  const [htmlBlocks, setHtmlBlocks] = useState<HtmlBlock[]>([{ id: "html-1", page: "页面A", source: "" }]);
   const [statusIndex, setStatusIndex] = useState(0);
   const [statusDetail, setStatusDetail] = useState("");
   const [error, setError] = useState("");
@@ -173,7 +212,14 @@ export default function ScriptModule() {
   const controllerRef = useRef<AbortController | null>(null);
 
   const busy = phase === "parsing" || phase === "generating";
-  const htmlChars = htmlSource.length;
+  const htmlChars = htmlBlocks.reduce((total, block) => total + block.source.length, 0);
+  const htmlSource = useMemo(
+    () =>
+      htmlBlocks
+        .map((block) => (block.page.trim() ? `【页面标识】${block.page.trim()}\n${block.source}` : block.source))
+        .join("\n\n"),
+    [htmlBlocks],
+  );
   const successfulSources = sources.filter((item) => item.status === "success");
   const textChars = inputText.length + successfulSources.reduce((total, item) => total + (item.text?.length ?? 0), 0);
   const imageCount = successfulSources.reduce(
@@ -253,13 +299,22 @@ export default function ScriptModule() {
     setError("");
   }
 
-  function handleHtmlChange(value: string) {
-    if (value.length > MAX_HTML_CHARS) {
-      toast.error(`HTML源码不能超过 ${MAX_HTML_CHARS.toLocaleString()} 字符`);
-      setHtmlSource(value.slice(0, MAX_HTML_CHARS));
-      return;
-    }
-    setHtmlSource(value);
+  function addHtmlBlock() {
+    setHtmlBlocks((current) => [
+      ...current,
+      { id: `html-${Date.now()}`, page: `页面${nextPageLabel(current.length)}`, source: "" },
+    ]);
+  }
+
+  function removeHtmlBlock(id: string) {
+    setHtmlBlocks((current) => {
+      const next = current.filter((block) => block.id !== id);
+      return next.length > 0 ? next : [{ id: `html-${Date.now()}`, page: "页面A", source: "" }];
+    });
+  }
+
+  function updateHtmlBlock(id: string, patch: Partial<Pick<HtmlBlock, "page" | "source">>) {
+    setHtmlBlocks((current) => current.map((block) => (block.id === id ? { ...block, ...patch } : block)));
   }
 
   async function generateScripts() {
@@ -320,8 +375,14 @@ export default function ScriptModule() {
           signal: controller.signal,
         });
         const extracted = parseTestCaseExtraction(response.content);
-        if (!extracted.ok) throw new Error(extracted.reason);
-        cases = [...cases, ...extracted.cases];
+        if (extracted.ok) {
+          cases = [...cases, ...extracted.cases];
+        } else if (inputText.trim()) {
+          cases = [...cases, deriveCaseFromInput(inputText)];
+          setStatusDetail("AI 未能解析为结构化用例，已按输入文本本地拆分为单条用例继续生成…");
+        } else {
+          throw new Error(extracted.reason);
+        }
       }
 
       cases = renumberCases(
@@ -440,8 +501,10 @@ export default function ScriptModule() {
             </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-5 lg:grid-cols-2">
-          <div className="space-y-4">
+          <section className="space-y-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              <FileText className="size-4 text-primary" /> 用例文本输入
+            </h3>
           <Textarea
             value={inputText}
             onChange={(event) => setInputText(event.target.value)}
@@ -458,7 +521,12 @@ export default function ScriptModule() {
             </span>
             {textChars > LIMITS.maxTextChars && <span className="text-destructive">内容超出字符上限</span>}
           </div>
+          </section>
 
+          <section className="space-y-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              <UploadCloud className="size-4 text-primary" /> 用例文档上传
+            </h3>
           <div
             role="button"
             tabIndex={0}
@@ -544,34 +612,61 @@ export default function ScriptModule() {
               ))}
             </div>
           )}
+          </section>
 
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <label htmlFor="html-source-input" className="text-sm font-medium">
-                  粘贴网页HTML源码
-                  <span className="ml-1 text-xs font-normal text-muted-foreground">（选填，粘贴后可生成带真实元素定位的脚本）</span>
-                </label>
-                <span className={cn("shrink-0 font-mono text-xs", htmlChars > MAX_HTML_CHARS ? "text-destructive" : "text-muted-foreground")}>
-                  {htmlChars.toLocaleString()} / {MAX_HTML_CHARS.toLocaleString()}
-                </span>
+          <section className="space-y-2">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              <FileCode2 className="size-4 text-primary" /> 网页HTML源码（支持多页面，选填）
+            </h3>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs text-muted-foreground">{htmlBlocks.length} 个页面 · 共 <span className="font-mono">{htmlChars.toLocaleString()}</span> 字符</span>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="outline" size="sm" onClick={addHtmlBlock} disabled={busy}>
+                    <Plus className="size-4" /> 添加页面
+                  </Button>
+                </div>
               </div>
-              <Textarea
-                id="html-source-input"
-                value={htmlSource}
-                onChange={(event) => handleHtmlChange(event.target.value)}
-                placeholder="浏览器F12，复制页面完整HTML源码粘贴到此处，为空则生成带占位符脚本骨架"
-                className="h-[220px] resize-none overflow-auto font-mono text-xs leading-relaxed"
-                disabled={busy}
-                spellCheck={false}
-                aria-label="网页HTML源码输入框"
-              />
+
+              <div className="space-y-3">
+                {htmlBlocks.map((block, index) => (
+                  <div key={block.id} className="space-y-2 rounded-md border border-border/80 bg-background/50 p-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={block.page}
+                        onChange={(event) => updateHtmlBlock(block.id, { page: event.target.value })}
+                        placeholder="页面A / 页面B / 页面C…"
+                        aria-label={`第 ${index + 1} 个源码所属页面标识`}
+                        disabled={busy}
+                        className="h-8 w-full max-w-[200px] rounded-md border bg-background px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                      />
+                      {htmlBlocks.length > 1 && (
+                        <button
+                          type="button"
+                          className="ml-auto rounded p-1.5 text-muted-foreground hover:text-destructive"
+                          onClick={() => removeHtmlBlock(block.id)}
+                          disabled={busy}
+                          aria-label={`删除 ${block.page || "页面"}源码`}
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      )}
+                    </div>
+                    <Textarea
+                      value={block.source}
+                      onChange={(event) => updateHtmlBlock(block.id, { source: event.target.value })}
+                      placeholder="浏览器F12，复制该页面完整HTML源码粘贴到此处；用例发生页面跳转时请为每个页面分别粘贴并填写页面标识"
+                      className="h-[180px] resize-none overflow-auto font-mono text-xs leading-relaxed"
+                      disabled={busy}
+                      spellCheck={false}
+                      aria-label={`${block.page || "页面"}的HTML源码`}
+                    />
+                  </div>
+                ))}
+              </div>
+
               <p className="text-xs text-muted-foreground">
-                直接在浏览器按 F12 复制页面完整 HTML 粘贴于此，模型将从源码中提取真实 id / xpath 生成尽量可直接运行的脚本；留空则生成带注释占位符的脚本骨架。
+                直接在浏览器按 F12 复制各页面完整 HTML，并为每段填写页面标识（页面A/页面B…）。模型会按「页面标识 → 源码」解析每个页面的真实 id / xpath；用例发生 A 跳转到 B 时自动切换对应页面的元素定位。全程不填则生成带注释占位符的脚本骨架。
               </p>
-            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-1 self-start rounded-md border bg-muted/50 p-0.5">
@@ -607,8 +702,7 @@ export default function ScriptModule() {
             </div>
           </div>
           {!config.model.trim() && <p className="text-right text-xs text-destructive">请先在左侧模型配置中选择模型</p>}
-          </div>
-          </div>
+          </section>
         </CardContent>
       </Card>
 

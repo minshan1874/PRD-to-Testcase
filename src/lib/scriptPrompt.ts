@@ -5,15 +5,17 @@ import { renumberCases, salvageJson, tryParseJson, validateGeneration } from "@/
  * HTML 源码已提供：解析 HTML 提取真实 id/xpath 定位符，生成尽量可直接运行的脚本。
  */
 export const SCRIPT_PROMPT_WITH_HTML = `你是专业自动化脚本生成工具。
-输入包含手工测试用例、网页HTML源码。
-任务：解析提供的HTML源码，找出操作步骤对应的页面控件，提取真实id或者简洁xpath定位器，生成Robot Framework + SeleniumLibrary WebUI自动化脚本。
+输入包含手工测试用例、可选多页面网页HTML源码。
+HTML会标注所属页面（页面A/页面B/页面C）。
+任务：解析各个页面HTML源码，找出每一步操作对应的页面控件，提取真实id或者简洁xpath定位器，生成Robot Framework + SeleniumLibrary WebUI自动化脚本。
 
 严格遵守规则：
 1、输出完整标准robot脚本，包含***Settings***、***Test Cases***段落，使用SeleniumLibrary官方原生关键字。
 2、优先使用id定位元素，没有id就写简短稳定xpath；禁止使用绝对xpath。
-3、根据用例操作步骤：打开页面、输入文本、点击元素、页面等待；根据预期结果自动编写断言关键字。
-4、加入合理Sleep等待，适配页面加载。
-5、脚本缩进格式严格正确，只输出脚本内容，不要任何解释、不要markdown多余文字。`;
+3、按照用例步骤，页面跳转后自动切换对应页面的元素定位；根据预期结果自动编写断言关键字。
+4、加入合理Sleep等待，适配页面加载与页面跳转。
+5、如果某个步骤对应的页面没有提供HTML源码，则使用带中文注释的占位符。
+6、脚本缩进格式严格正确，只输出脚本内容，不要任何解释、不要markdown多余文字。`;
 
 /**
  * HTML 源码为空：生成带注释占位符的脚本骨架，由用户自行替换元素定位。
@@ -62,7 +64,7 @@ export function buildScriptMessages(
   ].join("\n");
 
   const userContent = hasHtml
-    ? ["【手工测试用例】", caseSections, "", "【网页HTML源码】", htmlSource!.trim()].join("\n")
+    ? ["【手工测试用例】", caseSections, "", "【多页面HTML源码】", htmlSource!.trim()].join("\n")
     : [
         "请将下面这条手工测试用例转换为 Robot Framework + SeleniumLibrary WebUI 自动化脚本。",
         "",
