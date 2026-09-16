@@ -258,6 +258,7 @@ export interface BugAnalyseApiResponse {
 export interface BugAnalyseRequest {
   text: string;
   imageBase64?: string;
+  apiKey?: string;
   signal?: AbortSignal;
 }
 
@@ -276,7 +277,10 @@ export async function bugAnalyseRequest(
     if (req.imageBase64) body.imageBase64 = req.imageBase64;
     const res = await fetch("/api/ai/bug-analyse", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(req.apiKey ? { "x-openrouter-key": req.apiKey } : {}),
+      },
       body: JSON.stringify(body),
       signal: controller.signal,
     });

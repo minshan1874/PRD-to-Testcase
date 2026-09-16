@@ -784,6 +784,7 @@ export const useStore = create<AppState>()((set, get) => {
       const data = await bugAnalyseRequest({
         text: trimmed,
         imageBase64,
+        apiKey: config.apiKey || undefined,
         signal: bugController.signal,
       });
       set({ bugPhase: "validating" });

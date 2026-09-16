@@ -5,7 +5,6 @@ import Sidebar from "@/components/Sidebar";
 import PreReview from "@/components/PreReview";
 import ReviewPage from "@/components/ReviewPage";
 import BugAnalyse from "@/components/BugAnalyse";
-import ScriptModule from "@/components/ScriptModule";
 import StepUpload from "@/components/steps/StepUpload";
 import StepConfig from "@/components/steps/StepConfig";
 import StepGenerate from "@/components/steps/StepGenerate";
@@ -51,10 +50,7 @@ export default function App() {
       </aside>
       <main className="w-full min-w-0 flex-1">
         <div className="mx-auto max-w-6xl px-4 pb-16">
-          <div className={activeFeature === "script" ? "mt-8" : "hidden"}>
-            <ScriptModule />
-          </div>
-          {activeFeature !== "script" && (activeFeature === "preview" ? (
+          {activeFeature === "preview" ? (
             <div className="mt-8">
               <PreReview />
             </div>
@@ -79,7 +75,7 @@ export default function App() {
               {started && <StepGenerate />}
               {showResult && <StepResults />}
             </div>
-          ))}
+          )}
         </div>
       </main>
     </div>

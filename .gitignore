@@ -3,6 +3,10 @@ node_modules/
 
 # vite打包产物
 dist/
+dist-server/
+
+# TypeScript构建缓存
+*.tsbuildinfo
 
 # 本地环境变量（防止密钥泄露！你的大模型key不要提交到github）
 .env

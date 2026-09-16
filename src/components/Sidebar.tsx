@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { Bug, ClipboardList, FileCode2, FileSearch, ListChecks } from "lucide-react";
+import { Bug, ClipboardList, FileSearch, Key, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 import { useStore } from "@/store";
 import type { ActiveFeature } from "@/types";
@@ -8,17 +8,16 @@ import { effectiveCapabilities } from "@/lib/models";
 import { ModelSelect } from "@/components/ModelSelect";
 import { Input } from "@/components/ui/input";
 
-type NavKey = "preview" | "gen" | "review" | "bug" | "script";
+type NavKey = "preview" | "gen" | "review" | "bug";
 
 const NAV_ITEMS: { key: NavKey; label: string; icon: typeof ClipboardList }[] = [
   { key: "preview", label: "需求预审", icon: FileSearch },
   { key: "gen", label: "生成测试用例", icon: ClipboardList },
   { key: "review", label: "用例评审", icon: ListChecks },
-  { key: "script", label: "自动化脚本", icon: FileCode2 },
   { key: "bug", label: "Bug分析", icon: Bug },
 ];
 
-const FUNCTIONAL_KEYS: NavKey[] = ["gen", "preview", "review", "bug", "script"];
+const FUNCTIONAL_KEYS: NavKey[] = ["gen", "preview", "review", "bug"];
 
 /** 分组标题：功能入口 / 模型配置同级使用 */
 function SectionLabel({ children }: { children: ReactNode }) {
@@ -28,6 +27,33 @@ function SectionLabel({ children }: { children: ReactNode }) {
         {children}
       </span>
       <span className="h-px flex-1 bg-gradient-to-r from-sky-200 to-transparent" />
+    </div>
+  );
+}
+
+/** API Key 输入（仅存内存，刷新即清空） */
+function ApiKeySection() {
+  const config = useStore((s) => s.config);
+  const updateConfig = useStore((s) => s.updateConfig);
+
+  return (
+    <div className="space-y-2.5">
+      <SectionLabel>API Key</SectionLabel>
+      <div className="relative">
+        <Key className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          type="password"
+          className="h-8 pl-8 text-xs"
+          placeholder="输入 OpenRouter API Key"
+          value={config.apiKey}
+          onChange={(e) => updateConfig({ apiKey: e.target.value })}
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Key 仅存内存，刷新页面需重新输入
+      </p>
     </div>
   );
 }
@@ -80,7 +106,6 @@ function ModelConfigSection() {
 export default function Sidebar() {
   const active = useStore((s) => s.activeFeature);
   const setActiveFeature = useStore((s) => s.setActiveFeature);
-  const caseCount = useStore((s) => s.result?.cases.length ?? 0);
 
   const handleClick = (item: { key: NavKey; label: string }) => {
     if (FUNCTIONAL_KEYS.includes(item.key)) {
@@ -154,11 +179,6 @@ export default function Sidebar() {
                 }`}
               />
               <span className="truncate">{item.label}</span>
-              {item.key === "script" && caseCount > 0 && (
-                <span className={`ml-auto rounded px-1.5 py-0.5 text-[9px] font-medium ${isActive ? "bg-white/20 text-white" : "bg-sky-100 text-sky-700"}`}>
-                  {caseCount}
-                </span>
-              )}
               {!isFunctional && (
                 <span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-muted-foreground/70">
                   Soon
@@ -169,7 +189,8 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-4">
+      <div className="mt-4 space-y-4">
+        <ApiKeySection />
         <ModelConfigSection />
       </div>
     </div>

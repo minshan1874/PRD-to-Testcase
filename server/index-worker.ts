@@ -1,9 +1,12 @@
 import { ApiError, fetchModels, generate } from "./openrouter.js";
 
 interface WorkerEnv {
-  OPENROUTER_API_KEY?: string;
-  OPENROUTER_MODEL?: string;
   ASSETS?: { fetch: (request: Request) => Promise<Response> };
+}
+
+/** 从请求头 x-openrouter-key 读取用户输入的 API Key */
+function getApiKey(request: Request): string {
+  return request.headers.get("x-openrouter-key") ?? "";
 }
 
 const jsonHeaders = {
@@ -84,9 +87,13 @@ export default {
   },
 };
 
-async function handleModels(request: Request, env: WorkerEnv): Promise<Response> {
+async function handleModels(request: Request, _env: WorkerEnv): Promise<Response> {
+  const apiKey = getApiKey(request);
+  if (!apiKey) {
+    return apiJson(request, { error: { code: "auth", message: "请先在侧边栏输入 API Key" } }, 401);
+  }
   try {
-    const models = await fetchModels(env.OPENROUTER_API_KEY);
+    const models = await fetchModels(apiKey);
     return apiJson(request, { models, mock: false });
   } catch (err) {
     if (err instanceof ApiError) {
@@ -98,11 +105,12 @@ async function handleModels(request: Request, env: WorkerEnv): Promise<Response>
   }
 }
 
-async function handleChat(request: Request, env: WorkerEnv): Promise<Response> {
-  if (!env.OPENROUTER_API_KEY) {
+async function handleChat(request: Request, _env: WorkerEnv): Promise<Response> {
+  const apiKey = getApiKey(request);
+  if (!apiKey) {
     return apiJson(request, {
-      error: { code: "auth", message: "未配置服务端 API Key" },
-    }, 500);
+      error: { code: "auth", message: "请先在侧边栏输入 API Key" },
+    }, 401);
   }
 
   let body: Record<string, unknown>;
@@ -152,7 +160,7 @@ async function handleChat(request: Request, env: WorkerEnv): Promise<Response> {
       images,
       temperature: typeof body.temperature === "number" ? body.temperature : undefined,
       maxTokens: typeof body.maxTokens === "number" ? body.maxTokens : undefined,
-      apiKey: env.OPENROUTER_API_KEY,
+      apiKey,
       useJsonSchema: typeof body.useJsonSchema === "boolean" ? body.useJsonSchema : undefined,
       jsonSchema: body.jsonSchema && typeof body.jsonSchema === "object"
         ? body.jsonSchema as Record<string, unknown>
@@ -234,9 +242,10 @@ const BUG_JSON_SCHEMA = {
 const BUG_PROBLEM_TYPES = ["JS异常", "接口请求异常", "渲染样式异常", "网络&跨域", "环境兼容", "其他"];
 const BUG_BELONGS = ["前端", "后端服务", "网络网关", "浏览器环境", "无法确定，信息不足"];
 
-async function handleBugAnalyse(request: Request, env: WorkerEnv): Promise<Response> {
-  if (!env.OPENROUTER_API_KEY) {
-    return apiJson(request, { code: 500, message: "未配置服务端 API Key" }, 500);
+async function handleBugAnalyse(request: Request, _env: WorkerEnv): Promise<Response> {
+  const apiKey = getApiKey(request);
+  if (!apiKey) {
+    return apiJson(request, { code: 401, message: "请先在侧边栏输入 API Key" }, 401);
   }
 
   let body: Record<string, unknown>;
@@ -285,7 +294,7 @@ async function handleBugAnalyse(request: Request, env: WorkerEnv): Promise<Respo
       images,
       temperature: 0.2,
       maxTokens: 2000,
-      apiKey: env.OPENROUTER_API_KEY,
+      apiKey,
       useJsonSchema: true,
       jsonSchema: BUG_JSON_SCHEMA,
       timeoutMs: hasImage ? 45_000 : 30_000,

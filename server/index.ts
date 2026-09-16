@@ -7,14 +7,14 @@ import { mockFetchModels, mockGenerate, OpenRouterHttpError } from "./mock.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const MOCK = process.env.OPENROUTER_MOCK === "true";
-const ENV_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 const DEFAULT_MODEL = "openai/gpt-5.6-luna";
 
 const app = express();
 app.use(express.json({ limit: "32mb" }));
 
-function resolveApiKey(_req: express.Request): string {
-  return ENV_API_KEY;
+/** 从请求头 x-openrouter-key 读取用户输入的 API Key */
+function resolveApiKey(req: express.Request): string {
+  return req.header("x-openrouter-key") ?? "";
 }
 
 app.get("/api/health", (_req, res) => {
@@ -57,10 +57,10 @@ async function handleChat(req: express.Request, res: express.Response) {
         .filter((i: { mime?: unknown; dataUrl?: unknown }) => typeof i?.mime === "string" && typeof i?.dataUrl === "string" && i.dataUrl.startsWith("data:"))
         .map((i: { mime: string; dataUrl: string }) => ({ mime: i.mime, dataUrl: i.dataUrl }))
     : [];
-  // API Key 仅从服务端环境变量读取
-  const apiKey = ENV_API_KEY;
+  // API Key 从请求头读取
+  const apiKey = resolveApiKey(req);
   if (!apiKey && !MOCK) {
-    res.status(401).json({ error: { code: "auth", message: "未配置服务端 API Key，请在 .env 设置 OPENROUTER_API_KEY" } });
+    res.status(401).json({ error: { code: "auth", message: "请先在侧边栏输入 API Key" } });
     return;
   }
 
@@ -169,9 +169,9 @@ app.post("/api/ai/bug-analyse", async (req, res) => {
     return;
   }
 
-  const apiKey = ENV_API_KEY;
+  const apiKey = resolveApiKey(req);
   if (!apiKey && !MOCK) {
-    res.status(401).json({ code: 401, message: "未配置服务端 API Key" });
+    res.status(401).json({ code: 401, message: "请先在侧边栏输入 API Key" });
     return;
   }
 
