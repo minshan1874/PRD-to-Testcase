@@ -26,19 +26,19 @@
 
 ## 🔄 功能流程
 
-```mermaid
-flowchart LR
-    A[📄 需求文档 PRD] --> B[🔍 需求预审]
-    B -->|通过| C[📝 生成测试用例]
-    C --> D[✅ 用例评审]
-    D --> E[🐛 Bug 分析]
-    E -->|输出| F[📊 报告 / 修复建议]
-
-    style B fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
-    style C fill:#fef3c7,stroke:#d97706,color:#92400e
-    style D fill:#dcfce7,stroke:#16a34a,color:#14532d
-    style E fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/📄_PRD-需求文档-64748b?style=for-the-badge" />
+  &nbsp;➡️&nbsp;
+  <img src="https://img.shields.io/badge/🔍_需求预审-0369a1?style=for-the-badge&logoColor=white" />
+  &nbsp;➡️&nbsp;
+  <img src="https://img.shields.io/badge/📝_生成用例-d97706?style=for-the-badge&logoColor=white" />
+  &nbsp;➡️&nbsp;
+  <img src="https://img.shields.io/badge/✅_用例评审-16a34a?style=for-the-badge&logoColor=white" />
+  &nbsp;➡️&nbsp;
+  <img src="https://img.shields.io/badge/🐛_Bug分析-dc2626?style=for-the-badge&logoColor=white" />
+  &nbsp;➡️&nbsp;
+  <img src="https://img.shields.io/badge/📊_报告输出-7c3aed?style=for-the-badge&logoColor=white" />
+</p>
 
 ## ✨ 功能一览
 
