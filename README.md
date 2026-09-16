@@ -24,22 +24,6 @@
 
 ---
 
-## 🔄 功能流程
-
-<p align="center">
-  <img src="https://img.shields.io/badge/📄_PRD-需求文档-64748b?style=for-the-badge" />
-  &nbsp;➡️&nbsp;
-  <img src="https://img.shields.io/badge/🔍_需求预审-0369a1?style=for-the-badge&logoColor=white" />
-  &nbsp;➡️&nbsp;
-  <img src="https://img.shields.io/badge/📝_生成用例-d97706?style=for-the-badge&logoColor=white" />
-  &nbsp;➡️&nbsp;
-  <img src="https://img.shields.io/badge/✅_用例评审-16a34a?style=for-the-badge&logoColor=white" />
-  &nbsp;➡️&nbsp;
-  <img src="https://img.shields.io/badge/🐛_Bug分析-dc2626?style=for-the-badge&logoColor=white" />
-  &nbsp;➡️&nbsp;
-  <img src="https://img.shields.io/badge/📊_报告输出-7c3aed?style=for-the-badge&logoColor=white" />
-</p>
-
 ## ✨ 功能一览
 
 | 功能 | 说明 | 输入 | 输出 |
