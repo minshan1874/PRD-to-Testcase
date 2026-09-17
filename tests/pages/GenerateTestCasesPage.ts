@@ -46,7 +46,7 @@ export class GenerateTestCasesPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto('https://prd-to-testcase.yangf999212.workers.dev');
+    await this.page.goto('https://test-ai-studio.yangf999212.workers.dev');
   }
 
   async expectLoaded(): Promise<void> {

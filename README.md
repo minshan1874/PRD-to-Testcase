@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="https://prd-to-testcase.yangf999212.workers.dev"><b>🚀 在线体验</b></a>
+  <a href="https://test-ai-studio.yangf999212.workers.dev"><b>🚀 在线体验</b></a>
   ·
   <a href="#-功能一览">功能</a>
   ·

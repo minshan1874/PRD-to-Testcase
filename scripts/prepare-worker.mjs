@@ -24,7 +24,7 @@ fs.cpSync(path.join(dist, "assets"), path.join(publicDir, "assets"), { recursive
 fs.writeFileSync(
   path.join(workerDir, "wrangler.json"),
   `${JSON.stringify({
-    name: "prd-to-testcase",
+    name: "test-ai-studio",
     main: "./index.js",
     compatibility_date: "2026-09-05",
     workers_dev: true,
