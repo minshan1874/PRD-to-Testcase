@@ -34,8 +34,8 @@ import {
   delay,
   isDemoModel,
   DEMO_PREREVIEW_FIXED_RESULT,
+  DEMO_GENERATION_FIXED_RESULT,
   SAMPLE_BUG_RESULT,
-  SAMPLE_GENERATION_RESULT,
   SAMPLE_REVIEW_RESULT,
 } from "@/lib/sampleResults";
 
@@ -410,12 +410,12 @@ export const useStore = create<AppState>()((set, get) => {
 
     try {
       if (isDemoModel(config.model)) {
-        // 示例模型：不调用真实 API，模拟 5s 请求中 + 5s 校验中后输出固定示例结果
+        // 示例模型：不调用真实 API，模拟 5s 假 loading（请求中 2.5s + 校验中 2.5s）后固定输出真实生成结果
         set({ phase: "requesting", lastError: null });
-        await delay(5000, generationController);
+        await delay(2500, generationController);
         set({ phase: "validating" });
-        await delay(5000, generationController);
-        set({ phase: "done", result: { ...SAMPLE_GENERATION_RESULT, modelUsed: config.model } });
+        await delay(2500, generationController);
+        set({ phase: "done", result: { ...DEMO_GENERATION_FIXED_RESULT, modelUsed: config.model } });
         return;
       }
       await run(null);

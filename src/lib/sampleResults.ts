@@ -28,6 +28,65 @@ export function delay(ms: number, controller: AbortController): Promise<void> {
   });
 }
 
+/** Demo 模型生成的固定测试用例：用真实模型对「老照片修复」功能截图跑出的真实生成结果 */
+export const DEMO_GENERATION_FIXED_RESULT: GenerationResult = {
+  cases: [
+    { id: "TC-001", module: "老照片修复", featurePoint: "", title: "验证老照片修复页面正常展示图片预览、原始分辨率、分辨率选项及试用按钮", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，页面数据加载完成", testData: "页面展示元素：老照片预览区域、原始分辨率 1206x2622、HD 高清、FHD 超清、UHD 极致、立即尝试按钮及 40 个金币消耗文案", steps: ["1. 查看老照片修复页面整体布局。", "2. 检查图片预览区域是否展示老照片内容。", "3. 检查原始分辨率文案是否展示为 1206x2622。", "4. 检查 HD、FHD、UHD 三个分辨率选项及其名称是否展示。", "5. 检查立即尝试按钮及金币消耗文案是否展示。"], expected: "1. 页面加载完成且主要控件可见。；2. 图片预览区域展示当前待修复图片。；3. 原始分辨率展示为 1206x2622。；4. HD、FHD、UHD 三个分辨率选项均可见，UHD 选项呈当前选中视觉状态。；5. 页面展示立即尝试按钮，按钮旁展示金币图标和 40。", status: "未执行", actualResult: "", defectId: "", remark: "" },
+    { id: "TC-002", module: "老照片修复", featurePoint: "", title: "验证老照片修复-默认选中UHD极致分辨率", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，页面数据加载完成", testData: "分辨率选项：HD 高清、FHD 超清、UHD 极致；页面初始状态", steps: ["1. 进入老照片修复页面。", "2. 观察 HD、FHD、UHD 三个分辨率选项的选中状态。"], expected: "1. 页面初始显示三个分辨率选项。；2. UHD 极致选项呈选中状态，HD 高清和 FHD 超清选项呈未选中状态。", status: "未执行", actualResult: "", defectId: "", remark: "截图中UHD为选中状态；默认选中规则需结合产品定义确认。" },
+    { id: "TC-003", module: "老照片修复", featurePoint: "", title: "验证老照片修复-切换HD、FHD、UHD分辨率选中状态正确", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，页面数据加载完成", testData: "参数化分辨率：HD 高清、FHD 超清、UHD 极致", steps: ["1. 点击 HD 高清选项，检查选中状态。", "2. 点击 FHD 超清选项，检查选中状态。", "3. 点击 UHD 极致选项，检查选中状态。"], expected: "1. 点击 HD 高清后，HD 高清呈选中状态，FHD 超清和 UHD 极致呈未选中状态。；2. 点击 FHD 超清后，FHD 超清呈选中状态，HD 高清和 UHD 极致呈未选中状态。；3. 点击 UHD 极致后，UHD 极致呈选中状态，HD 高清和 FHD 超清呈未选中状态。", status: "未执行", actualResult: "", defectId: "", remark: "" },
+    { id: "TC-004", module: "老照片修复", featurePoint: "", title: "验证老照片修复-重复点击同一分辨率选项状态保持唯一", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，页面数据加载完成", testData: "目标选项：UHD 极致；重复点击次数：连续 2 次", steps: ["1. 连续点击 UHD 极致选项 2 次。", "2. 检查三个分辨率选项的选中状态。"], expected: "1. 重复点击操作完成后页面无异常。；2. UHD 极致保持选中状态，页面同时只有一个分辨率选项处于选中状态。", status: "未执行", actualResult: "", defectId: "", remark: "『同时只有一个选项处于选中状态』为根据单选式视觉交互的补充测试点。" },
+    { id: "TC-005", module: "老照片修复", featurePoint: "", title: "验证老照片修复-选择HD后点击立即尝试提交HD参数", testType: "功能/UI", caseType: "功能测试", priority: "P0", precondition: "已进入老照片修复页面，当前图片已加载，账户具备完成试用所需金币", testData: "图片：当前页面展示的老照片；分辨率：HD 高清；消耗文案：40 个金币", steps: ["1. 点击 HD 高清选项。", "2. 检查 HD 高清选中状态。", "3. 点击立即尝试按钮。", "4. 观察提交后的页面状态及任务结果。"], expected: "1. HD 高清切换成功。；2. HD 高清呈选中状态。；3. 点击立即尝试后，系统开始处理当前老照片修复请求。；4. 修复请求使用用户选择的 HD 高清分辨率参数；具体处理状态和完成结果按产品规则展示。", status: "未执行", actualResult: "", defectId: "", remark: "待人工确认：提交成功后的任务状态、完成结果展示方式及金币扣除时机。" },
+    { id: "TC-006", module: "老照片修复", featurePoint: "", title: "验证老照片修复-选择FHD后点击立即尝试提交FHD参数", testType: "功能/UI", caseType: "功能测试", priority: "P0", precondition: "已进入老照片修复页面，当前图片已加载，账户具备完成试用所需金币", testData: "图片：当前页面展示的老照片；分辨率：FHD 超清；消耗文案：40 个金币", steps: ["1. 点击 FHD 超清选项。", "2. 检查 FHD 超清选中状态。", "3. 点击立即尝试按钮。", "4. 观察提交后的页面状态及任务结果。"], expected: "1. FHD 超清切换成功。；2. FHD 超清呈选中状态。；3. 点击立即尝试后，系统开始处理当前老照片修复请求。；4. 修复请求使用用户选择的 FHD 超清分辨率参数；具体处理状态和完成结果按产品规则展示。", status: "未执行", actualResult: "", defectId: "", remark: "待人工确认：提交成功后的任务状态、完成结果展示方式及金币扣除时机。" },
+    { id: "TC-007", module: "老照片修复", featurePoint: "", title: "验证老照片修复-选择UHD后点击立即尝试提交UHD参数", testType: "功能/UI", caseType: "功能测试", priority: "P0", precondition: "已进入老照片修复页面，当前图片已加载，账户具备完成试用所需金币", testData: "图片：当前页面展示的老照片；分辨率：UHD 极致；消耗文案：40 个金币", steps: ["1. 点击 UHD 极致选项。", "2. 检查 UHD 极致选中状态。", "3. 点击立即尝试按钮。", "4. 观察提交后的页面状态及任务结果。"], expected: "1. UHD 极致切换成功。；2. UHD 极致呈选中状态。；3. 点击立即尝试后，系统开始处理当前老照片修复请求。；4. 修复请求使用用户选择的 UHD 极致分辨率参数；具体处理状态和完成结果按产品规则展示。", status: "未执行", actualResult: "", defectId: "", remark: "截图中UHD为默认选项；待人工确认：提交成功后的任务状态、完成结果展示方式及金币扣除时机。" },
+    { id: "TC-008", module: "老照片修复", featurePoint: "", title: "验证老照片修复-账户金币不足时点击立即尝试给出限制反馈", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，当前图片已加载，账户金币少于页面展示的 40 个金币消耗", testData: "账户状态：金币余额 39；页面消耗：40 个金币；分辨率：UHD 极致", steps: ["1. 点击立即尝试按钮。", "2. 观察页面反馈及是否产生修复任务。"], expected: "1. 页面给出金币不足相关反馈。；2. 不产生老照片修复任务。", status: "未执行", actualResult: "", defectId: "", remark: "截图展示需要消耗 40 个金币；待人工确认：金币不足时的具体提示文案、跳转行为及按钮状态。" },
+    { id: "TC-009", module: "老照片修复", featurePoint: "", title: "验证老照片修复-重复点击立即尝试不重复创建任务", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，当前图片已加载，账户具备完成试用所需金币", testData: "图片：当前页面展示的老照片；分辨率：UHD 极致；操作：连续快速点击立即尝试 2 次", steps: ["1. 连续快速点击立即尝试按钮 2 次。", "2. 观察按钮状态和处理状态。", "3. 检查当前图片对应的修复任务创建数量。"], expected: "1. 连续点击操作完成后页面不崩溃。；2. 处理期间按钮状态按照产品定义变化。；3. 同一张图片和同一分辨率组合仅产生一次修复任务。", status: "未执行", actualResult: "", defectId: "", remark: "『同一请求不可重复创建任务』为补充测试点；待人工确认：处理中按钮是否禁用及任务去重判定依据。" },
+    { id: "TC-010", module: "老照片修复", featurePoint: "", title: "验证老照片修复-图片加载失败时页面给出可识别错误反馈", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "进入老照片修复页面时图片资源加载失败", testData: "图片资源：不可访问的老照片资源；失败场景：图片加载失败", steps: ["1. 打开老照片修复页面。", "2. 等待图片资源加载完成或失败。", "3. 观察预览区域、立即尝试按钮及页面错误反馈。"], expected: "1. 图片加载失败后，预览区域不展示错误图片内容。；2. 页面展示可识别的加载失败反馈。；3. 页面不基于未成功加载的图片创建修复任务。", status: "未执行", actualResult: "", defectId: "", remark: "『图片加载失败』属于补充异常测试点；待人工确认：错误文案、重试入口及立即尝试按钮是否禁用。" },
+    { id: "TC-011", module: "老照片修复", featurePoint: "", title: "验证老照片修复-返回按钮退出页面行为符合未完成操作规则", testType: "功能/UI", caseType: "功能测试", priority: "P1", precondition: "已进入老照片修复页面，图片已加载，尚未点击立即尝试", testData: "页面状态：已选择 FHD 超清；未提交修复任务；点击左上角返回按钮", steps: ["1. 选择 FHD 超清分辨率。", "2. 点击左上角返回按钮。", "3. 观察页面返回结果及是否出现确认提示。"], expected: "1. FHD 超清呈选中状态。；2. 点击返回按钮后离开老照片修复页面。；3. 页面是否弹出二次确认以及返回后是否保留分辨率选择，按产品规则执行。", status: "未执行", actualResult: "", defectId: "", remark: "待人工确认：未提交时返回是否二次确认，以及返回后再次进入页面时分辨率选择是否保留。" },
+    { id: "TC-012", module: "老照片修复", featurePoint: "", title: "验证老照片修复-未登录或无权限账户访问功能时给出权限反馈", testType: "功能/UI", caseType: "安全性测试", priority: "P1", precondition: "使用未登录账户或不具备老照片修复权限的账户访问老照片修复页面", testData: "账户状态：未登录账户；权限状态：无老照片修复权限；当前图片：有效老照片", steps: ["1. 使用未登录账户访问老照片修复页面。", "2. 观察页面访问结果和立即尝试按钮状态。", "3. 使用无老照片修复权限账户重复访问页面。", "4. 观察页面权限反馈。"], expected: "1. 系统按照账户权限控制老照片修复功能访问。；2. 未登录账户无法绕过权限直接提交修复请求。；3. 无权限账户访问时展示权限相关反馈。；4. 无权限账户无法创建老照片修复任务。", status: "未执行", actualResult: "", defectId: "", remark: "『未登录及无权限访问控制』为补充测试点；待人工确认：页面是否允许查看、登录入口、权限提示文案及权限判定规则。" },
+    { id: "TC-013", module: "老照片修复", featurePoint: "", title: "验证老照片修复-不同分辨率选项在支持的移动端屏幕展示和操作正常", testType: "功能/UI", caseType: "兼容性测试", priority: "P2", precondition: "已在支持的移动端环境进入老照片修复页面，图片已加载", testData: "兼容环境：iOS 移动端；分辨率选项：HD 高清、FHD 超清、UHD 极致；页面尺寸：截图所示竖屏布局", steps: ["1. 在竖屏状态查看页面顶部返回区域、图片预览区域、分辨率选项和立即尝试按钮。", "2. 依次点击 HD 高清、FHD 超清、UHD 极致。", "3. 检查各选项文字、选中状态和按钮是否被遮挡。"], expected: "1. 页面主要控件在移动端竖屏布局中可见。；2. 三个分辨率选项均可完成点击切换。；3. 分辨率名称、选中状态和立即尝试按钮未发生重叠或裁切。", status: "未执行", actualResult: "", defectId: "", remark: "截图为 iOS 移动端竖屏界面；具体支持的系统版本及机型范围待人工确认。" },
+    { id: "TC-014", module: "老照片修复", featurePoint: "", title: "验证老照片修复-处理期间页面保持可操作状态并展示处理反馈", testType: "功能/UI", caseType: "性能测试", priority: "P1", precondition: "已进入老照片修复页面，图片已加载，账户具备完成试用所需金币", testData: "图片：当前页面展示的老照片；分辨率：UHD 极致；网络：正常但处理耗时超过即时返回时间", steps: ["1. 选择 UHD 极致分辨率。", "2. 点击立即尝试按钮。", "3. 在修复处理期间观察页面提示、按钮状态及分辨率选项状态。", "4. 等待处理流程结束并观察最终页面状态。"], expected: "1. UHD 极致呈选中状态。；2. 点击按钮后页面展示修复处理中的可观察反馈。；3. 处理期间页面不会因重复操作产生额外修复任务。；4. 处理结束后页面展示处理结果或明确失败反馈。", status: "未执行", actualResult: "", defectId: "", remark: "『处理中的中间状态及完成/失败反馈』为补充测试点；待人工确认：处理提示文案、超时阈值、按钮状态及结果承载页面。" },
+  ],
+  coverage: [
+    { feature: "老照片修复页面展示", testType: "功能/UI", count: 1, coverageStatus: "已覆盖", riskLevel: "中" },
+    { feature: "老照片修复分辨率默认状态", testType: "功能/UI", count: 1, coverageStatus: "已覆盖", riskLevel: "中" },
+    { feature: "老照片修复分辨率切换", testType: "功能/UI", count: 2, coverageStatus: "已覆盖", riskLevel: "中" },
+    { feature: "老照片修复任务提交", testType: "功能/UI", count: 3, coverageStatus: "已覆盖", riskLevel: "高" },
+    { feature: "老照片修复金币限制", testType: "异常", count: 1, coverageStatus: "已覆盖", riskLevel: "高" },
+    { feature: "老照片修复重复提交", testType: "异常", count: 1, coverageStatus: "已覆盖", riskLevel: "高" },
+    { feature: "老照片修复图片加载异常", testType: "异常", count: 1, coverageStatus: "已覆盖", riskLevel: "中" },
+    { feature: "老照片修复返回与退出", testType: "可用性", count: 1, coverageStatus: "部分覆盖", riskLevel: "中" },
+    { feature: "老照片修复权限控制", testType: "权限", count: 1, coverageStatus: "部分覆盖", riskLevel: "高" },
+    { feature: "老照片修复移动端适配", testType: "兼容性", count: 1, coverageStatus: "部分覆盖", riskLevel: "中" },
+    { feature: "老照片修复处理过程状态", testType: "性能", count: 1, coverageStatus: "部分覆盖", riskLevel: "高" },
+    { feature: "老照片修复接口请求参数、鉴权、幂等与错误码", testType: "接口", count: 0, coverageStatus: "未覆盖", riskLevel: "高" },
+    { feature: "老照片修复输入安全校验", testType: "安全", count: 1, coverageStatus: "部分覆盖", riskLevel: "高" },
+    { feature: "老照片修复压力、并发及长时间稳定性", testType: "稳定性", count: 0, coverageStatus: "未覆盖", riskLevel: "中" },
+    { feature: "老照片修复边界值规则", testType: "边界", count: 0, coverageStatus: "未覆盖", riskLevel: "中" },
+  ],
+  risksAndAssumptions: [
+    "截图仅描述老照片修复页面视觉信息，未提供完整PRD、接口文档、字段定义和状态流转规则。",
+    "截图中的原始分辨率 1206x2622、UHD 默认选中状态及 40 个金币消耗作为测试数据使用。",
+    "『假设值，需确认』：假设 HD、FHD、UHD 为互斥的单选分辨率选项。",
+    "『假设值，需确认』：假设立即尝试按钮会提交当前图片和当前分辨率配置并创建修复任务。",
+    "『假设值，需确认』：假设金币不足时不允许创建修复任务。",
+    "接口字段、鉴权方式、错误码、限流规则、超时阈值、任务状态、金币扣除时机和结果展示方式未提供。",
+    "未提供支持的操作系统版本、设备型号、浏览器范围和性能指标，兼容性、性能及稳定性覆盖有限。",
+  ],
+  confirmations: [
+    { problem: "提交修复请求成功后的任务状态、结果展示方式及金币扣除时机未定义。", impact: "影响核心提交成功、处理中、完成和失败场景的唯一验收标准。", sourceLocation: "截图中的『立即尝试』按钮及金币消耗区域", confirmSuggestion: "确认提交后是否创建任务、任务状态枚举、结果页面或结果区域、金币扣除时机及失败时是否返还。" },
+    { problem: "金币不足时的提示文案、跳转行为和按钮状态未定义。", impact: "影响权限/资源限制场景的预期结果和可执行性。", sourceLocation: "截图中的『立即尝试 40』金币消耗文案", confirmSuggestion: "确认余额不足时的提示文案、是否跳转充值或购买页面、是否允许继续点击及是否创建任务。" },
+    { problem: "HD、FHD、UHD是否为互斥单选项以及默认选中规则未明确。", impact: "影响分辨率切换、默认状态和提交参数校验。", sourceLocation: "截图中的 HD 高清、FHD 超清、UHD 极致选项", confirmSuggestion: "确认三个选项是否互斥、默认选项是否固定为 UHD，以及选项对应的实际输出规则。" },
+    { problem: "图片加载失败、任务处理失败和任务超时的处理规则未定义。", impact: "影响异常反馈、重试、按钮恢复和任务创建判断。", sourceLocation: "需求仅提供页面截图，未描述异常流程", confirmSuggestion: "确认错误提示、重试入口、按钮状态恢复、任务是否生成及失败任务的资源处理规则。" },
+    { problem: "返回按钮在未提交或处理中状态下的确认及数据保留规则未定义。", impact: "影响页面退出、未保存选择和处理中任务的可用性验证。", sourceLocation: "截图左上角返回按钮", confirmSuggestion: "确认返回是否弹二次确认、分辨率选择是否保留、处理中离开页面后任务是否继续及再次进入后的展示。" },
+    { problem: "登录态、功能权限及金币账户权限规则未定义。", impact: "影响未登录、无权限、金币不足和绕过页面提交场景的权限测试。", sourceLocation: "需求内容未描述账户和权限规则", confirmSuggestion: "确认访问老照片修复页面所需登录态、权限类型、金币校验位置及服务端鉴权规则。" },
+    { problem: "接口名称、请求字段、响应字段、鉴权方式、错误码、幂等键和限流规则未定义。", impact: "无法执行可追溯的接口参数、鉴权、错误处理、幂等和限流测试。", sourceLocation: "需求内容未提供接口文档", confirmSuggestion: "补充接口文档或确认是否存在老照片修复提交接口及其完整协议。" },
+    { problem: "支持的系统版本、设备型号及页面适配范围未定义。", impact: "影响兼容性测试环境选择和验收范围。", sourceLocation: "截图显示为移动端竖屏页面", confirmSuggestion: "确认支持的 iOS/Android 版本、屏幕尺寸、刘海屏和横竖屏范围。" },
+    { problem: "性能指标、并发量、处理时延和稳定性目标未定义。", impact: "无法确定性能、压力、并发和长时间运行测试的通过标准。", sourceLocation: "需求内容未提供非功能指标", confirmSuggestion: "确认页面加载时间、提交响应时间、修复处理时长、并发量、超时阈值及稳定性目标。" },
+  ],
+  evidence: [],
+  modelUsed: "",
+};
+
 export const SAMPLE_GENERATION_RESULT: GenerationResult = {
   "cases": [{"id": "TC-001", "module": "老照片修复", "title": "验证老照片修复页面展示预览图、分辨率选项和立即尝试按钮", "priority": "P1", "precondition": "已登录并进入老照片修复页面，页面资源加载完成", "testData": "页面内容：老照片修复标题；示例预览图；原始分辨率文案“1206x2622”；分辨率选项“高清”“超清”“极致”；按钮文案“立即尝试”；消耗数量“40”及对应图标", "steps": ["1. 查看老照片修复页面整体布局。", "2. 查看预览区域、原始分辨率、分辨率选项及底部操作按钮。"], "expected": "1. 页面显示“老照片修复”标题及返回入口。；2. 页面显示预览图、原始分辨率“1206x2622”、高清/超清/极致三个分辨率选项、立即尝试按钮和40个消耗数量。", "actualResult": "", "remark": "", "caseType": "功能测试", "featurePoint": "", "testType": "", "status": "未执行", "defectId": ""},
 {"id": "TC-002", "module": "老照片修复", "title": "验证老照片修复页面初始分辨率选中状态展示正确", "priority": "P1", "precondition": "已登录并进入老照片修复页面，页面资源加载完成", "testData": "页面加载后的分辨率配置；截图示例中极致选项为选中状态，高清和超清为未选中状态", "steps": ["1. 观察页面加载完成后的高清、超清、极致三个分辨率选项。", "2. 对比三个选项的选中和未选中视觉状态。"], "expected": "1. 三个分辨率选项均可见。；2. 页面按照实际加载配置展示唯一选中项；截图示例中极致选项显示选中状态，高清和超清显示未选中状态。", "actualResult": "", "remark": "待人工确认：页面首次进入时极致是否为固定默认选项，还是根据用户上次选择或服务端配置确定。", "caseType": "功能测试", "featurePoint": "", "testType": "", "status": "未执行", "defectId": ""},
