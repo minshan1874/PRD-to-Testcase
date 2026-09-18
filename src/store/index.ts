@@ -35,8 +35,8 @@ import {
   isDemoModel,
   DEMO_PREREVIEW_FIXED_RESULT,
   DEMO_GENERATION_FIXED_RESULT,
+  DEMO_REVIEW_FIXED_RESULT,
   SAMPLE_BUG_RESULT,
-  SAMPLE_REVIEW_RESULT,
 } from "@/lib/sampleResults";
 
 let activeGenerationController: AbortController | null = null;
@@ -522,12 +522,12 @@ export const useStore = create<AppState>()((set, get) => {
 
     try {
       if (isDemoModel(model)) {
-        // 示例模型评审：不调用真实 API，模拟 5s 请求中 + 5s 校验中后输出固定示例评审结果
+        // 示例模型评审：不调用真实 API，模拟 5s 假 loading（请求中 2.5s + 校验中 2.5s）后固定输出真实评审结果
         set({ reviewPhase: "requesting", reviewError: null });
-        await delay(5000, reviewController);
+        await delay(2500, reviewController);
         set({ reviewPhase: "validating" });
-        await delay(5000, reviewController);
-        set({ reviewPhase: "done", reviewResult: { ...SAMPLE_REVIEW_RESULT, modelUsed: model } });
+        await delay(2500, reviewController);
+        set({ reviewPhase: "done", reviewResult: { ...DEMO_REVIEW_FIXED_RESULT, modelUsed: model } });
         return;
       }
       await run(null);
@@ -736,13 +736,13 @@ export const useStore = create<AppState>()((set, get) => {
     try {
       if (isDemoModel(model)) {
         set({ standalonePhase: "requesting", standaloneError: null });
-        await delay(5000, standaloneController);
+        await delay(2500, standaloneController);
         set({ standalonePhase: "validating" });
-        await delay(5000, standaloneController);
+        await delay(2500, standaloneController);
         set({
           standalonePhase: "done",
           standaloneResult: postProcessReview({
-            ...SAMPLE_REVIEW_RESULT,
+            ...DEMO_REVIEW_FIXED_RESULT,
             modelUsed: model,
           }),
         });
