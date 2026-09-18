@@ -36,7 +36,7 @@ import {
   DEMO_PREREVIEW_FIXED_RESULT,
   DEMO_GENERATION_FIXED_RESULT,
   DEMO_REVIEW_FIXED_RESULT,
-  SAMPLE_BUG_RESULT,
+  DEMO_BUG_FIXED_RESULT,
 } from "@/lib/sampleResults";
 
 let activeGenerationController: AbortController | null = null;
@@ -791,9 +791,11 @@ export const useStore = create<AppState>()((set, get) => {
 
     try {
       if (isDemoModel(config.model)) {
-        // 示例模型：模拟 5 秒后返回示例结果
-        await delay(5000, bugController);
-        set({ bugPhase: "done", bugResult: { ...SAMPLE_BUG_RESULT } });
+        // 示例模型：模拟 5s 假 loading（请求中 2.5s + 校验中 2.5s）后固定输出真实 Bug 分析结果
+        await delay(2500, bugController);
+        set({ bugPhase: "validating", bugError: null });
+        await delay(2500, bugController);
+        set({ bugPhase: "done", bugResult: { ...DEMO_BUG_FIXED_RESULT } });
         return;
       }
       const imageBase64 = bugImage?.dataUrl;

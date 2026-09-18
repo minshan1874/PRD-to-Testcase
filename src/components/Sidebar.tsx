@@ -36,32 +36,27 @@ function SectionLabel({ children }: { children: ReactNode }) {
 function ApiKeySection() {
   const config = useStore((s) => s.config);
   const updateConfig = useStore((s) => s.updateConfig);
-  const isDemo = isDemoModel(config.model);
+  // 示例模型无需 API Key，直接隐藏整块输入提示
+  if (isDemoModel(config.model)) return null;
 
   return (
     <div className="space-y-2.5">
       <SectionLabel>API Key</SectionLabel>
-      {isDemo ? (
-        <p className="text-xs text-muted-foreground">示例模型演示中，无需填写 API Key</p>
-      ) : (
-        <>
-          <div className="relative">
-            <Key className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="password"
-              className="h-8 pl-8 text-xs"
-              placeholder="输入 OpenRouter API Key"
-              value={config.apiKey}
-              onChange={(e) => updateConfig({ apiKey: e.target.value })}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </div>
-          <p className="text-[10px] text-muted-foreground">
-            Key 仅存内存，刷新页面需重新输入
-          </p>
-        </>
-      )}
+      <div className="relative">
+        <Key className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          type="password"
+          className="h-8 pl-8 text-xs"
+          placeholder="输入 OpenRouter API Key"
+          value={config.apiKey}
+          onChange={(e) => updateConfig({ apiKey: e.target.value })}
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Key 仅存内存，刷新页面需重新输入
+      </p>
     </div>
   );
 }

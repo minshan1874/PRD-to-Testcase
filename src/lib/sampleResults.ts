@@ -324,6 +324,38 @@ export const SAMPLE_PREREVIEW_RESULT: PrereviewResult = {
   modelUsed: "",
 };
 
+/** Demo 模型 Bug 分析固定输出：用真实模型对「VikPea 视频生成 402 报错」跑出的真实分析结果 */
+export const DEMO_BUG_FIXED_RESULT: BugAnalyseResult = {
+  problemType: "接口请求异常",
+  belong: "后端服务",
+  reason: "接口返回 HTTP 402 及业务码 110402004，明确提示“Not support resolution and duration”。当前请求使用 pid=8801、api_site=9、resolution=720p、duration=4，可能是该模型或套餐不支持 720p 与 4 秒时长的组合，也可能是后端对 config 字符串内参数、顶层参数及用户权益校验不一致导致请求被拒绝；网关仅透传了后端业务错误，暂未发现网络超时或跨域特征。【AI推测，需要进一步验证】",
+  suggest: [
+    "使用后端接口文档或配置中心核对 pid=8801、api_site=9 支持的 resolution 和 duration 组合，以及当前用户套餐是否具备对应生成权限",
+    "分别将 resolution 和 duration 调整为已确认支持的组合进行对照测试，并记录返回的 HTTP 状态码、业务码和 message",
+    "核对顶层 resolution、duration、aspect_ratio、api_site 与 config JSON 字符串内对应字段是否完全一致，确认后端实际解析字段",
+    "根据 x-request-id=31586961-d444-4932-864b-5eff4a7373ec 查询服务端日志，定位具体是参数校验失败还是权益/计费校验失败",
+  ],
+  focusPoint:
+    "重点查看 POST /ven-app/video-generate 在服务端的参数校验与权益校验日志，关注 pid=8801、api_site=9、resolution=720p、duration=4，以及 config 中的 resolution、duration、aspectRatio 和 originalImageUrl 字段；同时核对业务码 110402004 与 HTTP 402 的映射规则，并使用 x-request-id 进行链路检索",
+  regressionAdvice: {
+    regressionSteps: [
+      "使用当前用户和相同图片重新提交已确认支持的分辨率与时长组合，确认请求可正常创建任务",
+      "分别覆盖 720p 和不同 duration 组合，验证不支持组合能返回明确且稳定的业务错误，不支持参数不会被错误扣费",
+      "验证顶层请求字段与 config 字段不一致、缺失或格式异常时，接口能返回正确参数错误并记录可追踪日志",
+      "验证不同用户套餐、pid 及 api_site 组合下的权限和参数校验结果",
+    ],
+    verifyPoint: [
+      "支持的 resolution 与 duration 组合返回成功业务响应并生成任务，不再返回 110402004",
+      "不支持组合稳定返回预期错误码和提示，且不会创建任务或产生扣费",
+      "服务端日志可通过 x-request-id 关联完整请求，并确认参数校验与权益校验结果一致",
+    ],
+    compatibleScope:
+      "覆盖 iOS 16.7 及以上常用版本、不同用户套餐状态、测试环境与生产配置；同时使用 VikPea 2.2.0 客户端验证网络正常和弱网场景",
+    riskTip:
+      "调整分辨率、时长或权益校验规则可能影响计费、任务创建及不同模型配置，回归时需重点确认不会误扣费或放行不支持参数。AI推测，仅供参考",
+  },
+};
+
 export const SAMPLE_BUG_RESULT: BugAnalyseResult = {
   problemType: "JS异常",
   belong: "前端",
