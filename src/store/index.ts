@@ -33,9 +33,9 @@ import {
   DEMO_MODEL_ID,
   delay,
   isDemoModel,
+  DEMO_PREREVIEW_FIXED_RESULT,
   SAMPLE_BUG_RESULT,
   SAMPLE_GENERATION_RESULT,
-  SAMPLE_PREREVIEW_RESULT,
   SAMPLE_REVIEW_RESULT,
 } from "@/lib/sampleResults";
 
@@ -622,12 +622,12 @@ export const useStore = create<AppState>()((set, get) => {
 
     try {
       if (isDemoModel(model)) {
-        // 示例模型预审：不调用真实 API，模拟 4s 请求中 + 4s 校验中后输出固定示例结果
+        // 示例模型预审：不调用真实 API，模拟 5s 假 loading（请求中 2.5s + 校验中 2.5s）后固定输出真实预审结果
         set({ prereviewPhase: "requesting", prereviewError: null });
-        await delay(4000, prereviewController);
+        await delay(2500, prereviewController);
         set({ prereviewPhase: "validating" });
-        await delay(4000, prereviewController);
-        set({ prereviewPhase: "done", prereviewResult: { ...SAMPLE_PREREVIEW_RESULT, modelUsed: model } });
+        await delay(2500, prereviewController);
+        set({ prereviewPhase: "done", prereviewResult: { ...DEMO_PREREVIEW_FIXED_RESULT, modelUsed: model } });
         return;
       }
       await run(null);
