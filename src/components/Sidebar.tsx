@@ -90,7 +90,9 @@ function ModelConfigSection() {
         showCapabilityBadges
         triggerClassName="w-full"
       />
-      {store.modelsError && <p className="text-[10px] text-destructive">{store.modelsError}</p>}
+      {!isDemoModel(config.model) && store.modelsError && (
+        <p className="text-[10px] text-destructive">{store.modelsError}</p>
+      )}
       {!store.models.some((m) => m.id === config.model) && (
         <Input
           className="h-8 text-xs"
