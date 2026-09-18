@@ -6,7 +6,15 @@
 
 ## 🚀 项目简介
 
-> 🌐 **在线体验**：https://test-ai-studio.yangf999212.workers.dev/（需科学上网访问）
+> 🌐 
+>
+> **在线体验**
+>
+> ：
+>
+> [https://test-ai-studio.yangf999212.workers.dev/](https://test-ai-studio.yangf999212.workers.dev/)
+>
+> （需科学上网访问）
 
 测试工作流里有大量重复、机械的环节，而真正有价值的判断（需求是否清晰、用例是否覆盖关键路径、Bug 到底出在哪一层）却往往被淹没在体力活里。本项目把 LLM 引入测试全链路，用 AI 完成**第一遍粗活**，再由测试工程师做**关键裁决**：
 
@@ -54,39 +62,11 @@ npm install
 npm run dev
 ```
 
-> ⚠️ 
->
-> **Windows 用户注意**
->
-> ：
->
-> `npm run dev`
->
->  中的 
->
-> `PORT=4179`
->
->  为 Unix 语法，在 PowerShell 下会报错。请分两个终端分别启动：
-
-
-
-```
-\# 终端 1：前端
-
-npx vite
-
-\# 终端 2：API
-
-\$env:PORT = "4179"
-
-npx tsx watch server/index.ts
-```
-
 ### 首次使用
 
 在左侧侧边栏输入 **OpenRouter API Key** 即可开始使用，Key 仅存浏览器内存，刷新即清空。
 
-> 🧪 没有 API Key 想先体验？选择 SampleFlow Demo 模型，无需真实调用。
+> 🧪 没有 API Key 想先体验？选择 SampleFlow Demo 模型，无需真实调用，输入任意内容，返回固定结果。
 
 
 
