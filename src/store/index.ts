@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "sonner";
 import type {
   ActiveFeature,
   BugAnalyseResult,
@@ -43,6 +44,16 @@ let activeReviewController: AbortController | null = null;
 let activePrereviewController: AbortController | null = null;
 let activeStandaloneController: AbortController | null = null;
 let activeBugController: AbortController | null = null;
+
+/** 校验是否有有效 API Key；示例模型无需真实 Key。非法时返回 false 并 toast 提示 */
+function requireValidApiKey(apiKey: string, model: string): boolean {
+  if (isDemoModel(model)) return true;
+  if (!apiKey || !apiKey.trim()) {
+    toast.error("请现在侧边栏输入 API Key");
+    return false;
+  }
+  return true;
+}
 
 const DEFAULT_FIELDS: FieldConfig[] = BUILTIN_FIELDS.map((f) => ({
   key: f.key,
@@ -326,6 +337,7 @@ export const useStore = create<AppState>()((set, get) => {
       set({ phase: "error", lastError: "请先在配置页选择或输入模型 ID" });
       return;
     }
+    if (!requireValidApiKey(config.apiKey, config.model)) return;
     activeGenerationController?.abort();
     const generationController = new AbortController();
     activeGenerationController = generationController;
@@ -446,6 +458,7 @@ export const useStore = create<AppState>()((set, get) => {
       set({ reviewPhase: "error", reviewError: "请先在侧边栏选择模型" });
       return;
     }
+    if (!requireValidApiKey(config.apiKey, config.model)) return;
     activeReviewController?.abort();
     const reviewController = new AbortController();
     activeReviewController = reviewController;
@@ -556,6 +569,7 @@ export const useStore = create<AppState>()((set, get) => {
       return;
     }
     activePrereviewController?.abort();
+    if (!requireValidApiKey(config.apiKey, config.model)) return;
     const prereviewController = new AbortController();
     activePrereviewController = prereviewController;
     let attempts = 0;
@@ -655,6 +669,7 @@ export const useStore = create<AppState>()((set, get) => {
       set({ standalonePhase: "error", standaloneError: "请先在侧边栏选择模型" });
       return;
     }
+    if (!requireValidApiKey(config.apiKey, config.model)) return;
     activeStandaloneController?.abort();
     const standaloneController = new AbortController();
     activeStandaloneController = standaloneController;
@@ -768,6 +783,7 @@ export const useStore = create<AppState>()((set, get) => {
       set({ bugPhase: "error", bugError: "请输入报错信息或上传截图" });
       return;
     }
+    if (!requireValidApiKey(config.apiKey, config.model)) return;
     activeBugController?.abort();
     const bugController = new AbortController();
     activeBugController = bugController;
