@@ -21,7 +21,6 @@ import { cn, scrollElementToStart } from "@/lib/utils";
 import * as UTIF from "utif";
 
 const MAX_CHARS = 8000;
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/tiff", "image/tif"];
 const TIFF_EXT = ["tiff", "tif"];
 
@@ -83,10 +82,6 @@ export default function BugAnalyse() {
       const isTiff = TIFF_EXT.includes(ext);
       if (!ALLOWED_IMAGE_TYPES.includes(file.type) && !isTiff) {
         toast.error("仅支持 PNG / JPG / TIFF 格式的图片");
-        return;
-      }
-      if (file.size > MAX_IMAGE_SIZE) {
-        toast.error("图片大小不能超过 5MB");
         return;
       }
       if (isTiff) {
@@ -250,7 +245,7 @@ export default function BugAnalyse() {
                 <UploadCloud className="size-5" />
               </div>
               <p className="text-sm font-medium">点击上传或拖拽截图到此处</p>
-              <p className="text-xs text-muted-foreground">支持 PNG / JPG / TIFF，单张 ≤ 5MB；也可在输入框中 Ctrl+V 粘贴</p>
+              <p className="text-xs text-muted-foreground">支持 PNG / JPG / TIFF，也可在输入框中 Ctrl+V 粘贴</p>
               <input
                 ref={fileInputRef}
                 type="file"

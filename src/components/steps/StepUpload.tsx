@@ -73,7 +73,7 @@ export default function StepUpload() {
             <span className="font-display text-base font-semibold tracking-tight">上传 PRD 文档</span>
           </CardTitle>
           <CardDescription>
-            单文件 ≤ {formatBytes(LIMITS.maxFileBytes, 0)}；扫描 PDF 最多转 {LIMITS.maxScanPages} 页图片。
+            扫描 PDF 最多转 {LIMITS.maxScanPages} 页图片。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

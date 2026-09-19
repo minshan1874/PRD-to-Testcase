@@ -1,5 +1,4 @@
 import type { SourceItem } from "@/types";
-import { LIMITS } from "@/lib/limits";
 import { parsePdfFile } from "@/lib/pdf";
 import { parseDocxFile } from "@/lib/docx";
 import { readImageDataUrl, readTextFile } from "@/lib/text";
@@ -31,10 +30,6 @@ export async function ingestFile(file: File): Promise<ParseMessage> {
     mime: file.type,
     forceAsImage: false,
   };
-
-  if (file.size > LIMITS.maxFileBytes) {
-    return fail(base, `文件超过大小限制（${Math.round(LIMITS.maxFileBytes / 1024 / 1024)}MB）`);
-  }
 
   try {
     if (PDF_EXT.has(ext) || file.type === "application/pdf") {
@@ -89,9 +84,6 @@ async function textToItem(base: SourceItem, file: File): Promise<ParseMessage> {
 }
 
 async function imageToItem(base: SourceItem, file: File): Promise<ParseMessage> {
-  if (file.size > LIMITS.maxImageBytes) {
-    return fail(base, `图片超过单张限制（${Math.round(LIMITS.maxImageBytes / 1024 / 1024)}MB）`);
-  }
   const ext = extOf(file.name);
   // TIFF 浏览器不原生支持，需解码后转 PNG
   if (TIFF_EXT.has(ext)) {
