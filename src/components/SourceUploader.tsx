@@ -89,12 +89,11 @@ export default function SourceUploader({ pool }: { pool: "prereview" | "review" 
           <UploadCloud className="size-5" />
         </div>
         <p className="text-sm font-medium">点击选择或拖拽文件到此处</p>
-        <p className="text-xs text-muted-foreground">支持 PDF / DOCX / MD / TXT / PNG / JPG / WEBP，可多选</p>
+        <p className="text-xs text-muted-foreground">支持 PDF / DOCX / MD / TXT / PNG / JPG / WEBP / TIFF，可多选</p>
         <input
           ref={inputRef}
           type="file"
           multiple
-          accept=".pdf,.docx,.md,.markdown,.txt,.png,.jpg,.jpeg,.webp,.tiff,.tif"
           className="hidden"
           onChange={(e) => {
             onFiles(e.target.files);

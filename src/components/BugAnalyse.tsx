@@ -250,11 +250,10 @@ export default function BugAnalyse() {
                 <UploadCloud className="size-5" />
               </div>
               <p className="text-sm font-medium">点击上传或拖拽截图到此处</p>
-              <p className="text-xs text-muted-foreground">支持 PNG / JPG，单张 ≤ 5MB；也可在输入框中 Ctrl+V 粘贴</p>
+              <p className="text-xs text-muted-foreground">支持 PNG / JPG / TIFF，单张 ≤ 5MB；也可在输入框中 Ctrl+V 粘贴</p>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/jpg,image/tiff,.tiff,.tif"
                 className="hidden"
                 onChange={(e) => {
                   handleFile(e.target.files?.[0]);
