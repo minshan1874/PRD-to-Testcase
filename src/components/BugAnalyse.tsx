@@ -254,7 +254,7 @@ export default function BugAnalyse() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/jpg,image/tiff"
+                accept="image/png,image/jpeg,image/jpg,image/tiff,.tiff,.tif"
                 className="hidden"
                 onChange={(e) => {
                   handleFile(e.target.files?.[0]);
