@@ -18,10 +18,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, scrollElementToStart } from "@/lib/utils";
+import * as UTIF from "utif";
 
 const MAX_CHARS = 8000;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg"];
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/tiff", "image/tif"];
+const TIFF_EXT = ["tiff", "tif"];
 
 const PROBLEM_TYPE_META: Record<string, { color: string }> = {
   "JS异常": { color: "bg-red-500/10 text-red-700 border-red-200" },
@@ -77,12 +79,37 @@ export default function BugAnalyse() {
   const handleFile = useCallback(
     (file: File | undefined) => {
       if (!file) return;
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        toast.error("仅支持 PNG / JPG 格式的图片");
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+      const isTiff = TIFF_EXT.includes(ext);
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type) && !isTiff) {
+        toast.error("仅支持 PNG / JPG / TIFF 格式的图片");
         return;
       }
       if (file.size > MAX_IMAGE_SIZE) {
         toast.error("图片大小不能超过 5MB");
+        return;
+      }
+      if (isTiff) {
+        // TIFF 浏览器不原生支持，需解码后转 PNG
+        file
+          .arrayBuffer()
+          .then((buffer) => {
+            const ifds = UTIF.decode(buffer);
+            if (!ifds || ifds.length === 0) throw new Error("TIFF 解码失败");
+            const ifd = ifds[0];
+            UTIF.decodeImage(buffer, ifd);
+            const rgba = UTIF.toRGBA8(ifd);
+            const canvas = document.createElement("canvas");
+            canvas.width = ifd.width;
+            canvas.height = ifd.height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) throw new Error("画布创建失败");
+            const imgData = new ImageData(new Uint8ClampedArray(rgba), ifd.width, ifd.height);
+            ctx.putImageData(imgData, 0, 0);
+            const dataUrl = canvas.toDataURL("image/png");
+            setBugImage({ dataUrl, fileName: file.name });
+          })
+          .catch(() => toast.error("TIFF 图片读取失败"));
         return;
       }
       const reader = new FileReader();
@@ -227,7 +254,7 @@ export default function BugAnalyse() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/jpg"
+                accept="image/png,image/jpeg,image/jpg,image/tiff"
                 className="hidden"
                 onChange={(e) => {
                   handleFile(e.target.files?.[0]);

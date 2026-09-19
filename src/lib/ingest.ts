@@ -3,12 +3,14 @@ import { LIMITS } from "@/lib/limits";
 import { parsePdfFile } from "@/lib/pdf";
 import { parseDocxFile } from "@/lib/docx";
 import { readImageDataUrl, readTextFile } from "@/lib/text";
+import * as UTIF from "utif";
 
 const TEXT_EXT = new Set(["md", "markdown", "txt", "text"]);
 const DOCX_EXT = new Set(["docx"]);
 const PDF_EXT = new Set(["pdf"]);
-const IMG_EXT = new Set(["png", "jpg", "jpeg", "webp"]);
-const IMG_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/jpg"]);
+const IMG_EXT = new Set(["png", "jpg", "jpeg", "webp", "tiff", "tif"]);
+const IMG_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/jpg", "image/tiff", "image/tif"]);
+const TIFF_EXT = new Set(["tiff", "tif"]);
 
 function extOf(name: string): string {
   return (name.split(".").pop() ?? "").toLowerCase();
@@ -90,8 +92,32 @@ async function imageToItem(base: SourceItem, file: File): Promise<ParseMessage> 
   if (file.size > LIMITS.maxImageBytes) {
     return fail(base, `图片超过单张限制（${Math.round(LIMITS.maxImageBytes / 1024 / 1024)}MB）`);
   }
+  const ext = extOf(file.name);
+  // TIFF 浏览器不原生支持，需解码后转 PNG
+  if (TIFF_EXT.has(ext)) {
+    const dataUrl = await tiffToPngDataUrl(file);
+    return { ok: true, item: { ...base, kind: "image", image: dataUrl, status: "success" } };
+  }
   const dataUrl = await readImageDataUrl(file);
   return { ok: true, item: { ...base, kind: "image", image: dataUrl, status: "success" } };
+}
+
+/** 将 TIFF 文件解码并转为 PNG dataURL */
+async function tiffToPngDataUrl(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const ifds = UTIF.decode(buffer);
+  if (!ifds || ifds.length === 0) throw new Error("TIFF 解码失败：未找到图像数据");
+  const ifd = ifds[0];
+  UTIF.decodeImage(buffer, ifd);
+  const rgba = UTIF.toRGBA8(ifd);
+  const canvas = document.createElement("canvas");
+  canvas.width = ifd.width;
+  canvas.height = ifd.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("TIFF 转 PNG 失败：无法创建画布");
+  const imgData = new ImageData(new Uint8ClampedArray(rgba), ifd.width, ifd.height);
+  ctx.putImageData(imgData, 0, 0);
+  return canvas.toDataURL("image/png");
 }
 
 export function fail(base: SourceItem, reason: string): ParseMessage {

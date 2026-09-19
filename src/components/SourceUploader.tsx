@@ -94,7 +94,7 @@ export default function SourceUploader({ pool }: { pool: "prereview" | "review" 
           ref={inputRef}
           type="file"
           multiple
-          accept=".pdf,.docx,.md,.markdown,.txt,.png,.jpg,.jpeg,.webp"
+          accept=".pdf,.docx,.md,.markdown,.txt,.png,.jpg,.jpeg,.webp,.tiff,.tif"
           className="hidden"
           onChange={(e) => {
             onFiles(e.target.files);
